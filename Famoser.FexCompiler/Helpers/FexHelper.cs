@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Famoser.FexCompiler.Enum;
 using Famoser.FexCompiler.Models;
 using Famoser.FexCompiler.Models.TextRepresentation;
@@ -16,105 +17,129 @@ namespace Famoser.FexCompiler.Helpers
                 Title = title
             };
 
-            int level = -2;
-            Dictionary<int, List<LineNode>> enumerationNodes = new Dictionary<int, List<LineNode>>();
+            var normalized = NormalizeLines(lines);
             Section section = new Section(null);
-            var root = section;
-            lines.Add("");
-            for (var index = 0; index < lines.Count - 1; index++)
-            {
-                var fexLine = GetFexLine(lines[index]);
-                var fexLine2 = GetFexLine(lines[index + 1]);
-
-                //if the line is null don't change anything
-                if (fexLine == null)
-                    continue;
-
-                //check the next line for irregularities 
-                if (fexLine2 != null)
-                {
-                    if (fexLine2.Text.Length >= 3 && fexLine2.Text.Substring(0, 3) == "===")
-                    {
-                        //header
-                        fexLine.Level = -1;
-                        index++;
-                    }
-
-                    if (fexLine2.Text.Trim('=', ' ').Length == 0)
-                    {
-
-                    }
-                }
-
-
-
-
-                while (level > fexLine.Level)
-                {
-                    //go out
-                    if (enumerationNodes.ContainsKey(level) && enumerationNodes[level].Count > 0)
-                        section.Paragraphs.Add(new Paragraph(enumerationNodes[level]) { IsEnumeration = true });
-
-                    enumerationNodes[level] = new List<LineNode>();
-                    section = section.Parent;
-                    level--;
-                }
-
-                if (level < fexLine.Level)
-                {
-                    //go in
-                    var newSection = new Section(section);
-                    section.Sections.Add(newSection);
-                    section = newSection;
-
-                    section.Title = ParseText(fexLine.Text);
-                    level++;
-                    continue;
-                }
-
-                if (level == fexLine.Level)
-                {
-                    if (fexLine.IsEnumeration)
-                    {
-                        enumerationNodes[level].Add(GetTextNodeSimple(fexLine.Text));
-                    }
-                    else
-                    {
-                        section.Paragraphs.Add(new Paragraph(GetTextNodeSimple(fexLine.Text)));
-                    }
-                }
-            }
-            document.Sections.AddRange(root.Sections);
+            FillSection(normalized, section, 0, 0);
+            document.Sections = section.Sections;
 
             return document;
         }
 
-        private static FexLine GetFexLine(string line)
+        private static int FillSection(List<FexLine> lines, Section section, int startIndex, int startLevel)
         {
-            if (string.IsNullOrWhiteSpace(line))
-                return null;
-            var fexLine = new FexLine();
+            int i = startIndex + 1;
+            int endIndex = 0;
 
-            //get level
-            while (line.StartsWith("\t"))
+            //check for bigger level (then we need to start new section)
+            bool startSection = false;
+            endIndex = lines.Count - 1;
+            for (; i < lines.Count; i++)
             {
-                line = line.Substring(1);
-                fexLine.Level++;
+                if (lines[i].Level > startLevel)
+                {
+                    startSection = true;
+                }
+                if (lines[i].Level < startLevel)
+                {
+                    endIndex = i;
+                    break;
+                }
             }
-            line = line.TrimStart();
 
-            //get enumeration
-            if (line.StartsWith("-"))
+            if (!startSection)
             {
-                fexLine.IsEnumeration = true;
-                line = line.Substring(1).TrimStart();
+                //fill paragraphs
+                for (i = startIndex; i < endIndex + 1; i++)
+                {
+                    section.Paragraphs.Add(new Paragraph(GetLineNodeSimple(lines[i].Text)));
+                }
             }
+            else
+            {
+                //create new sections
+                for (i = startIndex; i < endIndex + 1; i++)
+                {
+                    var newSection = new Section(section) { Title = GetLineNodeSimple(lines[i].Text) };
+                    section.Sections.Add(newSection);
+                    i = FillSection(lines, newSection, i + 1, startLevel + 1);
+                }
 
-            fexLine.Text = line.Trim();
-            return fexLine;
+            }
+            return endIndex;
         }
 
-        private static LineNode GetTextNodeSimple(string line)
+        private static List<FexLine> NormalizeLines(List<string> fileInput)
+        {
+            var res = new List<FexLine>();
+            fileInput.Add("");
+            for (var index = 0; index < fileInput.Count - 1; index++)
+            {
+                var line = fileInput[index];
+                var line2 = fileInput[index + 1];
+                if (string.IsNullOrWhiteSpace(line))
+                {
+                    continue;
+                }
+
+                var fexLine = new FexLine { Level = 2 };
+
+                //get level
+                while (line.StartsWith("\t"))
+                {
+                    line = line.Substring(1);
+                    fexLine.Level++;
+                }
+
+                //if next line is only === and at least 3 then set level to -1
+                if (line2.StartsWith("==="))
+                {
+                    fexLine.Level = 0;
+                    //skip === line
+                    index++;
+                }
+                if (line2.StartsWith("---"))
+                {
+                    fexLine.Level = 1;
+                    //skip === line
+                    index++;
+                }
+                fexLine.Text = line.Trim();
+                res.Add(fexLine);
+            }
+
+            //normalize indexes
+            //1: make all indexes come immediately after each other
+            var shift = 0;
+            var zeroStreak = 0;
+            for (int i = 0; i < 200; i++)
+            {
+                var i2 = i;
+                var iEnum = res.Where(s => s.Level == i2).ToList();
+                if (shift != 0)
+                {
+                    foreach (var entry in iEnum)
+                    {
+                        entry.Level = entry.Level - shift;
+                    }
+                }
+                if (iEnum.Count == 0)
+                {
+                    shift++;
+                    if (zeroStreak++ == 5)
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    zeroStreak = 0;
+                }
+            }
+
+            return res;
+        }
+
+        private static LineNode GetLineNodeSimple(string line)
         {
             var res = new List<TextNode>();
             if (line.Contains(":"))

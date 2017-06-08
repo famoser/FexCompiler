@@ -78,7 +78,7 @@ namespace Famoser.FexCompiler
                 var document = FexHelper.ParseDocument(lines.ToList(), title, config);
                 var content = LatexHelper.CreateLatex(document);
 
-                var texFile = path.Substring(path.LastIndexOf(".", StringComparison.Ordinal)) + "tex";
+                var texFile = path.Substring(0, path.LastIndexOf(".", StringComparison.Ordinal)) + ".tex";
                 File.WriteAllText(texFile, content);
                 var texPaths = texFile.Split(new[] { "\\" }, StringSplitOptions.None);
 

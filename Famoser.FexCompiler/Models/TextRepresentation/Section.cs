@@ -9,7 +9,7 @@ namespace Famoser.FexCompiler.Models.TextRepresentation
             Parent = parent;
         }
 
-        public string Title { get; set; }
+        public LineNode Title { get; set; }
         public List<Paragraph> Paragraphs { get; } = new List<Paragraph>();
         public List<Section> Sections { get; } = new List<Section>();
         public Section Parent { get; set; }

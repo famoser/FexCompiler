@@ -29,12 +29,12 @@ namespace Famoser.FexCompiler.Helpers
             var sectionName = "section";
             if (level == 1)
                 sectionName = "sub" + sectionName;
-            else
+            else if (level > 1)
                 sectionName = "subsub" + sectionName;
             var content = "";
             foreach (var documentSection in sections)
             {
-                content += "\\" + sectionName + "{" + documentSection.Title + "}\n";
+                content += "\\" + sectionName + "{" + ToLatex(documentSection.Title, false) + "}\n";
                 content += ToLatex(documentSection.Paragraphs);
                 content += ToLatex(documentSection.Sections, level + 1);
             }
@@ -63,7 +63,7 @@ namespace Famoser.FexCompiler.Helpers
             else
             {
                 content = ToLatex(paragraph.LineNodes, "");
-                content += "\\\\* "; //\\* 
+                content += "\n"; //\\* 
             }
             return content;
         }
@@ -73,15 +73,16 @@ namespace Famoser.FexCompiler.Helpers
             var content = "";
             foreach (var textNode in lines)
             {
-                content += prefix + ToLatex(textNode) + "\n";
+                content += prefix + ToLatex(textNode, true) + "\n";
             }
             return content;
         }
 
-        private static string ToLatex(LineNode line)
+        private static string ToLatex(LineNode line, bool allowNewline)
         {
             var content = ToLatex(line.TextNodes);
-            content += "\\\\* "; //\\* 
+            if (allowNewline)
+                content += "\n";
             return content;
         }
 
@@ -96,7 +97,7 @@ namespace Famoser.FexCompiler.Helpers
             {
                 content += "\\textbf{" + EscapeText(textNode.Text) + "}";
             }
-            content += " \n";
+            content += " ";
             return content;
         }
 
@@ -118,7 +119,7 @@ namespace Famoser.FexCompiler.Helpers
             text = text.Replace("\\ ", "\\textbackslash ");
             text = text.Replace("~", "\\textasciitilde");
             text = text.Replace("^", "\\textasciicircum");
-            var escapes = new[] {"&", "%", "$", "#", "_", "{", "}" };
+            var escapes = new[] { "&", "%", "$", "#", "_", "{", "}" };
             foreach (var escape in escapes)
             {
                 text = text.Replace(escape, "\\" + escape);
