@@ -116,9 +116,25 @@ namespace Famoser.FexCompiler.Helpers
             /*
              * & %  # _ { } ~ ^ \
              * */
-            text = text.Replace("\\ ", "\\textbackslash ");
-            text = text.Replace("~", "\\textasciitilde");
-            text = text.Replace("^", "\\textasciicircum");
+            var replaces = new Dictionary<string, string>()
+            {
+                {"\\", "\\textbackslash "},
+                {"~", "\\textasciitilde "},
+                {"^", "\\textasciicircum "},
+                {">", "\\textgreater "},
+                {"<", "\\textless "},
+                {"*", "\\textasteriskcentered "},
+                {"|", "\\textbar "},
+                {"{", "\\textbraceleft "},
+                {"}", "\\textbraceright "},
+                {"$", "\\textdollar "},
+                {"—", "\\textemdash "}
+            };
+           
+            foreach (var replace in replaces)
+            {
+                text = text.Replace(replace.Key, replace.Value);
+            }
             var escapes = new[] { "&", "%", "$", "#", "_", "{", "}" };
             foreach (var escape in escapes)
             {

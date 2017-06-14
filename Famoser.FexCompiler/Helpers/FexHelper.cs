@@ -27,7 +27,7 @@ namespace Famoser.FexCompiler.Helpers
 
         private static int FillSection(List<FexLine> lines, Section section, int startIndex, int startLevel)
         {
-            int i = startIndex + 1;
+            int i = startIndex;
             int endIndex = 0;
 
             //check for bigger level (then we need to start new section)
@@ -49,7 +49,7 @@ namespace Famoser.FexCompiler.Helpers
             if (!startSection)
             {
                 //fill paragraphs
-                for (i = startIndex; i < endIndex + 1; i++)
+                for (i = startIndex; i < endIndex; i++)
                 {
                     section.Paragraphs.Add(new Paragraph(GetLineNodeSimple(lines[i].Text)));
                 }
@@ -57,7 +57,7 @@ namespace Famoser.FexCompiler.Helpers
             else
             {
                 //create new sections
-                for (i = startIndex; i < endIndex + 1; i++)
+                for (i = startIndex; i < endIndex; )
                 {
                     var newSection = new Section(section) { Title = GetLineNodeSimple(lines[i].Text) };
                     section.Sections.Add(newSection);

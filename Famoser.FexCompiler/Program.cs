@@ -73,7 +73,7 @@ namespace Famoser.FexCompiler
             {
                 var lines = File.ReadAllLines(path);
                 var pathEntries = path.Split(new[] { "\\" }, StringSplitOptions.None);
-                var title = pathEntries[pathEntries.Length - 2];
+                var title = pathEntries[pathEntries.Length - 1];
 
                 var document = FexHelper.ParseDocument(lines.ToList(), title, config);
                 var content = LatexHelper.CreateLatex(document);
@@ -87,7 +87,7 @@ namespace Famoser.FexCompiler
                     StartInfo =
                     {
                         FileName = "pdflatex",
-                        Arguments = texPaths[texPaths.Length - 1],
+                        Arguments = "\"" + texPaths[texPaths.Length - 1] + "\"",
                         WindowStyle = ProcessWindowStyle.Hidden,
                         RedirectStandardOutput = true,
                         UseShellExecute = false
@@ -96,7 +96,7 @@ namespace Famoser.FexCompiler
                 try
                 {
                     p1.Start();
-
+                    Console.WriteLine("compiled latex for " + texPaths[texPaths.Length - 1]);
                 }
                 catch (Exception e)
                 {
