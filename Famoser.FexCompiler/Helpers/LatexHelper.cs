@@ -123,6 +123,11 @@ namespace Famoser.FexCompiler.Helpers
             var replaces = new Dictionary<string, string>()
             {
                 {"\\", "\\textbackslash "},
+                {"→", "->" },
+                {"∙", "*" },
+                {"α", "\\textalpha " },
+                {"β", "\\textbeta " },
+                {"σ", "\\textsigma " },
                 {"~", "\\textasciitilde "},
                 {"^", "\\textasciicircum "},
                 {">", "\\textgreater "},
@@ -132,7 +137,13 @@ namespace Famoser.FexCompiler.Helpers
                 {"{", "\\textbraceleft "},
                 {"}", "\\textbraceright "},
                 {"$", "\\textdollar "},
-                {"—", "\\textemdash "}
+                {"—", "\\textemdash "},
+                {"“", "\\textquotedblleft "},
+                {"”", "\\textquotedblright "},
+                {"„",  "\\textquotedblright "},
+                {",",  "\\textquotedblright "},
+                {"‘",  "\\textquotedblleft "},
+                {"‚",  "\\textquotedblright "}
             };
            
             foreach (var replace in replaces)
