@@ -46,6 +46,10 @@ namespace Famoser.FexCompiler.Helpers
             var content = "";
             foreach (var textNode in paragraphs)
             {
+                if (textNode.ExtraIndentation)
+                {
+                    content += "\\hspace{0.5cm} ";
+                }
                 content += ToLatex(textNode);
             }
             return content;

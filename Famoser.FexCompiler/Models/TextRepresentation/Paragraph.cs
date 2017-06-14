@@ -15,6 +15,7 @@ namespace Famoser.FexCompiler.Models.TextRepresentation
         }
 
         public bool IsEnumeration { get; set; } = false;
+        public bool ExtraIndentation { get; set; } = false;
         public List<LineNode> LineNodes { get; }
     }
 }

@@ -32,12 +32,15 @@ namespace Famoser.FexCompiler.Helpers
 
             //check for bigger level (then we need to start new section)
             bool startSection = false;
+            int maxLevel = startLevel;
             endIndex = lines.Count - 1;
             for (; i < lines.Count; i++)
             {
                 if (lines[i].Level > startLevel)
                 {
                     startSection = true;
+                    if (lines[i].Level > maxLevel)
+                        maxLevel = lines[i].Level;
                 }
                 if (lines[i].Level < startLevel)
                 {
@@ -52,6 +55,18 @@ namespace Famoser.FexCompiler.Helpers
                 for (i = startIndex; i < endIndex; i++)
                 {
                     section.Paragraphs.Add(new Paragraph(GetLineNodeSimple(lines[i].Text)));
+                }
+            }
+            else if (maxLevel - startLevel == 1 && startLevel > 2)
+            {
+                //save indentation here
+                for (i = startIndex; i < endIndex; i++)
+                {
+                    var p = new Paragraph(GetLineNodeSimple(lines[i].Text))
+                    {
+                        ExtraIndentation = lines[i].Level == maxLevel
+                    };
+                    section.Paragraphs.Add(p);
                 }
             }
             else
@@ -111,6 +126,7 @@ namespace Famoser.FexCompiler.Helpers
             //1: make all indexes come immediately after each other
             var shift = 0;
             var zeroStreak = 0;
+            //maximum level 200
             for (int i = 0; i < 200; i++)
             {
                 var i2 = i;
