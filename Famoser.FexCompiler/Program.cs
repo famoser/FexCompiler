@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Famoser.FexCompiler.Helpers;
 using Famoser.FexCompiler.Models;
 using Newtonsoft.Json;
@@ -95,7 +96,9 @@ namespace Famoser.FexCompiler
                 };
                 try
                 {
+                    Console.WriteLine("starting to compile for " + texPaths[texPaths.Length - 1]);
                     p1.Start();
+                    Thread.Sleep(TimeSpan.FromSeconds(2));
                     Console.WriteLine("compiled latex for " + texPaths[texPaths.Length - 1]);
                 }
                 catch (Exception e)
