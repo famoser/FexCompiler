@@ -140,10 +140,9 @@ namespace Famoser.FexCompiler.Helpers
                 {"—", "\\textemdash "},
                 {"“", "\\textquotedblleft "},
                 {"”", "\\textquotedblright "},
-                {"„",  "\\textquotedblright "},
-                {",",  "\\textquotedblright "},
-                {"‘",  "\\textquotedblleft "},
-                {"‚",  "\\textquotedblright "}
+                {"„",  "\\textquotedblleft "},
+                {"‘",  "'"},
+                {"‚",  ","} //<- this is not a comma: , (other UTF-8 code)
             };
            
             foreach (var replace in replaces)

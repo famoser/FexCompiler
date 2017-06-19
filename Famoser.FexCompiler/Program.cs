@@ -76,7 +76,7 @@ namespace Famoser.FexCompiler
                 var pathEntries = path.Split(new[] { "\\" }, StringSplitOptions.None);
                 var title = pathEntries[pathEntries.Length - 1];
 
-                var document = FexHelper.ParseDocument(lines.ToList(), title, config);
+                var document = FexHelper.ParseDocument(lines.ToList(), title.Substring(0, title.Length - 4), config);
                 var content = LatexHelper.CreateLatex(document);
 
                 var texFile = path.Substring(0, path.LastIndexOf(".", StringComparison.Ordinal)) + ".tex";
@@ -88,18 +88,23 @@ namespace Famoser.FexCompiler
                     StartInfo =
                     {
                         FileName = "pdflatex",
-                        Arguments = "\"" + texPaths[texPaths.Length - 1] + "\"",
-                        WindowStyle = ProcessWindowStyle.Hidden,
-                        RedirectStandardOutput = true,
-                        UseShellExecute = false
-                    }
+                        Arguments = "\"" + texFile + "\"",
+                        WindowStyle = ProcessWindowStyle.Normal,
+                        RedirectStandardOutput = false,
+                        UseShellExecute = true
+                    },
+                    EnableRaisingEvents = true
                 };
                 try
                 {
                     Console.WriteLine("starting to compile for " + texPaths[texPaths.Length - 1]);
                     p1.Start();
-                    Thread.Sleep(TimeSpan.FromSeconds(2));
+                    p1.ErrorDataReceived += (sender, args) =>
+                    {
+                        Console.WriteLine("failure compiling " + texPaths[texPaths.Length - 1]);
+                    };
                     Console.WriteLine("compiled latex for " + texPaths[texPaths.Length - 1]);
+                    break;
                 }
                 catch (Exception e)
                 {

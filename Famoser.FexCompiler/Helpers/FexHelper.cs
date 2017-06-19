@@ -57,7 +57,7 @@ namespace Famoser.FexCompiler.Helpers
                     section.Paragraphs.Add(new Paragraph(GetLineNodeSimple(lines[i].Text)));
                 }
             }
-            else if (maxLevel - startLevel == 1 && startLevel > 2)
+            else if (maxLevel - startLevel == 1 && startLevel > 1)
             {
                 //save indentation here
                 for (i = startIndex; i < endIndex; i++)
@@ -72,7 +72,7 @@ namespace Famoser.FexCompiler.Helpers
             else
             {
                 //create new sections
-                for (i = startIndex; i < endIndex; )
+                for (i = startIndex; i < endIndex;)
                 {
                     var newSection = new Section(section) { Title = GetLineNodeSimple(lines[i].Text) };
                     section.Sections.Add(newSection);
@@ -173,8 +173,7 @@ namespace Famoser.FexCompiler.Helpers
 
         private static string ParseText(string str)
         {
-            var res = str.Trim();
-            return res.Trim(':');
+            return str.Trim();
         }
     }
 }
