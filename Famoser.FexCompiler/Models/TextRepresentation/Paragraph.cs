@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using Famoser.FexCompiler.Models.TextRepresentation.Base;
 
 namespace Famoser.FexCompiler.Models.TextRepresentation
 {
-    public class Paragraph
+    public class Paragraph : Content
     {
         public Paragraph(List<LineNode> nodes)
         {

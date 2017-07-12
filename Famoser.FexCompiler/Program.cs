@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using Famoser.FexCompiler.Helpers;
 using Famoser.FexCompiler.Models;
@@ -70,46 +71,61 @@ namespace Famoser.FexCompiler
         private static void Compile(ConfigModel config)
         {
             var paths = PathHelper.GetAllFexFilePaths(config.CompilePath);
-            foreach (var path in paths)
+            for (var index = 0; index < paths.Count; index++)
             {
+                var path = paths[index];
                 var lines = File.ReadAllLines(path);
-                var pathEntries = path.Split(new[] { "\\" }, StringSplitOptions.None);
+                var pathEntries = path.Split(new[] {"\\"}, StringSplitOptions.None);
                 var title = pathEntries[pathEntries.Length - 1];
 
                 var document = FexHelper.ParseDocument(lines.ToList(), title.Substring(0, title.Length - 4), config);
                 var content = LatexHelper.CreateLatex(document);
 
-                var texFile = path.Substring(0, path.LastIndexOf(".", StringComparison.Ordinal)) + ".tex";
+                var baseFileName = path.Substring(0, path.LastIndexOf(".", StringComparison.Ordinal));
+                var texFile = baseFileName + ".tex";
                 File.WriteAllText(texFile, content);
-                var texPaths = texFile.Split(new[] { "\\" }, StringSplitOptions.None);
+                var texFolder = texFile.Substring(0, texFile.LastIndexOf("\\", StringComparison.Ordinal));
 
-                Process p1 = new Process
-                {
-                    StartInfo =
-                    {
-                        FileName = "pdflatex",
-                        Arguments = "\"" + texFile + "\"",
-                        WindowStyle = ProcessWindowStyle.Normal,
-                        RedirectStandardOutput = false,
-                        UseShellExecute = true
-                    },
-                    EnableRaisingEvents = true
-                };
+
+                var batFileLines = new string[3];
+                batFileLines[0] = "cd \"" + texFolder + "\"";
+                batFileLines[1] = "del \"" + baseFileName + ".aux\"";
+                batFileLines[2] = "pdflatex \"" + texFile + "\"";
+                var batFilename = "batch" + index + ".bat";
+                File.WriteAllLines(batFilename, batFileLines);
+
                 try
                 {
-                    Console.WriteLine("starting to compile for " + texPaths[texPaths.Length - 1]);
-                    p1.Start();
-                    p1.ErrorDataReceived += (sender, args) =>
+                    Console.WriteLine("###############################################");
+                    Console.WriteLine("###############################################");
+                    Console.WriteLine("##### starting to compile for " + title + " ####");
+                    Console.WriteLine("##### file at " + texFile + " ####");
+                    Console.WriteLine("###############################################");
+                    Console.WriteLine("###############################################");
+                    Process p1 = new Process
                     {
-                        Console.WriteLine("failure compiling " + texPaths[texPaths.Length - 1]);
+                        StartInfo =
+                        {
+                            FileName = batFilename,
+                            UseShellExecute = false
+                        }
                     };
-                    Console.WriteLine("compiled latex for " + texPaths[texPaths.Length - 1]);
-                    break;
+
+                    p1.Start();
+                    p1.WaitForExit();
+                    Console.WriteLine("###############################################");
+                    Console.WriteLine("#### compiled for " + title + " ####");
+                    Console.WriteLine("###############################################");
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
                 }
+            }
+
+            for (int i = 0; i < 10; i++)
+            {
+                Console.WriteLine();
             }
         }
 

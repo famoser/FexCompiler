@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using Famoser.FexCompiler.Models.TextRepresentation.Base;
 
 namespace Famoser.FexCompiler.Models.TextRepresentation
 {
-    public class Section
+    public class Section : Content
     {
         public Section(Section parent)
         {
@@ -10,8 +11,7 @@ namespace Famoser.FexCompiler.Models.TextRepresentation
         }
 
         public LineNode Title { get; set; }
-        public List<Paragraph> Paragraphs { get; } = new List<Paragraph>();
-        public List<Section> Sections { get; } = new List<Section>();
+        public List<Content> Content { get; } = new List<Content>();
         public Section Parent { get; set; }
     }
 }

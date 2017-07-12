@@ -4,6 +4,7 @@ using System.Linq;
 using Famoser.FexCompiler.Enum;
 using Famoser.FexCompiler.Models;
 using Famoser.FexCompiler.Models.TextRepresentation;
+using Famoser.FexCompiler.Models.TextRepresentation.Base;
 
 namespace Famoser.FexCompiler.Helpers
 {
@@ -20,7 +21,7 @@ namespace Famoser.FexCompiler.Helpers
             var normalized = NormalizeLines(lines);
             Section section = new Section(null);
             FillSection(normalized, section, 0, 0);
-            document.Sections = section.Sections;
+            document.Content = section.Content;
 
             return document;
         }
@@ -28,59 +29,93 @@ namespace Famoser.FexCompiler.Helpers
         private static int FillSection(List<FexLine> lines, Section section, int startIndex, int startLevel)
         {
             int i = startIndex;
-            int endIndex = 0;
-
-            //check for bigger level (then we need to start new section)
-            bool startSection = false;
-            int maxLevel = startLevel;
-            endIndex = lines.Count - 1;
             for (; i < lines.Count; i++)
             {
-                if (lines[i].Level > startLevel)
-                {
-                    startSection = true;
-                    if (lines[i].Level > maxLevel)
-                        maxLevel = lines[i].Level;
-                }
+                //stop if we've reached the end of our responsibility
                 if (lines[i].Level < startLevel)
                 {
-                    endIndex = i;
                     break;
                 }
-            }
 
-            if (!startSection)
-            {
-                //fill paragraphs
-                for (i = startIndex; i < endIndex; i++)
+                //if next level is bigger we need to print it in another section, else we simply print it
+                if (i < lines.Count - 2 && lines[i + 1].Level > startLevel)
                 {
-                    section.Paragraphs.Add(new Paragraph(GetLineNodeSimple(lines[i].Text)));
-                }
-            }
-            else if (maxLevel - startLevel == 1 && startLevel > 1)
-            {
-                //save indentation here
-                for (i = startIndex; i < endIndex; i++)
-                {
-                    var p = new Paragraph(GetLineNodeSimple(lines[i].Text))
+                    //try to simply indent
+                    //keep two lists; one with the indented nodes
+                    var lineNodes = new List<LineNode>();
+                    //one with the contents
+                    var contentNodes = new List<Content> { new Paragraph(GetLineNodeSimple(lines[i].Text)) };
+
+                    //if bigger than threshhold we need a new section for sure
+                    var hasBroken = false;
+                    var threshHold = startLevel + 1;
+                    //check if we really need a new section
+                    int j = i + 1;
+                    for (; j < lines.Count; j++)
                     {
-                        ExtraIndentation = lines[i].Level == maxLevel
-                    };
-                    section.Paragraphs.Add(p);
+                        if (lines[j].Level == startLevel)
+                        {
+                            //stop at the end of this level part
+                            break;
+                        }
+                        if (lines[j].Level > threshHold || (lines[j].Level == threshHold && lines[j].Level < 2))
+                        {
+                            //wops we really need a new section
+                            var newSection = new Section(section) { Title = GetLineNodeSimple(lines[i].Text) };
+                            contentNodes.Add(newSection);
+                            i = FillSection(lines, newSection, i + 1, startLevel + 1);
+                            j = i;
+                            lineNodes.Clear();
+                        }
+                        else if (lines[j].Level == threshHold)
+                        {
+                            //if same level; we do not indent
+                            
+                            //add lineNodes if any
+                            if (lineNodes.Count > 0)
+                            {
+                                contentNodes.Add(new Paragraph(lineNodes)
+                                {
+                                    ExtraIndentation = true
+                                });
+                                contentNodes.Clear();
+                            }
+                            //add the current line
+                            contentNodes.Add(new Paragraph(GetLineNodeSimple(lines[j].Text)));
+                        }
+                        else
+                        {
+                            //add the current line to the indented cache
+                            lineNodes.Add(GetLineNodeSimple(lines[j].Text));
+                        }
+                    }
+
+                    //add lineNodes if any
+                    if (lineNodes.Count > 0)
+                    {
+                        contentNodes.Add(new Paragraph(lineNodes)
+                        {
+                            ExtraIndentation = true
+                        });
+                        contentNodes.Clear();
+                    }
+
+                    //add content nodes to section
+                    foreach (var contentNode in contentNodes)
+                    {
+                        section.Content.Add(contentNode);
+                    }
+
+                    //correct i
+                    i = j - 1;
                 }
-            }
-            else
-            {
-                //create new sections
-                for (i = startIndex; i < endIndex;)
+                else
                 {
-                    var newSection = new Section(section) { Title = GetLineNodeSimple(lines[i].Text) };
-                    section.Sections.Add(newSection);
-                    i = FillSection(lines, newSection, i + 1, startLevel + 1);
+                    section.Content.Add(new Paragraph(GetLineNodeSimple(lines[i].Text)));
                 }
 
             }
-            return endIndex;
+            return i;
         }
 
         private static List<FexLine> NormalizeLines(List<string> fileInput)

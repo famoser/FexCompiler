@@ -4,6 +4,7 @@ using System.IO;
 using Famoser.FexCompiler.Enum;
 using Famoser.FexCompiler.Models;
 using Famoser.FexCompiler.Models.TextRepresentation;
+using Famoser.FexCompiler.Models.TextRepresentation.Base;
 
 namespace Famoser.FexCompiler.Helpers
 {
@@ -18,13 +19,30 @@ namespace Famoser.FexCompiler.Helpers
             template = template.Replace("AUTHOR", document.Author);
             template = template.Replace("GENERATED_AT", DateTime.Now.ToLongDateString());
 
-            var content = ToLatex(document.Sections, 0);
+            var content = ToLatex(document.Content, 0);
 
             template = template.Replace("CONTENT", content);
             return template;
         }
 
-        private static string ToLatex(List<Section> sections, int level)
+        private static string ToLatex(List<Content> contentList, int level)
+        {
+            var res = "";
+            foreach (var content in contentList)
+            {
+                if (content is Paragraph)
+                {
+                    res += ToLatex((Paragraph)content);
+                }
+                if (content is Section)
+                {
+                    res += ToLatex((Section)content, level + 1);
+                }
+            }
+            return res;
+        }
+
+        private static string ToLatex(Section section, int level)
         {
             var sectionName = "section";
             if (level == 1)
@@ -32,12 +50,8 @@ namespace Famoser.FexCompiler.Helpers
             else if (level > 1)
                 sectionName = "subsub" + sectionName;
             var content = "";
-            foreach (var documentSection in sections)
-            {
-                content += "\\" + sectionName + "{" + ToLatex(documentSection.Title, false) + "}\n";
-                content += ToLatex(documentSection.Paragraphs);
-                content += ToLatex(documentSection.Sections, level + 1);
-            }
+            content += "\\" + sectionName + "{" + ToLatex(section.Title, false) + "}\n";
+            content += ToLatex(section.Content, level + 1);
             return content;
         }
 
@@ -46,10 +60,6 @@ namespace Famoser.FexCompiler.Helpers
             var content = "";
             foreach (var textNode in paragraphs)
             {
-                if (textNode.ExtraIndentation)
-                {
-                    content += "\\hspace{0.5cm} ";
-                }
                 content += ToLatex(textNode);
             }
             return content;
@@ -66,7 +76,11 @@ namespace Famoser.FexCompiler.Helpers
             }
             else
             {
-                content = ToLatex(paragraph.LineNodes, "");
+                if (paragraph.ExtraIndentation)
+                {
+                    content += "\\hspace{0.5cm} ";
+                }
+                content += ToLatex(paragraph.LineNodes, "");
                 content += "\n"; //\\* 
             }
             return content;
@@ -144,7 +158,7 @@ namespace Famoser.FexCompiler.Helpers
                 {"‘",  "'"},
                 {"‚",  ","} //<- this is not a comma: , (other UTF-8 code)
             };
-           
+
             foreach (var replace in replaces)
             {
                 text = text.Replace(replace.Key, replace.Value);
