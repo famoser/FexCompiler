@@ -1,19 +1,42 @@
-\documentclass[]{article}
+\documentclass[11px, twocolumn]{article}
+\setcounter{secnumdepth}{6}
+
+% add subparagraph
+\makeatletter
+\newcounter{subsubparagraph}[subparagraph]
+\renewcommand\thesubsubparagraph{%
+  \thesubparagraph.\@arabic\c@subsubparagraph}
+\newcommand\subsubparagraph{%
+  \@startsection{subsubparagraph}    % counter
+    {6}                              % level
+    {0cm}                     % indent
+    {0cm} % beforeskip
+    {0ex}                           % afterskip
+    {\normalfont\normalsize\bfseries}}
+\newcommand\l@subsubparagraph{\@dottedtocline{6}{10em}{5em}}
+\newcommand{\subsubparagraphmark}[1]{}
+\makeatother
 
 % don't need the following. simply use defaults
 \setlength{\textwidth}{16cm}
 \setlength{\oddsidemargin}{0.25cm}
 \setlength{\evensidemargin}{0.25cm}
 \setlength{\parindent}{0cm}
+\setlength{\parskip}{0cm}
 % \renewcommand{\familydefault}{\sfdefault}
 
 % change font to times
-\usepackage{times}
+% \usepackage{times}
 \usepackage[utf8]{inputenc}
 \usepackage{textgreek}
+\usepackage{titlesec}
 
 % create a comment command
 \newcommand{\comment}[1]{}
+
+\titlespacing{\section}{0pt}{1ex}{0ex minus 1ex}
+\titlespacing{\subsection}{0pt}{1ex}{0ex minus 1ex}
+\titlespacing{\subsubsection}{0pt}{1ex}{0ex minus 1ex}
 
 \title{TITLE}
 \author{AUTHOR}

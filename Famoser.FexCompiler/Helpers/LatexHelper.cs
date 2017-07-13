@@ -36,7 +36,7 @@ namespace Famoser.FexCompiler.Helpers
                 }
                 if (content is Section)
                 {
-                    res += ToLatex((Section)content, level + 1);
+                    res += ToLatex((Section)content, level);
                 }
             }
             return res;
@@ -47,10 +47,16 @@ namespace Famoser.FexCompiler.Helpers
             var sectionName = "section";
             if (level == 1)
                 sectionName = "sub" + sectionName;
-            else if (level > 1)
+            else if (level == 2)
                 sectionName = "subsub" + sectionName;
+            else if (level == 3)
+                sectionName = "paragraph";
+            else if (level== 4)
+                sectionName = "subparagraph";
+            else if (level > 4)
+                sectionName = "subsubparagraph";
             var content = "";
-            content += "\\" + sectionName + "{" + ToLatex(section.Title, false) + "}\n";
+            content += "\\" + sectionName + "{" + ToLatex(section.Title, false) + " \\\\}\n";
             content += ToLatex(section.Content, level + 1);
             return content;
         }
