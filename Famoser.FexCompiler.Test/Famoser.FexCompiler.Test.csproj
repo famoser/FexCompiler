@@ -56,7 +56,7 @@
     <Content Include="Input\simple.fex">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Input\simpleAdvanced.fex">
+    <Content Include="Input\advanced.fex">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="packages.config" />

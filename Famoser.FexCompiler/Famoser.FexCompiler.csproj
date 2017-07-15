@@ -50,6 +50,7 @@
     <Compile Include="Helpers\FexHelper.cs" />
     <Compile Include="Helpers\LatexHelper.cs" />
     <Compile Include="Helpers\PathHelper.cs" />
+    <Compile Include="Helpers\TextHelper.cs" />
     <Compile Include="Models\ConfigModel.cs" />
     <Compile Include="Models\Document.cs" />
     <Compile Include="Models\FexLine.cs" />

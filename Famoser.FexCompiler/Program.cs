@@ -79,6 +79,8 @@ namespace Famoser.FexCompiler
                 var title = pathEntries[pathEntries.Length - 1];
 
                 var document = FexHelper.ParseDocument(lines.ToList(), title.Substring(0, title.Length - 4), config);
+                TextHelper.Improve(document);
+
                 var content = LatexHelper.CreateLatex(document);
 
                 var baseFileName = path.Substring(0, path.LastIndexOf(".", StringComparison.Ordinal));

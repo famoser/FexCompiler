@@ -14,7 +14,7 @@ namespace Famoser.FexCompiler.Test.Helpers
         public static string[] GetInputFile(string fileName)
         {
             var basePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            return File.ReadAllLines(Path.Combine(basePath, "Input/simple.fex"));
+            return File.ReadAllLines(Path.Combine(basePath, "Input/" + fileName));
         }
 
         public static ConfigModel GetConfigModel()
