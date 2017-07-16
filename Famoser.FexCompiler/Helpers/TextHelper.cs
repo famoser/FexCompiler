@@ -24,7 +24,7 @@ namespace Famoser.FexCompiler.Helpers
             if (sec.Content.Count(s => s is Paragraph) == sec.Content.Count)
             {
                 //collapse paragraphs to this level
-                if (level > 2)
+                if (level >= 2)
                 {
                     return true;
                 }
@@ -44,7 +44,10 @@ namespace Famoser.FexCompiler.Helpers
                             var myPara = (Paragraph) content;
                             myLines.AddRange(myPara.LineNodes);
                         }
-                        var para = new Paragraph(myLines);
+                        var para = new Paragraph(myLines)
+                        {
+                            ExtraIndentation = true
+                        };
                         sec.Content[i] = para;
                         sec.Content.Insert(i, new Paragraph(myCont.Title));
                         i++;

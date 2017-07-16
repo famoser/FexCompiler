@@ -40,7 +40,7 @@ namespace Famoser.FexCompiler.Helpers
                     var newStartIndex = i + 1;
                     var newStopIndex = stopIndex;
                     int j = newStartIndex;
-                    for (; j < stopIndex; j++)
+                    for (; j <= stopIndex; j++)
                     {
                         if (lines[j].Level - levelCorrection == 0)
                         {

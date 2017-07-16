@@ -95,6 +95,7 @@ namespace Famoser.FexCompiler.Test
 
 
             TextHelper.Improve(doc);
+            Assert.IsTrue(h2Section?.Content?.Count == 5);
             Assert.IsTrue(h2Section?.Content[0] is Paragraph);
             Assert.IsTrue(h2Section?.Content[1] is Paragraph); //indentation
             Assert.IsTrue(h2Section?.Content[2] is Paragraph); //normal
