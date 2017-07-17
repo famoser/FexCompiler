@@ -28,15 +28,25 @@ namespace Famoser.FexCompiler.Helpers
         private static string ToLatex(List<Content> contentList, int level)
         {
             var res = "";
+            var lastWasParagraph = false;
             foreach (var content in contentList)
             {
                 if (content is Paragraph)
                 {
-                    res += ToLatex((Paragraph)content);
+                    res += ToLatex((Paragraph)content, lastWasParagraph);
+                    lastWasParagraph = true;
                 }
-                if (content is Section)
+                else
                 {
-                    res += ToLatex((Section)content, level);
+                    lastWasParagraph = false;
+                    if (content is Section)
+                    {
+                        res += ToLatex((Section)content, level);
+                    }
+                    else if (content is Code)
+                    {
+                        res += ToLatex((Code)content);
+                    }
                 }
             }
             return res;
@@ -51,7 +61,7 @@ namespace Famoser.FexCompiler.Helpers
                 sectionName = "subsub" + sectionName;
             else if (level == 3)
                 sectionName = "paragraph";
-            else if (level== 4)
+            else if (level == 4)
                 sectionName = "subparagraph";
             else if (level > 4)
                 sectionName = "subsubparagraph";
@@ -61,17 +71,7 @@ namespace Famoser.FexCompiler.Helpers
             return content;
         }
 
-        private static string ToLatex(List<Paragraph> paragraphs)
-        {
-            var content = "";
-            foreach (var textNode in paragraphs)
-            {
-                content += ToLatex(textNode);
-            }
-            return content;
-        }
-
-        private static string ToLatex(Paragraph paragraph)
+        private static string ToLatex(Paragraph paragraph, bool hasParagraphBefore)
         {
             var content = "";
             if (paragraph.IsEnumeration)
@@ -82,9 +82,9 @@ namespace Famoser.FexCompiler.Helpers
             }
             else
             {
-                if (paragraph.ExtraIndentation)
+                if (paragraph.VerticalSpaceBefore && hasParagraphBefore)
                 {
-                    content += "\\hspace{0.5cm} ";
+                    content += "\\vspace{10pt}";
                 }
                 content += ToLatex(paragraph.LineNodes, "");
                 content += "\n"; //\\* 
@@ -176,5 +176,13 @@ namespace Famoser.FexCompiler.Helpers
             }
             return text;
         }
+
+        private static string ToLatex(Code code)
+        {
+            var res = "\\onecolumn{}\n\\begin{verbatim}\n";
+            res += code.Text;
+            return res + "\\end{verbatim}\n\\twocolumn{}\n";
+        }
+
     }
 }

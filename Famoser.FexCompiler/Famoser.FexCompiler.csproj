@@ -55,6 +55,7 @@
     <Compile Include="Models\Document.cs" />
     <Compile Include="Models\FexLine.cs" />
     <Compile Include="Models\TextRepresentation\Base\TextUnit.cs" />
+    <Compile Include="Models\TextRepresentation\Code.cs" />
     <Compile Include="Models\TextRepresentation\LineNode.cs" />
     <Compile Include="Models\TextRepresentation\Paragraph.cs" />
     <Compile Include="Models\TextRepresentation\Section.cs" />

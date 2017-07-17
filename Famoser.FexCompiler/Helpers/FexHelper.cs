@@ -32,32 +32,39 @@ namespace Famoser.FexCompiler.Helpers
             int i = startIndex;
             for (; i <= stopIndex; i++)
             {
-                var nextLevel = i < stopIndex ? lines[i + 1].Level - levelCorrection : -100;
-
-                //if nextLevel is bigger we recursively call
-                if (nextLevel > 0)
+                if (lines[i].IsCode)
                 {
-                    var newStartIndex = i + 1;
-                    var newStopIndex = stopIndex;
-                    int j = newStartIndex;
-                    for (; j <= stopIndex; j++)
-                    {
-                        if (lines[j].Level - levelCorrection == 0)
-                        {
-                            newStopIndex = j - 1;
-                            break;
-                        }
-                    }
-
-                    //wops we really need a new section
-                    var newSection = new Section(section) { Title = GetLineNodeSimple(lines[i].Text) };
-                    FillSection(lines, newSection, newStartIndex, newStopIndex, levelCorrection + 1);
-                    i = newStopIndex;
-                    section.Content.Add(newSection);
+                    section.Content.Add(new Code(lines[i].Text));
                 }
                 else
                 {
-                    section.Content.Add(new Paragraph(GetLineNodeSimple(lines[i].Text)));
+                    var nextLevel = i < stopIndex ? lines[i + 1].Level - levelCorrection : -100;
+
+                    //if nextLevel is bigger we recursively call
+                    if (nextLevel > 0)
+                    {
+                        var newStartIndex = i + 1;
+                        var newStopIndex = stopIndex;
+                        int j = newStartIndex;
+                        for (; j <= stopIndex; j++)
+                        {
+                            if (lines[j].Level - levelCorrection == 0)
+                            {
+                                newStopIndex = j - 1;
+                                break;
+                            }
+                        }
+
+                        //wops we really need a new section
+                        var newSection = new Section(section) { Title = GetLineNodeSimple(lines[i].Text, true) };
+                        FillSection(lines, newSection, newStartIndex, newStopIndex, levelCorrection + 1);
+                        i = newStopIndex;
+                        section.Content.Add(newSection);
+                    }
+                    else
+                    {
+                        section.Content.Add(new Paragraph(GetLineNodeSimple(lines[i].Text, false)));
+                    }
                 }
             }
         }
@@ -131,21 +138,78 @@ namespace Famoser.FexCompiler.Helpers
                 }
             }
 
+            //normalize code
+            for (int i = 0; i < res.Count; i++)
+            {
+                if (res[i].Text.Trim() == "CODE_START")
+                {
+                    res.RemoveAt(i);
+                    var levelCorrection = res[i].Level;
+                    for (int j = i + 1; j < res.Count;)
+                    {
+                        if (res[j].Text.Trim() == "CODE_STOP")
+                        {
+                            res.RemoveAt(j);
+                            break;
+                        }
+                        //collapse in single line
+                        //correct level (at least 0)
+                        var myLevel = res[j].Level - levelCorrection;
+                        myLevel = myLevel >= 0 ? myLevel : 0;
+                        res[i].Text += "\n" + new string(' ', myLevel*4) + res[j].Text;
+                        res.RemoveAt(j);
+                    }
+                    res[i].IsCode = true;
+                }
+            }
+
+            //normalize titles
+            for (int i = 0; i < res.Count; i++)
+            {
+                if (res[i].IsCode)
+                {
+                    continue;
+                }
+
+                var index = res[i].Text.IndexOf(":", StringComparison.Ordinal);
+                if (index > 0)
+                {
+                    var after = res[i].Text.Substring(index + 1);
+                    if (after.Length > 0)
+                    {
+                        res.Insert(i + 1, new FexLine()
+                        {
+                            Level = res[i].Level + 1,
+                            Text = after
+                        });
+                    }
+                    res[i].Text = res[i].Text.Substring(0, index);
+                }
+            }
+
             return res;
         }
 
-        private static LineNode GetLineNodeSimple(string line)
+        private static LineNode GetLineNodeSimple(string line, bool isTitle)
         {
             var res = new List<TextNode>();
-            if (line.Contains(":"))
+            line = line.Trim();
+            if (line.Contains(":") && !isTitle)
             {
                 var index = line.IndexOf(":", StringComparison.Ordinal);
-                res.Add(new TextNode() { TextType = TextType.Bold, Text = ParseText(line.Substring(0, index + 1)) });
-                res.Add(new TextNode() { TextType = TextType.Normal, Text = ParseText(line.Substring(index + 1)) });
+                if (index == line.Length - 1)
+                {
+                    res.Add(new TextNode() { TextType = TextType.Normal, Text = ParseText(line.Substring(0, index)) });
+                }
+                else
+                {
+                    res.Add(new TextNode() { TextType = TextType.Bold, Text = ParseText(line.Substring(0, index + 1)) });
+                    res.Add(new TextNode() { TextType = TextType.Normal, Text = ParseText(line.Substring(index + 1)) });
+                }
             }
             else
             {
-                res.Add(new TextNode() { TextType = TextType.Normal, Text = ParseText(line) });
+                res.Add(new TextNode() { TextType = isTitle ? TextType.Bold : TextType.Normal, Text = ParseText(line) });
             }
             return new LineNode(res);
         }

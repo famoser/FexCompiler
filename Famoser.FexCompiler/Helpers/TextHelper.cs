@@ -44,12 +44,11 @@ namespace Famoser.FexCompiler.Helpers
                             var myPara = (Paragraph) content;
                             myLines.AddRange(myPara.LineNodes);
                         }
-                        var para = new Paragraph(myLines)
+                        sec.Content[i] = new Paragraph(myLines);
+                        sec.Content.Insert(i, new Paragraph(myCont.Title)
                         {
-                            ExtraIndentation = true
-                        };
-                        sec.Content[i] = para;
-                        sec.Content.Insert(i, new Paragraph(myCont.Title));
+                            VerticalSpaceBefore = true
+                        });
                         i++;
                     }
                 }
