@@ -26,7 +26,7 @@ namespace Famoser.FexCompiler.Test
             var h1Section = (Section)doc.Content[0];
             //check H1 header
             Assert.IsTrue(h1Section.Title?.TextNodes?.Count == 1);
-            Assert.IsTrue(h1Section.Title.TextNodes[0].TextType == TextType.Normal);
+            Assert.IsTrue(h1Section.Title.TextNodes[0].TextType == TextType.Bold);
             Assert.IsTrue(h1Section.Title.TextNodes[0].Text == "H1");
 
             //check h1 content
@@ -36,7 +36,7 @@ namespace Famoser.FexCompiler.Test
             var h2Section = (Section)h1Section.Content[0];
             //check H2 header
             Assert.IsTrue(h2Section.Title?.TextNodes?.Count == 1);
-            Assert.IsTrue(h2Section.Title.TextNodes[0].TextType == TextType.Normal);
+            Assert.IsTrue(h2Section.Title.TextNodes[0].TextType == TextType.Bold);
             Assert.IsTrue(h2Section.Title.TextNodes[0].Text == "H2");
 
             //check h2 content
@@ -73,7 +73,7 @@ namespace Famoser.FexCompiler.Test
             var h1Section = (Section)doc.Content[0];
             //check H1 header
             Assert.IsTrue(h1Section.Title?.TextNodes?.Count == 1);
-            Assert.IsTrue(h1Section.Title.TextNodes[0].TextType == TextType.Normal);
+            Assert.IsTrue(h1Section.Title.TextNodes[0].TextType == TextType.Bold);
             Assert.IsTrue(h1Section.Title.TextNodes[0].Text == "H1");
 
             //check h1 content
@@ -83,7 +83,7 @@ namespace Famoser.FexCompiler.Test
             var h2Section = (Section)h1Section.Content[0];
             //check H2 header
             Assert.IsTrue(h2Section.Title?.TextNodes?.Count == 1);
-            Assert.IsTrue(h2Section.Title.TextNodes[0].TextType == TextType.Normal);
+            Assert.IsTrue(h2Section.Title.TextNodes[0].TextType == TextType.Bold);
             Assert.IsTrue(h2Section.Title.TextNodes[0].Text == "H2");
 
             //check h2 content
@@ -113,6 +113,7 @@ namespace Famoser.FexCompiler.Test
             Assert.IsTrue(paragraph0.LineNodes.Count == 1);
             Assert.IsTrue(paragraph0.LineNodes[0].TextNodes.Count == 1);
             Assert.IsTrue(paragraph0.LineNodes[0].TextNodes[0].Text == "text");
+            Assert.IsTrue(paragraph0.VerticalSpaceBefore);
 
             //check paragraph1
             Assert.IsTrue(paragraph1.LineNodes?.Count == 2);
@@ -120,7 +121,7 @@ namespace Famoser.FexCompiler.Test
             Assert.IsTrue(paragraph1.LineNodes[0].TextNodes[0].Text == "only indent this one");
             Assert.IsTrue(paragraph1.LineNodes[1].TextNodes?.Count == 1);
             Assert.IsTrue(paragraph1.LineNodes[1].TextNodes[0].Text == "do not create new titles");
-            Assert.IsTrue(paragraph1.ExtraIndentation);
+            Assert.IsTrue(!paragraph1.VerticalSpaceBefore);
         }
     }
 }

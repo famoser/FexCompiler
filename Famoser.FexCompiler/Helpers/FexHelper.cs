@@ -157,7 +157,7 @@ namespace Famoser.FexCompiler.Helpers
                         //correct level (at least 0)
                         var myLevel = res[j].Level - levelCorrection;
                         myLevel = myLevel >= 0 ? myLevel : 0;
-                        res[i].Text += "\n" + new string(' ', myLevel*4) + res[j].Text;
+                        res[i].Text += "\n" + new string(' ', myLevel * 4) + res[j].Text;
                         res.RemoveAt(j);
                     }
                     res[i].IsCode = true;
@@ -204,23 +204,7 @@ namespace Famoser.FexCompiler.Helpers
         {
             var res = new List<TextNode>();
             line = line.Trim();
-            if (line.Contains(":") && !isTitle)
-            {
-                var index = line.IndexOf(":", StringComparison.Ordinal);
-                if (index == line.Length - 1)
-                {
-                    res.Add(new TextNode() { TextType = TextType.Normal, Text = ParseText(line.Substring(0, index)) });
-                }
-                else
-                {
-                    res.Add(new TextNode() { TextType = TextType.Bold, Text = ParseText(line.Substring(0, index + 1)) });
-                    res.Add(new TextNode() { TextType = TextType.Normal, Text = ParseText(line.Substring(index + 1)) });
-                }
-            }
-            else
-            {
-                res.Add(new TextNode() { TextType = isTitle ? TextType.Bold : TextType.Normal, Text = ParseText(line) });
-            }
+            res.Add(new TextNode() { TextType = isTitle ? TextType.Bold : TextType.Normal, Text = ParseText(line) });
             return new LineNode(res);
         }
 
