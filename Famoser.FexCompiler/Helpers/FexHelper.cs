@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Famoser.FexCompiler.Enum;
 using Famoser.FexCompiler.Models;
 using Famoser.FexCompiler.Models.TextRepresentation;
@@ -172,18 +173,27 @@ namespace Famoser.FexCompiler.Helpers
                 }
 
                 var index = res[i].Text.IndexOf(":", StringComparison.Ordinal);
-                if (index > 0)
+                //min length to ensure its a text (counter example: 1:n)
+                if (index > 1)
                 {
-                    var after = res[i].Text.Substring(index + 1);
-                    if (after.Length > 0)
+                    var before = res[i].Text.Substring(0, index);
+                    if (!Regex.IsMatch(before, "([_{}])+"))
                     {
-                        res.Insert(i + 1, new FexLine()
+                        var after = res[i].Text.Substring(index + 1);
+                        if (after.Length > 0)
                         {
-                            Level = res[i].Level + 1,
-                            Text = after
-                        });
+                            res.Insert(i + 1, new FexLine()
+                            {
+                                Level = res[i].Level + 1,
+                                Text = after
+                            });
+                        }
+                        res[i].Text = before;
                     }
-                    res[i].Text = res[i].Text.Substring(0, index);
+                    else
+                    {
+                        //do not split, probably formula or similar
+                    }
                 }
             }
 

@@ -66,7 +66,7 @@ namespace Famoser.FexCompiler.Helpers
             else if (level > 4)
                 sectionName = "subsubparagraph";
             var content = "";
-            content += "\\" + sectionName + "{" + ToLatex(section.Title, false) + " \\\\}\n";
+            content += "\\" + sectionName + "{" + ToLatex(section.Title, false) + " }\n";
             content += ToLatex(section.Content, level + 1);
             return content;
         }
