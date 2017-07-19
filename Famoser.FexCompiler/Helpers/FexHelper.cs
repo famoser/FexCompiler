@@ -179,16 +179,26 @@ namespace Famoser.FexCompiler.Helpers
                     var before = res[i].Text.Substring(0, index);
                     if (!Regex.IsMatch(before, "([_{}])+"))
                     {
-                        var after = res[i].Text.Substring(index + 1);
-                        if (after.Length > 0)
+                        //now check that it is not in brackets 
+                        if (!Regex.IsMatch(before, ".+\\(.+") || Regex.IsMatch(before, ".+\\(.+\\).*"))
                         {
-                            res.Insert(i + 1, new FexLine()
+                            //not allowed: hi mom (this is
+                            //allowed: hi mom
+                            //allowed: hi mom (small)
+                            var after = res[i].Text.Substring(index + 1);
+                            if (after.Length > 0)
                             {
-                                Level = res[i].Level + 1,
-                                Text = after
-                            });
+                                res.Insert(i + 1, new FexLine()
+                                {
+                                    Level = res[i].Level + 1,
+                                    Text = after
+                                });
+                            }
+                            res[i].Text = before;
+
+                            //ensure the break happens only once
+                            i++;
                         }
-                        res[i].Text = before;
                     }
                     else
                     {
