@@ -84,7 +84,7 @@ namespace Famoser.FexCompiler.Helpers
             {
                 if (paragraph.VerticalSpaceBefore && hasParagraphBefore)
                 {
-                    content += "\\vspace{10pt}";
+                    content += "\\vspace{5pt}";
                 }
                 content += ToLatex(paragraph.LineNodes, "");
                 content += "\n"; //\\* 

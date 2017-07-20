@@ -113,6 +113,7 @@ namespace Famoser.FexCompiler.Test
             Assert.IsTrue(paragraph0.LineNodes.Count == 1);
             Assert.IsTrue(paragraph0.LineNodes[0].TextNodes.Count == 1);
             Assert.IsTrue(paragraph0.LineNodes[0].TextNodes[0].Text == "text");
+            Assert.IsTrue(paragraph0.LineNodes[0].TextNodes[0].TextType == TextType.Bold);
             Assert.IsTrue(paragraph0.VerticalSpaceBefore);
 
             //check paragraph1

@@ -186,6 +186,7 @@ namespace Famoser.FexCompiler.Helpers
                             //allowed: hi mom
                             //allowed: hi mom (small)
                             var after = res[i].Text.Substring(index + 1);
+                            res[i].Text = before;
                             if (after.Length > 0)
                             {
                                 res.Insert(i + 1, new FexLine()
@@ -193,11 +194,10 @@ namespace Famoser.FexCompiler.Helpers
                                     Level = res[i].Level + 1,
                                     Text = after
                                 });
-                            }
-                            res[i].Text = before;
 
-                            //ensure the break happens only once
-                            i++;
+                                //ensure the break happens only once
+                                i++;
+                            }
                         }
                     }
                     else
