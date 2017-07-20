@@ -67,6 +67,11 @@ namespace Famoser.FexCompiler.Helpers
                 sectionName = "subsubparagraph";
             var content = "";
             content += "\\" + sectionName + "{" + ToLatex(section.Title, false) + " }\n";
+            if (level >= 3)
+            {
+                //force line break after paragraph
+                content += "\\mbox{}\\\\\\vspace{3pt}";
+            }
             content += ToLatex(section.Content, level + 1);
             return content;
         }
@@ -152,7 +157,7 @@ namespace Famoser.FexCompiler.Helpers
                 {"^", "\\textasciicircum "},
                 {">", "\\textgreater "},
                 {"<", "\\textless "},
-                {"*", "\\textasteriskcentered "},
+                {"*", "\\textasteriskcentered  "},
                 {"|", "\\textbar "},
                 {"{", "\\textbraceleft "},
                 {"}", "\\textbraceright "},
