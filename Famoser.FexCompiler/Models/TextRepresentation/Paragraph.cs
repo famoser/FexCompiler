@@ -16,7 +16,7 @@ namespace Famoser.FexCompiler.Models.TextRepresentation
         }
 
         public bool IsEnumeration { get; set; } = false;
-        public bool VerticalSpaceBefore { get; set; } = false;
+        public int VerticalSpaceUnitsBefore { get; set; } = 0;
         public List<LineNode> LineNodes { get; }
     }
 }

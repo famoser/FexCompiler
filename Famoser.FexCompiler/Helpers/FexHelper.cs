@@ -17,7 +17,8 @@ namespace Famoser.FexCompiler.Helpers
             var document = new Document
             {
                 Author = configModel.Author,
-                Title = title
+                Title = title,
+                DocumentStats = AnalyzeLines(lines)
             };
 
             var normalized = NormalizeLines(lines);
@@ -68,6 +69,18 @@ namespace Famoser.FexCompiler.Helpers
                     }
                 }
             }
+        }
+
+        private static DocumentStats AnalyzeLines(List<string> fileInput)
+        {
+            var res = new DocumentStats
+            {
+                LineCount = fileInput.Count,
+                CharacterCount = fileInput.Sum(s => s.Length),
+                WordCount = fileInput.Sum(s1 => s1.Split(new[] {" "}, StringSplitOptions.RemoveEmptyEntries)
+                    .Count(s => s.Trim().Length > 0))
+            };
+            return res;
         }
 
         private static List<FexLine> NormalizeLines(List<string> fileInput)

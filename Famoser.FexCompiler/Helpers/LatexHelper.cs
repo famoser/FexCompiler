@@ -17,7 +17,9 @@ namespace Famoser.FexCompiler.Helpers
 
             template = template.Replace("TITLE", document.Title);
             template = template.Replace("AUTHOR", document.Author);
-            template = template.Replace("GENERATED_AT", DateTime.Now.ToLongDateString());
+            template = template.Replace("CHARACTER_COUNT", document.DocumentStats.CharacterCount.ToString());
+            template = template.Replace("WORD_COUNT", document.DocumentStats.WordCount.ToString());
+            template = template.Replace("LINE_COUNT", document.DocumentStats.LineCount.ToString());
 
             var content = ToLatex(document.Content, 0);
 
@@ -87,9 +89,10 @@ namespace Famoser.FexCompiler.Helpers
             }
             else
             {
-                if (paragraph.VerticalSpaceBefore && hasParagraphBefore)
+                if (paragraph.VerticalSpaceUnitsBefore > 0 && hasParagraphBefore)
                 {
-                    content += "\\vspace{5pt}";
+                    var vSpaceNumber = paragraph.VerticalSpaceUnitsBefore == 1 ? 5 : 8;
+                    content += "\\vspace{"+ vSpaceNumber + "pt}";
                 }
                 content += ToLatex(paragraph.LineNodes, "");
                 content += "\n"; //\\* 

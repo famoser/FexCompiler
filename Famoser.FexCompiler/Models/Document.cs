@@ -9,5 +9,6 @@ namespace Famoser.FexCompiler.Models
         public string Title { get; set; }
         public string Author { get; set; }
         public List<Content> Content { get; set; }
+        public DocumentStats DocumentStats { get; set; }
     }
 }

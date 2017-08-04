@@ -114,7 +114,7 @@ namespace Famoser.FexCompiler.Test
             Assert.IsTrue(paragraph0.LineNodes[0].TextNodes.Count == 1);
             Assert.IsTrue(paragraph0.LineNodes[0].TextNodes[0].Text == "text");
             Assert.IsTrue(paragraph0.LineNodes[0].TextNodes[0].TextType == TextType.Bold);
-            Assert.IsTrue(paragraph0.VerticalSpaceBefore);
+            Assert.IsTrue(paragraph0.VerticalSpaceUnitsBefore == 1);
 
             //check paragraph1
             Assert.IsTrue(paragraph1.LineNodes?.Count == 2);
@@ -122,7 +122,7 @@ namespace Famoser.FexCompiler.Test
             Assert.IsTrue(paragraph1.LineNodes[0].TextNodes[0].Text == "only indent this one");
             Assert.IsTrue(paragraph1.LineNodes[1].TextNodes?.Count == 1);
             Assert.IsTrue(paragraph1.LineNodes[1].TextNodes[0].Text == "do not create new titles");
-            Assert.IsTrue(!paragraph1.VerticalSpaceBefore);
+            Assert.IsTrue(paragraph1.VerticalSpaceUnitsBefore == 0);
         }
     }
 }

@@ -30,6 +30,7 @@ namespace Famoser.FexCompiler.Helpers
                 }
             }
 
+            bool collapsedBefore = false;
             for (int i = 0; i < sec.Content.Count; i++)
             {
                 var myCont = sec.Content[i] as Section;
@@ -47,9 +48,20 @@ namespace Famoser.FexCompiler.Helpers
                         sec.Content[i] = new Paragraph(myLines);
                         sec.Content.Insert(i, new Paragraph(myCont.Title)
                         {
-                            VerticalSpaceBefore = true
+                            VerticalSpaceUnitsBefore = 1
                         });
                         i++;
+
+                        collapsedBefore = true;
+                    }
+                    else if (collapsedBefore)
+                    {
+                        collapsedBefore = false;
+                        var paragraph = sec.Content[i] as Paragraph;
+                        if (paragraph != null)
+                        {
+                            paragraph.VerticalSpaceUnitsBefore = 2;
+                        }
                     }
                 }
             }
