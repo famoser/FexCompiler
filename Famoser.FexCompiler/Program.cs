@@ -89,10 +89,9 @@ namespace Famoser.FexCompiler
                 var texFolder = texFile.Substring(0, texFile.LastIndexOf("\\", StringComparison.Ordinal));
 
 
-                var batFileLines = new string[3];
-                batFileLines[0] = "cd \"" + texFolder + "\"";
-                batFileLines[1] = "del \"" + baseFileName + ".aux\"";
-                batFileLines[2] = "pdflatex \"" + texFile + "\"";
+                var batFileLines = new string[2];
+                batFileLines[0] = "del \"" + baseFileName + ".aux\"";
+                batFileLines[1] = "pdflatex \"" + texFile + "\" -output-directory=\"" + texFolder + "\"";
                 var batFilename = "batch" + index + ".bat";
                 File.WriteAllLines(batFilename, batFileLines);
 
@@ -118,6 +117,8 @@ namespace Famoser.FexCompiler
                     Console.WriteLine("###############################################");
                     Console.WriteLine("#### compiled for " + title + " ####");
                     Console.WriteLine("###############################################");
+
+                    File.Delete(batFilename);
                 }
                 catch (Exception e)
                 {
