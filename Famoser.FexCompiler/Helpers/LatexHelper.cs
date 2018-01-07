@@ -150,9 +150,11 @@ namespace Famoser.FexCompiler.Helpers
              * */
             var replaces = new Dictionary<string, string>()
             {
+                {"$", "\\textdollar "},
                 {"\\", "\\textbackslash "},
-                {"→", "->" },
                 {"∙", "*" },
+                {"→", "$\\to$" },
+                {"->", "$\\to$" },
                 {"α", "\\textalpha " },
                 {"β", "\\textbeta " },
                 {"σ", "\\textsigma " },
@@ -164,23 +166,20 @@ namespace Famoser.FexCompiler.Helpers
                 {"|", "\\textbar "},
                 {"{", "\\textbraceleft "},
                 {"}", "\\textbraceright "},
-                {"$", "\\textdollar "},
                 {"—", "\\textemdash "},
                 {"“", "\\textquotedblleft "},
                 {"”", "\\textquotedblright "},
                 {"„",  "\\textquotedblleft "},
+                {"&",  "\\&"},
+                {"%",  "\\%"},
+                {"#",  "\\#"},
+                {"_",  "\\_"},
                 {"‘",  "'"},
                 {"‚",  ","} //<- this is not a comma: , (other UTF-8 code)
             };
-
             foreach (var replace in replaces)
             {
                 text = text.Replace(replace.Key, replace.Value);
-            }
-            var escapes = new[] { "&", "%", "$", "#", "_", "{", "}" };
-            foreach (var escape in escapes)
-            {
-                text = text.Replace(escape, "\\" + escape);
             }
             return text;
         }
