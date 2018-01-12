@@ -74,7 +74,15 @@ namespace Famoser.FexCompiler
             for (var index = 0; index < paths.Count; index++)
             {
                 var path = paths[index];
-                var lines = File.ReadAllLines(path);
+                var text = File.ReadAllText(path);
+                var escapedText = LatexHelper.EscapeTextForLatex(text);
+                var lines = escapedText.Split(new[] { "\r\n" }, StringSplitOptions.None);
+                if (lines.Length == 1)
+                {
+                    //probably linux line ending; try fix :)
+                    lines = escapedText.Split(new[] { "\n" }, StringSplitOptions.None);
+                }
+
                 var pathEntries = path.Split(new[] {"\\"}, StringSplitOptions.None);
                 var title = pathEntries[pathEntries.Length - 1];
 

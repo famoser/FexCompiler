@@ -145,6 +145,11 @@ namespace Famoser.FexCompiler.Helpers
 
         private static string EscapeText(string text)
         {
+            return text;
+        }
+
+        public static string EscapeTextForLatex(string text)
+        {
             /*
              * & %  # _ { } ~ ^ \
              * */
@@ -155,21 +160,9 @@ namespace Famoser.FexCompiler.Helpers
                 {"∙", "*" },
                 {"→", "$\\to$" },
                 {"->", "$\\to$" },
-                {"α", "\\textalpha " },
-                {"β", "\\textbeta " },
-                {"σ", "\\textsigma " },
-                {"~", "\\textasciitilde "},
-                {"^", "\\textasciicircum "},
-                {">", "\\textgreater "},
-                {"<", "\\textless "},
-                {"*", "\\textasteriskcentered  "},
-                {"|", "\\textbar "},
-                {"{", "\\textbraceleft "},
-                {"}", "\\textbraceright "},
-                {"—", "\\textemdash "},
-                {"“", "\\textquotedblleft "},
-                {"”", "\\textquotedblright "},
-                {"„",  "\\textquotedblleft "},
+                {"=>", "$\\Rightarrow$" },
+                {"<=", "$\\Leftarrow$" },
+                {"<=>", "$\\Leftrightarrow" },
                 {"&",  "\\&"},
                 {"%",  "\\%"},
                 {"#",  "\\#"},
@@ -181,6 +174,34 @@ namespace Famoser.FexCompiler.Helpers
             {
                 text = text.Replace(replace.Key, replace.Value);
             }
+
+            var textReplaces = new Dictionary<string, string>()
+            {
+                {"{", "\\textbraceleft"},
+                {"}", "\\textbraceright"},
+                {"α", "\\textalpha" },
+                {"β", "\\textbeta" },
+                {"σ", "\\textsigma" },
+                {"~", "\\textasciitilde"},
+                {"^", "\\textasciicircum"},
+                {">", "\\textgreater"},
+                {"<", "\\textless"},
+                {"*", "\\textasteriskcentered"},
+                {"|", "\\textbar"},
+                {"—", "\\textemdash"},
+                {"“", "\\textquotedblleft"},
+                {"”", "\\textquotedblright"},
+                {"„",  "\\textquotedblleft"},
+            };
+
+            foreach (var textReplace in textReplaces)
+            {
+                text = text.Replace(textReplace.Key + " ", textReplace.Value + " " + "VSPACE_PLACEHOLDER");
+                text = text.Replace(textReplace.Key, textReplace.Value + " ");
+            }
+
+            text = text.Replace("VSPACE_PLACEHOLDER", "\\vspace{5pt}");
+
             return text;
         }
 
