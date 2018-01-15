@@ -161,8 +161,9 @@ namespace Famoser.FexCompiler.Helpers
                 {"→", "$\\to$" },
                 {"->", "$\\to$" },
                 {"=>", "$\\Rightarrow$" },
-                {"<=", "$\\Leftarrow$" },
                 {"<=>", "$\\Leftrightarrow" },
+                {">=", "$\\ge$"},
+                {"<=", " $\\le$"},
                 {"&",  "\\&"},
                 {"%",  "\\%"},
                 {"#",  "\\#"},
@@ -191,7 +192,7 @@ namespace Famoser.FexCompiler.Helpers
                 {"—", "\\textemdash"},
                 {"“", "\\textquotedblleft"},
                 {"”", "\\textquotedblright"},
-                {"„",  "\\textquotedblleft"},
+                {"„",  "\\textquotedblleft"}
             };
 
             foreach (var textReplace in textReplaces)
@@ -200,7 +201,7 @@ namespace Famoser.FexCompiler.Helpers
                 text = text.Replace(textReplace.Key, textReplace.Value + " ");
             }
 
-            text = text.Replace("VSPACE_PLACEHOLDER", "\\vspace{5pt}");
+            text = text.Replace("VSPACE_PLACEHOLDER", "\\hspace{3pt}");
 
             return text;
         }
