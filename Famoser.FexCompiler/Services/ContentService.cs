@@ -49,6 +49,7 @@ namespace Famoser.FexCompiler.Services
                                 {
                                     //currentLine is a header of a new section, process this by recursive call
                                     i = FillSection(newSection, i, rootLevel + 1);
+                                    i--;
                                 }
                                 else
                                 {

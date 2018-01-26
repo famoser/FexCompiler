@@ -49,11 +49,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helpers\TestHelper.cs" />
-    <Compile Include="FexLinesService.cs" />
+    <Compile Include="Service\TestContentService.cs" />
+    <Compile Include="Service\TestFexLinesService.cs" />
     <Compile Include="Service\Base\BaseService.cs" />
-    <Compile Include="TestStatisticService.cs" />
-    <Compile Include="TestMetaDataService.cs" />
-    <Compile Include="TestFileService.cs" />
+    <Compile Include="Service\TestStatisticService.cs" />
+    <Compile Include="Service\TestMetaDataService.cs" />
+    <Compile Include="Service\TestFileService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -61,6 +62,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Input\advanced.fex">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Input\long.fex">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="packages.config" />

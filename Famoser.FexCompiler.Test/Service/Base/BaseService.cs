@@ -21,6 +21,12 @@ namespace Famoser.FexCompiler.Test.Service.Base
             TestFex("advanced.fex");
         }
 
+        [TestMethod]
+        public void TestLongFex()
+        {
+            TestFex("long.fex");
+        }
+
         protected abstract void TestFex(string fileName);
     }
 }

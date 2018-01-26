@@ -1,0 +1,18 @@
+﻿H1
+===========
+
+H2
+	text
+		only indent this one
+		do not create new titles
+
+H3
+	more text
+	content
+
+H4
+====
+
+H5
+	normal text again
+	this is a subtitle

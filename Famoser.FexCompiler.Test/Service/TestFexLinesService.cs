@@ -4,10 +4,10 @@ using Famoser.FexCompiler.Test.Helpers;
 using Famoser.FexCompiler.Test.Service.Base;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Famoser.FexCompiler.Test
+namespace Famoser.FexCompiler.Test.Service
 {
     [TestClass]
-    public class FexLinesService : BaseService
+    public class TestFexLinesService : BaseService
     {
         protected override void TestFex(string fileName)
         {
@@ -25,7 +25,8 @@ namespace Famoser.FexCompiler.Test
             var dic = new Dictionary<string, int>()
             {
                 {"simple.fex", 4},
-                {"advanced.fex", 11}
+                {"advanced.fex", 11},
+                {"long.fex", 12}
             };
             Assert.AreEqual(fexLines.Count, dic[fileName]);
 
@@ -38,10 +39,18 @@ namespace Famoser.FexCompiler.Test
                         0,1,2,2
                     }
                 },
-                {"advanced.fex",
+                {
+                    "advanced.fex",
                     new List<int>()
                     {
                         0,1,2,3,3,2,2,3,4,4,2
+                    }
+                },
+                {
+                    "long.fex",
+                    new List<int>()
+                    {
+                        0,1,2,3,3,1,2,2,0,1,2,2
                     }
                 }
             };

@@ -3,7 +3,7 @@ using Famoser.FexCompiler.Test.Helpers;
 using Famoser.FexCompiler.Test.Service.Base;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Famoser.FexCompiler.Test
+namespace Famoser.FexCompiler.Test.Service
 {
     [TestClass]
     public class TestStatisticService : BaseService
