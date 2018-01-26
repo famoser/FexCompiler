@@ -56,31 +56,42 @@ namespace Famoser.FexCompiler.Services
             if (content is Section)
             {
                 var section = (Section)content;
-                var sectionName = "section";
-                if (level == 1)
-                    sectionName = "subsection";
-                else if (level == 2)
-                    sectionName = "subsubsection";
-                else if (level == 3)
-                    sectionName = "paragraph";
-                else if (level == 4)
-                    sectionName = "subparagraph";
-                else if (level > 4)
-                    sectionName = "subsubparagraph";
 
-                var noSubContent = !section.Content.Any();
-                //use only bold when no sub content
-                if (noSubContent)
-                    sectionName = "textbf";
+                if (section.Content.Any())
+                {
+                    var sectionName = "section";
+                    if (level == 1)
+                        sectionName = "subsection";
+                    else if (level == 2)
+                        sectionName = "subsubsection";
+                    else if (level == 3)
+                        sectionName = "paragraph";
+                    else if (level == 4)
+                        sectionName = "subparagraph";
+                    else if (level > 4)
+                        sectionName = "subsubparagraph";
 
-                res += "\\" + sectionName + "{" + ToLatex(section.Header) + "}\n";
+                    res += "\\" + sectionName + "{" + ToLatex(section.Header) + "}\n";
+                }
+                else
+                {
+                    //use bold only when no sub content
+                    res += "\\textbf{" + ToLatex(section.Header) + "}\\\\\n";
+                }
 
-                //add section description
-                res += ToLatex(section.TextContent);
+                if (section.TextContent.Any())
+                {
+                    //add section description
+                    res += ToLatex(section.TextContent);
 
-                //need to manually add spacing if no sub defined
-                if (noSubContent)
-                    res += "\\mbox{}\\\\\\vspace{" + AfterParagraphSpacing + "pt}";
+                    //add spacer if bold is following afterwards
+                    if (section.Content.Any() && 
+                        section.Content[0] is Section &&
+                        !((Section) section.Content[0]).Content.Any())
+                    {
+                        res += "\\vspace{" + ParagraphOnParagraphSpacing + "pt}";
+                    }
+                }
 
                 //add higher levels recursively
                 for (var index = 0; index < section.Content.Count; index++)
@@ -91,7 +102,7 @@ namespace Famoser.FexCompiler.Services
                     //check if spacing needed
                     var beforeSection = baseContent as Section;
                     var afterSection = index + 1 < section.Content.Count ? section.Content[index + 1] as Section : null;
-                    if (beforeSection != null && afterSection != null && level > 1)
+                    if (beforeSection != null && afterSection != null)
                     {
                         //if after is paragraph, need to add spacing
                         if (!afterSection.Content.Any())
