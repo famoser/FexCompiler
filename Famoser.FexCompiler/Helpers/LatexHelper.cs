@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using Famoser.FexCompiler.Enum;
 using Famoser.FexCompiler.Models;
-using Famoser.FexCompiler.Models.ContentTypes;
-using Famoser.FexCompiler.Models.ContentTypes.Base;
+using Famoser.FexCompiler.Models.Content;
+using Famoser.FexCompiler.Models.Content.Base;
 using Famoser.FexCompiler.Models.TextRepresentation;
 
 namespace Famoser.FexCompiler.Helpers
@@ -18,9 +18,9 @@ namespace Famoser.FexCompiler.Helpers
 
             template = template.Replace("TITLE", documentModel.Title);
             template = template.Replace("AUTHOR", documentModel.Author);
-            template = template.Replace("CHARACTER_COUNT", documentModel.DocumentStats.CharacterCount.ToString());
-            template = template.Replace("WORD_COUNT", documentModel.DocumentStats.WordCount.ToString());
-            template = template.Replace("LINE_COUNT", documentModel.DocumentStats.LineCount.ToString());
+            template = template.Replace("CHARACTER_COUNT", documentModel.StatisticModel.CharacterCount.ToString());
+            template = template.Replace("WORD_COUNT", documentModel.StatisticModel.WordCount.ToString());
+            template = template.Replace("LINE_COUNT", documentModel.StatisticModel.LineCount.ToString());
 
             var content = ToLatex(documentModel.Content, 0);
 
@@ -28,7 +28,7 @@ namespace Famoser.FexCompiler.Helpers
             return template;
         }
 
-        private static string ToLatex(List<Content> contentList, int level)
+        private static string ToLatex(List<BaseContent> contentList, int level)
         {
             var res = "";
             var lastWasParagraph = false;

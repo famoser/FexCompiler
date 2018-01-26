@@ -84,20 +84,25 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Enum\TextType.cs" />
+    <Compile Include="Helpers\ContentService.cs" />
     <Compile Include="Helpers\FexService.cs" />
     <Compile Include="Helpers\FileService.cs" />
+    <Compile Include="Helpers\Interface\IProcessService.cs" />
     <Compile Include="Helpers\LatexHelper.cs" />
+    <Compile Include="Helpers\MetaDataService.cs" />
     <Compile Include="Helpers\PathHelper.cs" />
+    <Compile Include="Helpers\StatisticService.cs" />
     <Compile Include="Helpers\TextHelper.cs" />
     <Compile Include="Models\ConfigModel.cs" />
     <Compile Include="Models\DocumentModel.cs" />
-    <Compile Include="Models\DocumentStats.cs" />
+    <Compile Include="Models\Document\MetaDataModel.cs" />
+    <Compile Include="Models\Document\StatisticModel.cs" />
     <Compile Include="Models\FexLine.cs" />
-    <Compile Include="Models\ContentTypes\Base\Content.cs" />
-    <Compile Include="Models\ContentTypes\Code.cs" />
+    <Compile Include="Models\Content\Base\BaseContent.cs" />
+    <Compile Include="Models\Content\Code.cs" />
     <Compile Include="Models\TextRepresentation\LineNode.cs" />
-    <Compile Include="Models\ContentTypes\Paragraph.cs" />
-    <Compile Include="Models\ContentTypes\Section.cs" />
+    <Compile Include="Models\Content\Paragraph.cs" />
+    <Compile Include="Models\Content\Section.cs" />
     <Compile Include="Models\TextRepresentation\TextNode.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Famoser.FexCompiler.Models;
-using Famoser.FexCompiler.Models.ContentTypes;
+using Famoser.FexCompiler.Models.Content;
 using Famoser.FexCompiler.Models.TextRepresentation;
 
 namespace Famoser.FexCompiler.Helpers

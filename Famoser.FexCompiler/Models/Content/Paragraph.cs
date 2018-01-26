@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using Famoser.FexCompiler.Models.ContentTypes.Base;
+using Famoser.FexCompiler.Models.Content.Base;
 using Famoser.FexCompiler.Models.TextRepresentation;
 
-namespace Famoser.FexCompiler.Models.ContentTypes
+namespace Famoser.FexCompiler.Models.Content
 {
-    public class Paragraph : Content
+    public class Paragraph : BaseContent
     {
         public Paragraph(LineNode header)
         {
@@ -12,7 +12,6 @@ namespace Famoser.FexCompiler.Models.ContentTypes
         }
 
         public LineNode Header { get; }
-
         public List<LineNode> Content { get; } = new List<LineNode>();
     }
 }

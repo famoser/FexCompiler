@@ -74,14 +74,30 @@ namespace Famoser.FexCompiler
             for (var index = 0; index < paths.Count; index++)
             {
                 var path = paths[index];
-                var fileService = new FileService(path);
-                var document = fileService.Process();
                 
+                //prepare meta data
+                var metaDataService = new MetaDataService(config, path);
+                var metaData = metaDataService.Process();
 
-                var pathEntries = path.Split(new[] {"\\"}, StringSplitOptions.None);
-                var title = pathEntries[pathEntries.Length - 1];
+                //todo: check if file needs to be regenerated
 
-                var document = FexService.ParseDocument(lines.ToList(), title.Substring(0, title.Length - 4), config);
+                var document = new DocumentModel();
+
+                //read out file
+                var fileService = new FileService(path);
+                document.RawLines = fileService.Process();
+
+                //create statistic
+                var statisticService = new StatisticService(document.RawLines);
+                document.StatisticModel = statisticService.Process();
+
+                //convert to fexLines
+                var fexService = new FexService(document.RawLines);
+                document.FexLines = fexService.Process();
+
+                //convert to content
+
+
                 TextHelper.Improve(document);
 
                 var content = LatexHelper.CreateLatex(document);

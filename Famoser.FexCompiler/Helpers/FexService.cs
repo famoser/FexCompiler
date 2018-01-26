@@ -2,77 +2,34 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using Famoser.FexCompiler.Enum;
+using Famoser.FexCompiler.Helpers.Interface;
 using Famoser.FexCompiler.Models;
-using Famoser.FexCompiler.Models.ContentTypes;
 using Famoser.FexCompiler.Models.TextRepresentation;
 using Newtonsoft.Json.Linq;
 
 namespace Famoser.FexCompiler.Helpers
 {
-    public class FexService
+    /// <summary>
+    /// 
+    /// </summary>
+    public class FexService : IProcessService<List<FexLine>>
     {
-        private readonly DocumentModel _document;
-        public FexService(DocumentModel document)
+        private readonly string[] _lines;
+        public FexService(string[] lines)
         {
-            _document = document;
+            _lines = lines;
         }
 
-        public DocumentModel ParseDocument()
+        public List<FexLine> Process()
         {
-            var fexLines = ConvertToFexLines(_document.RawLines);
+            var fexLines = ConvertToFexLines(_lines);
             NormalizeFexLineLevels(fexLines);
             TightenFexLineLevels(fexLines);
             ProcessColon(fexLines);
-
-            Section section = new Section(null);
-            FillSection(fexLines, section, 0, fexLines.Count - 1, 0);
-            document.Content = section.Content;
-
-            return document;
-        }
-
-        private static void FillSection(List<FexLine> lines, Section section, int startIndex, int stopIndex, int levelCorrection)
-        {
-            int i = startIndex;
-            for (; i <= stopIndex; i++)
-            {
-                if (lines[i].IsCode)
-                {
-                    section.Content.Add(new Code(lines[i].Text));
-                }
-                else
-                {
-                    var nextLevel = i < stopIndex ? lines[i + 1].Level - levelCorrection : -100;
-
-                    //if nextLevel is bigger we recursively call
-                    if (nextLevel > 0)
-                    {
-                        var newStartIndex = i + 1;
-                        var newStopIndex = stopIndex;
-                        int j = newStartIndex;
-                        for (; j <= stopIndex; j++)
-                        {
-                            if (lines[j].Level - levelCorrection == 0)
-                            {
-                                newStopIndex = j - 1;
-                                break;
-                            }
-                        }
-
-                        //wops we really need a new section
-                        var newSection = new Section(section) { Title = GetLineNodeSimple(lines[i].Text, true) };
-                        FillSection(lines, newSection, newStartIndex, newStopIndex, levelCorrection + 1);
-                        i = newStopIndex;
-                        section.Content.Add(newSection);
-                    }
-                    else
-                    {
-                        section.Content.Add(new Paragraph(GetLineNodeSimple(lines[i].Text, false)));
-                    }
-                }
-            }
+            return fexLines;
         }
 
         /// <summary>
@@ -235,7 +192,6 @@ namespace Famoser.FexCompiler.Helpers
                     lastLevel = lines[i].Level;
                 }
             } while (strangeLinesFound);
-
         }
 
         /// <summary>
@@ -310,21 +266,6 @@ namespace Famoser.FexCompiler.Helpers
                     }
                 }
             }
-
-            //remove all colons at the end of the line
-        }
-
-        private static LineNode GetLineNodeSimple(string line, bool isTitle)
-        {
-            var res = new List<TextNode>();
-            line = line.Trim();
-            res.Add(new TextNode() { TextType = isTitle ? TextType.Bold : TextType.Normal, Text = ParseText(line) });
-            return new LineNode(res);
-        }
-
-        private static string ParseText(string str)
-        {
-            return str.Trim();
         }
     }
 }

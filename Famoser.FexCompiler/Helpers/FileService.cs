@@ -4,11 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Famoser.FexCompiler.Helpers.Interface;
 using Famoser.FexCompiler.Models;
 
 namespace Famoser.FexCompiler.Helpers
 {
-    public class FileService
+    public class FileService : IProcessService<string[]>
     {
         private readonly string _path;
         public FileService(string path)
@@ -16,21 +17,9 @@ namespace Famoser.FexCompiler.Helpers
             _path = path;
         }
 
-        public DocumentModel Process()
+        public string[] Process()
         {
-            var lines = File.ReadAllLines(_path);
-            
-            return new DocumentModel()
-            {
-                RawLines = lines,
-                DocumentStats = new DocumentStats
-                {
-                    LineCount = lines.Length,
-                    CharacterCount = lines.Sum(s => s.Length),
-                    WordCount = lines.Sum(s1 => s1.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries)
-                        .Count(s => s.Trim().Length > 0))
-                }
-            };
+            return File.ReadAllLines(_path);
         }
     }
 }
