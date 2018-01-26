@@ -2,17 +2,17 @@
 ===========
 
 H2
-	text
-		only indent this one
-		do not create new titles
+	H2.1
+		H2.1.1
+		H2.1.2
 
 H3
-	more text
-	content
+	H3.1
+	H3.1
 
 H4
 ====
 
 H5
-	normal text again
-	this is a subtitle
+	H5.1
+	H5.2
