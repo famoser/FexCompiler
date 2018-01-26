@@ -1,5 +1,8 @@
 # FexCompiler
 
+[![Build status](https://ci.appveyor.com/api/projects/status/987fgimtc5rk546d?svg=true)](https://ci.appveyor.com/project/famoser/fexcompiler)
+[![codecov](https://codecov.io/gh/famoser/FexCompiler/branch/master/graph/badge.svg)](https://codecov.io/gh/famoser/FexCompiler)
+
 The FexCompiler can process .fex files to create a printable .pdf.
 
 # Fex
