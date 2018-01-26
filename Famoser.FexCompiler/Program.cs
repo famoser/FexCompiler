@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Famoser.FexCompiler.Helpers;
 using Famoser.FexCompiler.Models;
 using Famoser.FexCompiler.Services;
 using Newtonsoft.Json;
@@ -17,11 +18,12 @@ namespace Famoser.FexCompiler
         {
             Console.WriteLine("Welcome to FexCompiler");
 
+            var fileService = new FileService();
             //get config file
-            var configModel = GetConfigModel();
-            if (configModel == null || !configModel.IsComplete())
+            var configModel = fileService.GetConfigModel();
+            if (!configModel.IsComplete())
             {
-                configModel = CreateConfiguration();
+                RenewConfiguration(configModel, fileService);
             }
 
             //worker loop
@@ -33,7 +35,7 @@ namespace Famoser.FexCompiler
                 if (key.Key == ConsoleKey.Enter)
                 {
                     //compile
-                    Compile(configModel);
+                    Compile(configModel, fileService);
                 }
                 else if (key.Key == ConsoleKey.Q)
                 {
@@ -43,7 +45,7 @@ namespace Famoser.FexCompiler
                 else if (key.Key == ConsoleKey.C)
                 {
                     //create config
-                    configModel = CreateConfiguration();
+                    RenewConfiguration(configModel, fileService);
                 }
                 else
                 {
@@ -52,25 +54,21 @@ namespace Famoser.FexCompiler
             }
         }
 
-        private static ConfigModel CreateConfiguration()
+        private static void RenewConfiguration(ConfigModel configModel, FileService fileService)
         {
-            var configModel = new ConfigModel();
-
-            //configuration init
+            //configure
             Console.WriteLine("Choose path to look for .fex files");
             configModel.CompilePath = Console.ReadLine();
             Console.WriteLine("Choose your Author");
             configModel.Author = Console.ReadLine();
 
-            //save file
-            string configFilePath = PathHelper.GetAssemblyPath(ConfigFileName);
-            File.WriteAllText(configFilePath, JsonConvert.SerializeObject(configModel));
-            return configModel;
+            //persist
+            fileService.SetConfigModel(configModel);
         }
 
-        private static void Compile(ConfigModel config)
+        private static void Compile(ConfigModel config, FileService fileService)
         {
-            var paths = PathHelper.GetAllFexFilePaths(config.CompilePath);
+            var paths = fileService.GetAllFexFilePaths(config.CompilePath);
             for (var index = 0; index < paths.Count; index++)
             {
                 var path = paths[index];
@@ -89,8 +87,7 @@ namespace Famoser.FexCompiler
                 };
 
                 //read out file
-                var fileService = new FileService(path);
-                document.RawLines = fileService.Process();
+                document.RawLines = fileService.ReadFile(path);
                 Console.WriteLine("#");
 
                 //convert to fexLines
@@ -120,6 +117,18 @@ namespace Famoser.FexCompiler
                     Console.WriteLine(metaData.Title + " compiled successfully");
                 else
                     Console.WriteLine(metaData.Title + " failed to compile");
+
+                //learning cards compile
+                var learningCardsService = new LearningCardsService(document.RootSection.Content);
+                var cards = learningCardsService.Process();
+
+                //persist learning cards as json
+                var baseFileName = path.Substring(0, path.LastIndexOf(".", StringComparison.Ordinal));
+                var jsonFile = baseFileName + ".json";
+                File.WriteAllText(jsonFile, JsonConvert.SerializeObject(cards));
+                //persist cards as csv
+                var csvFile = baseFileName + ".csv";
+                File.WriteAllText(csvFile, cards.Aggregate("", (a, b) => a + "\n\n\n\n" + b.Title + "\t" + b.Content).Substring(4));
             }
 
             for (int i = 0; i < 10; i++)
@@ -128,17 +137,5 @@ namespace Famoser.FexCompiler
             }
         }
 
-        private static string ConfigFileName = "config.json";
-        private static ConfigModel GetConfigModel()
-        {
-            //read out existing or create new config model
-            string configFilePath = PathHelper.GetAssemblyPath(ConfigFileName);
-            if (File.Exists(configFilePath))
-            {
-                var configFileContent = File.ReadAllText(configFilePath);
-                return JsonConvert.DeserializeObject<ConfigModel>(configFileContent);
-            }
-            return new ConfigModel();
-        }
     }
 }

@@ -13,7 +13,7 @@ namespace Famoser.FexCompiler.Test.Service
         {
             //arrange
             var fileService = new FileService(TestHelper.GetInputFilePath(fileName));
-            var lines = fileService.Process();
+            var lines = fileService.ReadFile();
             var fexService = new FexService(lines);
 
             //act
@@ -64,7 +64,7 @@ namespace Famoser.FexCompiler.Test.Service
         {
             //arrange
             var fileService = new FileService(TestHelper.GetInputFilePath("colon.fex"));
-            var lines = fileService.Process();
+            var lines = fileService.ReadFile();
             var fexService = new FexService(lines);
 
             //act
@@ -91,7 +91,7 @@ namespace Famoser.FexCompiler.Test.Service
         {
             //arrange
             var fileService = new FileService(TestHelper.GetInputFilePath("simple.fex"));
-            var lines = fileService.Process();
+            var lines = fileService.ReadFile();
             var fexService = new FexService(lines);
 
             //act

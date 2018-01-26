@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Famoser.FexCompiler.Enum;
+using Famoser.FexCompiler.Helpers;
 using Famoser.FexCompiler.Models.Content;
 using Famoser.FexCompiler.Models.Content.Base;
 using Famoser.FexCompiler.Models.Document;
@@ -18,7 +19,6 @@ namespace Famoser.FexCompiler.Services
         private readonly MetaDataModel _metaDataModel;
         private readonly List<BaseContent> _content;
 
-        private const int AfterParagraphSpacing = 3;
         private const int ParagraphOnParagraphSpacing = 5;
         private const int SectionOnParagraphSpacing = 8;
 
@@ -31,7 +31,7 @@ namespace Famoser.FexCompiler.Services
 
         public string Process()
         {
-            var path = PathHelper.GetAssemblyPath("Templates/template_Article.tex");
+            var path = Path.Combine(PathHelper.GetAssemblyPath(), "Templates/template_Article.tex");
             var template = File.ReadAllText(path);
 
             template = template.Replace("TITLE", _metaDataModel.Title);
@@ -85,9 +85,9 @@ namespace Famoser.FexCompiler.Services
                     res += ToLatex(section.TextContent);
 
                     //add spacer if bold is following afterwards
-                    if (section.Content.Any() && 
+                    if (section.Content.Any() &&
                         section.Content[0] is Section &&
-                        !((Section) section.Content[0]).Content.Any())
+                        !((Section)section.Content[0]).Content.Any())
                     {
                         res += "\\vspace{" + ParagraphOnParagraphSpacing + "pt}";
                     }

@@ -14,7 +14,7 @@ namespace Famoser.FexCompiler.Test.Service
             var fileService = new FileService(TestHelper.GetInputFilePath(fileName));
 
             //act
-            var lines = fileService.Process();
+            var lines = fileService.ReadFile();
 
             //assert 
             Assert.IsTrue(lines != null);
