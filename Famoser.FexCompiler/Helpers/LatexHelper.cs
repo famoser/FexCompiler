@@ -3,25 +3,26 @@ using System.Collections.Generic;
 using System.IO;
 using Famoser.FexCompiler.Enum;
 using Famoser.FexCompiler.Models;
+using Famoser.FexCompiler.Models.ContentTypes;
+using Famoser.FexCompiler.Models.ContentTypes.Base;
 using Famoser.FexCompiler.Models.TextRepresentation;
-using Famoser.FexCompiler.Models.TextRepresentation.Base;
 
 namespace Famoser.FexCompiler.Helpers
 {
     public class LatexHelper
     {
-        public static string CreateLatex(Document document)
+        public static string CreateLatex(DocumentModel documentModel)
         {
             var path = PathHelper.GetAssemblyPath("Templates/template_Article.tex");
             var template = File.ReadAllText(path);
 
-            template = template.Replace("TITLE", document.Title);
-            template = template.Replace("AUTHOR", document.Author);
-            template = template.Replace("CHARACTER_COUNT", document.DocumentStats.CharacterCount.ToString());
-            template = template.Replace("WORD_COUNT", document.DocumentStats.WordCount.ToString());
-            template = template.Replace("LINE_COUNT", document.DocumentStats.LineCount.ToString());
+            template = template.Replace("TITLE", documentModel.Title);
+            template = template.Replace("AUTHOR", documentModel.Author);
+            template = template.Replace("CHARACTER_COUNT", documentModel.DocumentStats.CharacterCount.ToString());
+            template = template.Replace("WORD_COUNT", documentModel.DocumentStats.WordCount.ToString());
+            template = template.Replace("LINE_COUNT", documentModel.DocumentStats.LineCount.ToString());
 
-            var content = ToLatex(document.Content, 0);
+            var content = ToLatex(documentModel.Content, 0);
 
             template = template.Replace("CONTENT", content);
             return template;

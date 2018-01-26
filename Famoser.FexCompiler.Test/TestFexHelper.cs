@@ -2,6 +2,7 @@
 using System.Linq;
 using Famoser.FexCompiler.Enum;
 using Famoser.FexCompiler.Helpers;
+using Famoser.FexCompiler.Models.ContentTypes;
 using Famoser.FexCompiler.Models.TextRepresentation;
 using Famoser.FexCompiler.Test.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -16,7 +17,7 @@ namespace Famoser.FexCompiler.Test
         {
             var fileContent = TestHelper.GetInputFile("simple.fex");
             var configModel = TestHelper.GetConfigModel();
-            var doc = FexHelper.ParseDocument(fileContent.ToList(), "test", configModel);
+            var doc = FexService.ParseDocument(fileContent.ToList(), "test", configModel);
 
             //check h1 section
             Assert.IsTrue(doc != null);
@@ -63,7 +64,7 @@ namespace Famoser.FexCompiler.Test
         {
             var fileContent = TestHelper.GetInputFile("advanced.fex");
             var configModel = TestHelper.GetConfigModel();
-            var doc = FexHelper.ParseDocument(fileContent.ToList(), "test", configModel);
+            var doc = FexService.ParseDocument(fileContent.ToList(), "test", configModel);
 
             //check h1 section
             Assert.IsTrue(doc != null);

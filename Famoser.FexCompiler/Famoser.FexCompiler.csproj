@@ -84,19 +84,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Enum\TextType.cs" />
-    <Compile Include="Helpers\FexHelper.cs" />
+    <Compile Include="Helpers\FexService.cs" />
+    <Compile Include="Helpers\FileService.cs" />
     <Compile Include="Helpers\LatexHelper.cs" />
     <Compile Include="Helpers\PathHelper.cs" />
     <Compile Include="Helpers\TextHelper.cs" />
     <Compile Include="Models\ConfigModel.cs" />
-    <Compile Include="Models\Document.cs" />
+    <Compile Include="Models\DocumentModel.cs" />
     <Compile Include="Models\DocumentStats.cs" />
     <Compile Include="Models\FexLine.cs" />
-    <Compile Include="Models\TextRepresentation\Base\TextUnit.cs" />
-    <Compile Include="Models\TextRepresentation\Code.cs" />
+    <Compile Include="Models\ContentTypes\Base\Content.cs" />
+    <Compile Include="Models\ContentTypes\Code.cs" />
     <Compile Include="Models\TextRepresentation\LineNode.cs" />
-    <Compile Include="Models\TextRepresentation\Paragraph.cs" />
-    <Compile Include="Models\TextRepresentation\Section.cs" />
+    <Compile Include="Models\ContentTypes\Paragraph.cs" />
+    <Compile Include="Models\ContentTypes\Section.cs" />
     <Compile Include="Models\TextRepresentation\TextNode.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

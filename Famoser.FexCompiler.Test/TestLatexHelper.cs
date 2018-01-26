@@ -17,7 +17,7 @@ namespace Famoser.FexCompiler.Test
         {
             var fileContent = TestHelper.GetInputFile("advanced.fex");
             var configModel = TestHelper.GetConfigModel();
-            var doc = FexHelper.ParseDocument(fileContent.ToList(), "test", configModel);
+            var doc = FexService.ParseDocument(fileContent.ToList(), "test", configModel);
             TextHelper.Improve(doc);
 
             var latex = LatexHelper.CreateLatex(doc);

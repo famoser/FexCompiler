@@ -4,13 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Famoser.FexCompiler.Models;
+using Famoser.FexCompiler.Models.ContentTypes;
 using Famoser.FexCompiler.Models.TextRepresentation;
 
 namespace Famoser.FexCompiler.Helpers
 {
     public class TextHelper
     {
-        public static void Improve(Document doc)
+        public static void Improve(DocumentModel doc)
         {
             foreach (var content in doc.Content)
             {
