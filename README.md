@@ -1,17 +1,13 @@
 # FexCompiler
 
+The FexCompiler can process .fex files to create a printable .pdf.
 
-This projects compiles .fex files to .pdf files. It first convertes the .fex format to .tex, and then calls a .tex compiler to create the pdf. You can find the specifications of the .fex language down below.
+# Fex
 
-## Fex
-
-This language was created specifically for the easy & fast creation of summaries in a text editor, and then convert it to a printable format. 
-The language has no control caracters, and builds the .tex mainly from tabs & spaces.
-
-Following are the currently supported caracters:
- - The Tab caracter creates a new chapter. The first line of the new chapter is its title
- - You can create lists with either `-` or numbers in the format `1:`
- - You can create bold text with appendending a `:` at the end (example: `Diffusion:`)
+Fex was created specifically for fast creation of summaries in a text editor. 
+Its very simple:  
+Write each topic on its own line, and use tabs to differentiate chapters.
+You may also use the structure "keyword: content" if you don't want to create a new line for a few words.
 
 ## Example Fex
 

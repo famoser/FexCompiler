@@ -1,0 +1,16 @@
+os: Visual Studio 2017
+install:
+- set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
+before_build:
+  - nuget restore
+build:
+  project: Famoser.FexCompiler.sln
+  verbosity: minimal
+test_script: 
+    - .\packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:"C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\MSTest.exe" -targetargs:"/noresults /noisolation /testcontainer:"".\Famoser.SyncApi.UnitTests\bin\Debug\Famoser.SyncApi.UnitTests.dll" -filter:"+[Famoser.SyncApi]*  -[Famoser.SyncApi]Famoser.SyncApi.Properties.*" -excludebyattribute:*.ExcludeFromCodeCoverage* -hideskipped:All -output:.\SyncApi_coverage.xml -returntargetcode
+    - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
+    - pip install codecov
+    - codecov -f "SyncApi_coverage.xml"  
+# preserve "packages" directory in the root of build folder but will reset it if packages.config is modified
+cache:
+  - packages -> **\packages.config
