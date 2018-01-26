@@ -26,9 +26,10 @@ namespace Famoser.FexCompiler.Helpers
         {
             var pathEntries = _path.Split(new[] { "\\" }, StringSplitOptions.None);
             var title = pathEntries[pathEntries.Length - 1];
-            
+            title = title.Substring(0, title.IndexOf(".", StringComparison.Ordinal));
+
             var changeDateTime = File.GetLastWriteTime(_path);
-            
+
             //get file hash
             byte[] byteHash;
             using (var sha256 = SHA256.Create())
@@ -39,11 +40,11 @@ namespace Famoser.FexCompiler.Helpers
                 }
             }
             var hash = Convert.ToBase64String(byteHash);
-            
+
             return new MetaDataModel
             {
                 Author = _configModel.Author.Trim(),
-                GeneratedAt = new DateTime(),
+                GeneratedAt = DateTime.Now,
                 ChangedAt = changeDateTime,
                 Title = title.Trim(),
                 Hash = hash

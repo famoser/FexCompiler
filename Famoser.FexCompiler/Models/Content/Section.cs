@@ -6,8 +6,13 @@ namespace Famoser.FexCompiler.Models.Content
 {
     public class Section : BaseContent
     {
+        public Section(LineNode header)
+        {
+            Header = header;
+        }
+
         public LineNode Header { get; }
-        public LineNode Description { get; }
+        public List<LineNode> TextContent { get; } = new List<LineNode>();
         public List<BaseContent> Content { get; } = new List<BaseContent>();
     }
 }

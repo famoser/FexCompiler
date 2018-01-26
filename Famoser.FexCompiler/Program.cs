@@ -74,75 +74,52 @@ namespace Famoser.FexCompiler
             for (var index = 0; index < paths.Count; index++)
             {
                 var path = paths[index];
-                
+
                 //prepare meta data
                 var metaDataService = new MetaDataService(config, path);
                 var metaData = metaDataService.Process();
+                Console.WriteLine("compiling " + metaData.Title);
 
                 //todo: check if file needs to be regenerated
 
-                var document = new DocumentModel();
+                Console.Write("#");
+                var document = new DocumentModel()
+                {
+                    MetaDataModel = metaData
+                };
 
                 //read out file
                 var fileService = new FileService(path);
                 document.RawLines = fileService.Process();
+                Console.WriteLine("#");
 
                 //create statistic
                 var statisticService = new StatisticService(document.RawLines);
                 document.StatisticModel = statisticService.Process();
+                Console.Write("#");
 
                 //convert to fexLines
                 var fexService = new FexService(document.RawLines);
                 document.FexLines = fexService.Process();
+                Console.Write("#");
 
                 //convert to content
+                var contentService = new ContentService(document.FexLines);
+                document.RootSection = contentService.Process();
+                Console.Write("#");
 
+                //latex output
+                var latexService = new LatexService(document.StatisticModel, document.MetaDataModel, document.RootSection.Content);
+                var latex = latexService.Process();
+                Console.Write("#");
 
-                TextHelper.Improve(document);
-
-                var content = LatexHelper.CreateLatex(document);
-
-                var baseFileName = path.Substring(0, path.LastIndexOf(".", StringComparison.Ordinal));
-                var texFile = baseFileName + ".tex";
-                File.WriteAllText(texFile, content);
-                var texFolder = texFile.Substring(0, texFile.LastIndexOf("\\", StringComparison.Ordinal));
-
-
-                var batFileLines = new string[2];
-                batFileLines[0] = "del \"" + baseFileName + ".aux\"";
-                batFileLines[1] = "pdflatex \"" + texFile + "\" -output-directory=\"" + texFolder + "\"";
-                var batFilename = "batch" + index + ".bat";
-                File.WriteAllLines(batFilename, batFileLines);
-
-                try
-                {
-                    Console.WriteLine("###############################################");
-                    Console.WriteLine("###############################################");
-                    Console.WriteLine("##### starting to compile for " + title + " ####");
-                    Console.WriteLine("##### file at " + texFile + " ####");
-                    Console.WriteLine("###############################################");
-                    Console.WriteLine("###############################################");
-                    Process p1 = new Process
-                    {
-                        StartInfo =
-                        {
-                            FileName = batFilename,
-                            UseShellExecute = false
-                        }
-                    };
-
-                    p1.Start();
-                    p1.WaitForExit();
-                    Console.WriteLine("###############################################");
-                    Console.WriteLine("#### compiled for " + title + " ####");
-                    Console.WriteLine("###############################################");
-
-                    File.Delete(batFilename);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
+                //latex compile
+                var latexCompilerService = new LatexCompilerService(path, latex);
+                var latexCompileFeedback = latexCompilerService.Process();
+                if (latexCompileFeedback)
+                    Console.WriteLine(metaData.Title + " compiled successfully");
+                else
+                    Console.WriteLine(metaData.Title + " failed to compile");
             }
 
             for (int i = 0; i < 10; i++)

@@ -84,15 +84,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Enum\TextType.cs" />
-    <Compile Include="Helpers\ContentService.cs" />
-    <Compile Include="Helpers\FexService.cs" />
-    <Compile Include="Helpers\FileService.cs" />
-    <Compile Include="Helpers\Interface\IProcessService.cs" />
-    <Compile Include="Helpers\LatexHelper.cs" />
-    <Compile Include="Helpers\MetaDataService.cs" />
-    <Compile Include="Helpers\PathHelper.cs" />
-    <Compile Include="Helpers\StatisticService.cs" />
-    <Compile Include="Helpers\TextHelper.cs" />
+    <Compile Include="Services\ContentService.cs" />
+    <Compile Include="Services\FexService.cs" />
+    <Compile Include="Services\FileService.cs" />
+    <Compile Include="Services\Interface\IProcessService.cs" />
+    <Compile Include="Services\LatexCompilerService.cs" />
+    <Compile Include="Services\LatexService.cs" />
+    <Compile Include="Services\MetaDataService.cs" />
+    <Compile Include="Services\PathHelper.cs" />
+    <Compile Include="Services\StatisticService.cs" />
     <Compile Include="Models\ConfigModel.cs" />
     <Compile Include="Models\DocumentModel.cs" />
     <Compile Include="Models\Document\MetaDataModel.cs" />
@@ -101,7 +101,6 @@
     <Compile Include="Models\Content\Base\BaseContent.cs" />
     <Compile Include="Models\Content\Code.cs" />
     <Compile Include="Models\TextRepresentation\LineNode.cs" />
-    <Compile Include="Models\Content\Paragraph.cs" />
     <Compile Include="Models\Content\Section.cs" />
     <Compile Include="Models\TextRepresentation\TextNode.cs" />
     <Compile Include="Program.cs" />

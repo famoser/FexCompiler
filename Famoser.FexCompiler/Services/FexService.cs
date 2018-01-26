@@ -159,6 +159,8 @@ namespace Famoser.FexCompiler.Helpers
             var strangeLinesFound = false;
             do
             {
+                strangeLinesFound = false;
+
                 var lastLevel = lines[0].Level;
                 for (int i = 1; i < lines.Count; i++)
                 {
@@ -176,16 +178,21 @@ namespace Famoser.FexCompiler.Helpers
                         Debug.Assert(correction >= 1);
 
                         //correct all lines with level 
-                        for (int j = i; j < lines.Count; j++)
+                        for (;i < lines.Count; i++)
                         {
-                            if (lines[j].Level >= faultyLevel)
+                            if (lines[i].Level >= faultyLevel)
                             {
-                                lines[j].Level -= correction;
+                                lines[i].Level -= correction;
                             }
                             else
                             {
                                 break;
                             }
+                        }
+
+                        if (i == lines.Count)
+                        {
+                            break;
                         }
                     }
 

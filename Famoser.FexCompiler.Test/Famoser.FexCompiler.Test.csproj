@@ -49,9 +49,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helpers\TestHelper.cs" />
-    <Compile Include="TestFexHelper.cs" />
+    <Compile Include="TestMetaDataService.cs" />
+    <Compile Include="TestFileService.cs" />
+    <Compile Include="TestContentService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestLatexHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Input\simple.fex">

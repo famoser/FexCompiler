@@ -1,27 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Famoser.FexCompiler.Enum;
 using Famoser.FexCompiler.Helpers;
+using Famoser.FexCompiler.Models.Content;
+using Famoser.FexCompiler.Models.TextRepresentation;
 using Famoser.FexCompiler.Test.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Famoser.FexCompiler.Test
 {
     [TestClass]
-    public class TestLatexHelper
+    public class TestContentService
     {
+        [TestMethod]
+        public void TestSimpleFex()
+        {
+            var fileContent = TestHelper.GetInputFile("simple.fex");
+            var configModel = TestHelper.GetConfigModel();
+        }
+
         [TestMethod]
         public void TestAdvancedFex()
         {
             var fileContent = TestHelper.GetInputFile("advanced.fex");
             var configModel = TestHelper.GetConfigModel();
-            var doc = FexService.ParseDocument(fileContent.ToList(), "test", configModel);
-            TextHelper.Improve(doc);
-
-            var latex = LatexHelper.CreateLatex(doc);
-            Assert.IsTrue(latex != "");
         }
     }
 }
