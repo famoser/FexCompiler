@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="Helpers\TestHelper.cs" />
     <Compile Include="FexLinesService.cs" />
+    <Compile Include="Service\Base\BaseService.cs" />
     <Compile Include="TestStatisticService.cs" />
     <Compile Include="TestMetaDataService.cs" />
     <Compile Include="TestFileService.cs" />

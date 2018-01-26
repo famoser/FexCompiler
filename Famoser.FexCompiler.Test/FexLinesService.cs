@@ -1,25 +1,14 @@
 ﻿using Famoser.FexCompiler.Services;
 using Famoser.FexCompiler.Test.Helpers;
+using Famoser.FexCompiler.Test.Service.Base;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Famoser.FexCompiler.Test
 {
     [TestClass]
-    public class FexLinesService
+    public class FexLinesService : BaseService
     {
-        [TestMethod]
-        public void TestSimpleFex()
-        {
-            TestFex("simple.fex");
-        }
-
-        [TestMethod]
-        public void TestAdvancedFex()
-        {
-            TestFex("advanced.fex");
-        }
-
-        private void TestFex(string fileName)
+        protected override void TestFex(string fileName)
         {
             //arrange
             var fileService = new FileService(TestHelper.GetInputFilePath(fileName));

@@ -1,24 +1,13 @@
 ﻿using Famoser.FexCompiler.Services;
 using Famoser.FexCompiler.Test.Helpers;
+using Famoser.FexCompiler.Test.Service.Base;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Famoser.FexCompiler.Test
 {
     [TestClass]
-    public class TestStatisticService
+    public class TestStatisticService : BaseService
     {
-        [TestMethod]
-        public void TestSimpleFex()
-        {
-            TestFex("simple.fex");
-        }
-
-        [TestMethod]
-        public void TestAdvancedFex()
-        {
-            TestFex("advanced.fex");
-        }
-
         [TestMethod]
         public void TestSimpleFexExact()
         {
@@ -38,7 +27,7 @@ namespace Famoser.FexCompiler.Test
             Assert.IsTrue(statistic.LineCount == 4);
         }
 
-        private void TestFex(string fileName)
+        protected override void TestFex(string fileName)
         {
             //arrange
             var fileService = new FileService(TestHelper.GetInputFilePath(fileName));

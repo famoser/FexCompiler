@@ -7,25 +7,14 @@ using Famoser.FexCompiler.Models.Document;
 using Famoser.FexCompiler.Models.TextRepresentation;
 using Famoser.FexCompiler.Services;
 using Famoser.FexCompiler.Test.Helpers;
+using Famoser.FexCompiler.Test.Service.Base;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Famoser.FexCompiler.Test
 {
     [TestClass]
-    public class TestMetaDataService
+    public class TestMetaDataService : BaseService
     {
-        [TestMethod]
-        public void TestSimpleFex()
-        {
-            TestFex("simple.fex", "simple");
-        }
-
-        [TestMethod]
-        public void TestAdvancedFex()
-        {
-            TestFex("advanced.fex", "advanced");
-        }
-
         [TestMethod]
         public void TestHashFex()
         {
@@ -42,7 +31,7 @@ namespace Famoser.FexCompiler.Test
             Assert.AreNotEqual(metaData1.Hash, metaData2.Hash);
         }
 
-        private void TestFex(string fileName, string expectedName)
+        protected override void TestFex(string fileName)
         {
             //arrange
             var configModel = TestHelper.GetConfigModel();
@@ -52,7 +41,7 @@ namespace Famoser.FexCompiler.Test
             var metaData = metaDataService.Process();
 
             //assert
-            Assert.AreEqual(metaData.Title, expectedName);
+            Assert.AreEqual(metaData.Title, fileName.Substring(0, fileName.Length - 4));
             Assert.AreEqual(metaData.Author, configModel.Author);
             Assert.IsTrue(!string.IsNullOrEmpty(metaData.Hash));
             Assert.IsTrue(metaData.ChangedAt > DateTime.MinValue);
