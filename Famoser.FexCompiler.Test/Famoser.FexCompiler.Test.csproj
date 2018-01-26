@@ -49,9 +49,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helpers\TestHelper.cs" />
+    <Compile Include="FexLinesService.cs" />
+    <Compile Include="TestStatisticService.cs" />
     <Compile Include="TestMetaDataService.cs" />
     <Compile Include="TestFileService.cs" />
-    <Compile Include="TestContentService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

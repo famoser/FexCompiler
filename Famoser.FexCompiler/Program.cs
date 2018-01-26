@@ -93,14 +93,14 @@ namespace Famoser.FexCompiler
                 document.RawLines = fileService.Process();
                 Console.WriteLine("#");
 
-                //create statistic
-                var statisticService = new StatisticService(document.RawLines);
-                document.StatisticModel = statisticService.Process();
-                Console.Write("#");
-
                 //convert to fexLines
                 var fexService = new FexService(document.RawLines);
                 document.FexLines = fexService.Process();
+                Console.Write("#");
+
+                //create statistic
+                var statisticService = new StatisticService(document.FexLines);
+                document.StatisticModel = statisticService.Process();
                 Console.Write("#");
 
                 //convert to content

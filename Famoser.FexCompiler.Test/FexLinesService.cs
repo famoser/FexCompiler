@@ -1,16 +1,11 @@
-﻿using System;
-using System.Linq;
-using Famoser.FexCompiler.Enum;
-using Famoser.FexCompiler.Models.Content;
-using Famoser.FexCompiler.Models.TextRepresentation;
-using Famoser.FexCompiler.Services;
+﻿using Famoser.FexCompiler.Services;
 using Famoser.FexCompiler.Test.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Famoser.FexCompiler.Test
 {
     [TestClass]
-    public class TestFileService
+    public class FexLinesService
     {
         [TestMethod]
         public void TestSimpleFex()
@@ -28,13 +23,14 @@ namespace Famoser.FexCompiler.Test
         {
             //arrange
             var fileService = new FileService(TestHelper.GetInputFilePath(fileName));
+            var lines = fileService.Process();
+            var fexService = new FexService(lines);
 
             //act
-            var lines = fileService.Process();
+            var fexLines = fexService.Process();
 
             //assert 
-            Assert.IsTrue(lines != null);
-            Assert.IsTrue(lines.Length > 0);
+            Assert.IsTrue(fexLines.Count > 0);
         }
     }
 }
