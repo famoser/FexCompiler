@@ -12,8 +12,8 @@ namespace Famoser.FexCompiler.Test.Service
         public void TestSimpleFexExact()
         {
             //arrange
-            var fileService = new FileService(TestHelper.GetInputFilePath("simple.fex"));
-            var lines = fileService.ReadFile();
+            var fileService = new FileService();
+            var lines = fileService.ReadFile(TestHelper.GetInputFilePath("simple.fex"));
             var fexService = new FexService(lines);
             var fexLines = fexService.Process();
             var statisticService = new StatisticService(fexLines);
@@ -30,8 +30,8 @@ namespace Famoser.FexCompiler.Test.Service
         protected override void TestFex(string fileName)
         {
             //arrange
-            var fileService = new FileService(TestHelper.GetInputFilePath(fileName));
-            var lines = fileService.ReadFile();
+            var fileService = new FileService();
+            var lines = fileService.ReadFile(TestHelper.GetInputFilePath(fileName));
             var fexService = new FexService(lines);
             var fexLines = fexService.Process();
             var statisticService = new StatisticService(fexLines);

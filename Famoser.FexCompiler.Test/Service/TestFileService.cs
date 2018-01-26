@@ -11,10 +11,10 @@ namespace Famoser.FexCompiler.Test.Service
         protected override void TestFex(string fileName)
         {
             //arrange
-            var fileService = new FileService(TestHelper.GetInputFilePath(fileName));
+            var fileService = new FileService();
 
             //act
-            var lines = fileService.ReadFile();
+            var lines = fileService.ReadFile(TestHelper.GetInputFilePath(fileName));
 
             //assert 
             Assert.IsTrue(lines != null);
