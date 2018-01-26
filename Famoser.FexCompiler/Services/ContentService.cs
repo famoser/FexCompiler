@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Famoser.FexCompiler.Enum;
-using Famoser.FexCompiler.Helpers.Interface;
+﻿using System.Collections.Generic;
 using Famoser.FexCompiler.Models;
 using Famoser.FexCompiler.Models.Content;
-using Famoser.FexCompiler.Models.Content.Base;
 using Famoser.FexCompiler.Models.TextRepresentation;
+using Famoser.FexCompiler.Services.Interface;
 
-namespace Famoser.FexCompiler.Helpers
+namespace Famoser.FexCompiler.Services
 {
     public class ContentService : IProcessService<Section>
     {

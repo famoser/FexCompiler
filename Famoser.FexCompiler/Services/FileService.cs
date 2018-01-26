@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Famoser.FexCompiler.Helpers.Interface;
-using Famoser.FexCompiler.Models;
+﻿using System.IO;
+using Famoser.FexCompiler.Services.Interface;
 
-namespace Famoser.FexCompiler.Helpers
+namespace Famoser.FexCompiler.Services
 {
     public class FileService : IProcessService<string[]>
     {

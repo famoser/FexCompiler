@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Famoser.FexCompiler.Models;
 using Famoser.FexCompiler.Models.Document;
 
-namespace Famoser.FexCompiler.Helpers
+namespace Famoser.FexCompiler.Services
 {
     public class StatisticService
     {

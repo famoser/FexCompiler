@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
-using Famoser.FexCompiler.Enum;
-using Famoser.FexCompiler.Helpers.Interface;
 using Famoser.FexCompiler.Models;
-using Famoser.FexCompiler.Models.TextRepresentation;
-using Newtonsoft.Json.Linq;
+using Famoser.FexCompiler.Services.Interface;
 
-namespace Famoser.FexCompiler.Helpers
+namespace Famoser.FexCompiler.Services
 {
     /// <summary>
     /// 

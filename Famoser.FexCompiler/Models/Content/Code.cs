@@ -9,6 +9,6 @@ namespace Famoser.FexCompiler.Models.Content
             Text = text;
         }
 
-        public string Text { get; }
+        public string Text { get; private set; }
     }
 }

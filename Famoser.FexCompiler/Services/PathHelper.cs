@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
-namespace Famoser.FexCompiler.Helpers
+namespace Famoser.FexCompiler.Services
 {
     public class PathHelper
     {

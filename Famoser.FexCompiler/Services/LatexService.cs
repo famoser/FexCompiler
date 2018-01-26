@@ -4,14 +4,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Famoser.FexCompiler.Enum;
-using Famoser.FexCompiler.Helpers.Interface;
-using Famoser.FexCompiler.Models;
 using Famoser.FexCompiler.Models.Content;
 using Famoser.FexCompiler.Models.Content.Base;
 using Famoser.FexCompiler.Models.Document;
 using Famoser.FexCompiler.Models.TextRepresentation;
+using Famoser.FexCompiler.Services.Interface;
 
-namespace Famoser.FexCompiler.Helpers
+namespace Famoser.FexCompiler.Services
 {
     public class LatexService : IProcessService<string>
     {
@@ -54,8 +53,9 @@ namespace Famoser.FexCompiler.Helpers
         private string ToLatex(BaseContent content, int level = 0)
         {
             var res = "";
-            if (content is Section section)
+            if (content is Section)
             {
+                var section = (Section) content;
                 var sectionName = "section";
                 if (level == 1)
                     sectionName = "subsection";
@@ -103,8 +103,9 @@ namespace Famoser.FexCompiler.Helpers
                     }
                 }
             }
-            else if (content is Code code)
+            else if (content is Code)
             {
+                var code = (Code) content;
                 res += "\\onecolumn{}\n\\begin{verbatim}\n";
                 res += code.Text;
                 res += "\\end{verbatim}\n\\twocolumn{}\n";

@@ -9,10 +9,12 @@ namespace Famoser.FexCompiler.Models.Content
         public Section(LineNode header)
         {
             Header = header;
+            TextContent = new List<LineNode>();
+            Content = new List<BaseContent>();
         }
 
-        public LineNode Header { get; }
-        public List<LineNode> TextContent { get; } = new List<LineNode>();
-        public List<BaseContent> Content { get; } = new List<BaseContent>();
+        public LineNode Header { get; private set; }
+        public List<LineNode> TextContent { get; private set; }
+        public List<BaseContent> Content { get; private set; }
     }
 }

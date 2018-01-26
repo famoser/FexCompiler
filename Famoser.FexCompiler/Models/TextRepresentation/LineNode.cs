@@ -9,6 +9,6 @@ namespace Famoser.FexCompiler.Models.TextRepresentation
             TextNodes = nodes;
         }
 
-        public List<TextNode> TextNodes { get; }
+        public List<TextNode> TextNodes { get; private set; }
     }
 }
