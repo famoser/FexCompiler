@@ -150,7 +150,7 @@ namespace Famoser.FexCompiler.Services
                 return;
             }
 
-            var strangeLinesFound = false;
+            bool strangeLinesFound;
             do
             {
                 strangeLinesFound = false;
@@ -172,7 +172,7 @@ namespace Famoser.FexCompiler.Services
                         Debug.Assert(correction >= 1);
 
                         //correct all lines with level 
-                        for (;i < lines.Count; i++)
+                        for (; i < lines.Count; i++)
                         {
                             if (lines[i].Level >= faultyLevel)
                             {
@@ -210,14 +210,16 @@ namespace Famoser.FexCompiler.Services
                 {
                     continue;
                 }
-                
+
                 if (lines[i].Text.Contains(":"))
                 {
                     //only split if its single :
                     var textToProcess = lines[i].Text;
                     var splitIndex = -1;
                     var insideBracketLevel = 0; //(), {}
-                    for (int j = 0; j < textToProcess.Length - 1; j++)
+                    //Length - 2 because we don't want index exceptions (see four lines below)
+                    //and because the last color could be escaped too
+                    for (int j = 0; j < textToProcess.Length - 2; j++)
                     {
                         switch (textToProcess[j])
                         {
@@ -225,7 +227,8 @@ namespace Famoser.FexCompiler.Services
                                 if (textToProcess[j + 1] == ':')
                                     //remove, because :: treated as escape for :
                                     textToProcess = textToProcess.Remove(j, 1);
-                                else if (insideBracketLevel == 0)
+                                else if (textToProcess[j + 1] == ' ' && insideBracketLevel == 0 && splitIndex < 0)
+                                    //only split if space following afterwards
                                     //not inside brackets, therefore can split here
                                     splitIndex = j;
 
@@ -241,11 +244,18 @@ namespace Famoser.FexCompiler.Services
                         }
                     }
 
+                    //cut off last :
+                    if (textToProcess[textToProcess.Length - 1] == ':')
+                    {
+                        textToProcess = textToProcess.Substring(0, textToProcess.Length - 1);
+                    }
+
+
                     if (splitIndex > 0)
                     {
                         //split at defined index
                         var before = textToProcess.Substring(0, splitIndex);
-                        var after = textToProcess.Substring(splitIndex + 1);
+                        var after = textToProcess.Substring(splitIndex + 2);
 
                         lines[i].Text = before;
                         if (after.Length > 0)

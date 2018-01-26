@@ -55,7 +55,7 @@ namespace Famoser.FexCompiler.Services
             var res = "";
             if (content is Section)
             {
-                var section = (Section) content;
+                var section = (Section)content;
                 var sectionName = "section";
                 if (level == 1)
                     sectionName = "subsection";
@@ -68,21 +68,27 @@ namespace Famoser.FexCompiler.Services
                 else if (level > 4)
                     sectionName = "subsubparagraph";
 
-                res += "\\" + sectionName + "{" + ToLatex(section.Header) + " }\n";
-                if (level > 2)
-                {
-                    //force line break after paragraph
-                    res += "\\mbox{}\\\\\\vspace{" + AfterParagraphSpacing + "pt}";
-                }
+                var noSubContent = !section.Content.Any();
+                //use only bold when no sub content
+                if (noSubContent)
+                    sectionName = "textbf";
+
+                res += "\\" + sectionName + "{" + ToLatex(section.Header) + "}\n";
 
                 //add section description
                 res += ToLatex(section.TextContent);
+
+                //need to manually add spacing if no sub defined
+                if (noSubContent)
+                    res += "\\mbox{}\\\\\\vspace{" + AfterParagraphSpacing + "pt}";
 
                 //add higher levels recursively
                 for (var index = 0; index < section.Content.Count; index++)
                 {
                     var baseContent = section.Content[index];
                     res += ToLatex(baseContent, level + 1);
+
+                    //check if spacing needed
                     var beforeSection = baseContent as Section;
                     var afterSection = index + 1 < section.Content.Count ? section.Content[index + 1] as Section : null;
                     if (beforeSection != null && afterSection != null && level > 1)
@@ -105,7 +111,7 @@ namespace Famoser.FexCompiler.Services
             }
             else if (content is Code)
             {
-                var code = (Code) content;
+                var code = (Code)content;
                 res += "\\onecolumn{}\n\\begin{verbatim}\n";
                 res += code.Text;
                 res += "\\end{verbatim}\n\\twocolumn{}\n";
@@ -145,7 +151,7 @@ namespace Famoser.FexCompiler.Services
                 }
                 content += " ";
             }
-            
+
             return content;
         }
 

@@ -59,6 +59,32 @@ namespace Famoser.FexCompiler.Test.Service
                 Assert.AreEqual(fexLines[i].Level, dic2[fileName][i]);
             }
         }
+        [TestMethod]
+        public void TestColon()
+        {
+            //arrange
+            var fileService = new FileService(TestHelper.GetInputFilePath("colon.fex"));
+            var lines = fileService.Process();
+            var fexService = new FexService(lines);
+
+            //act
+            var fexLines = fexService.Process();
+
+            //assert 
+            Assert.IsTrue(fexLines.Count == 5);
+
+            var levelList = new List<int>() { 0, 1, 1, 2, 1 };
+            for (int i = 0; i < fexLines.Count; i++)
+            {
+                Assert.AreEqual(levelList[i], fexLines[i].Level);
+            }
+
+            var contentList = new List<string>() { "H1", "my menu", "my entry", "and more : stuff", "please escap : this" };
+            for (int i = 0; i < fexLines.Count; i++)
+            {
+                Assert.AreEqual(contentList[i], fexLines[i].Text);
+            }
+        }
 
         [TestMethod]
         public void TestSimpleFexLine()
