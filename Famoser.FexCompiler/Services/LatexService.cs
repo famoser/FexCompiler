@@ -60,7 +60,7 @@ namespace Famoser.FexCompiler.Services
                 if (section.Content.Any())
                 {
                     var sectionName = "section";
-                    //max sub is sub_sub_sub_sub_section
+                    //max sub is sub_sub_sub_sub_section (no _, just here for easier counting)
                     for (int i = 0; i < level && i < 4; i++)
                     {
                         sectionName = "sub" + sectionName;

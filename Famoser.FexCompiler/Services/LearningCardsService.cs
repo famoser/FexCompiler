@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Famoser.FexCompiler.Models.Content;
 using Famoser.FexCompiler.Models.Content.Base;
+using Famoser.FexCompiler.Models.Document;
 using Famoser.FexCompiler.Models.Export;
 using Famoser.FexCompiler.Models.TextRepresentation;
 using Famoser.FexCompiler.Services.Interface;
@@ -13,22 +14,31 @@ using Newtonsoft.Json;
 
 namespace Famoser.FexCompiler.Services
 {
-    public class LearningCardsService : IProcessService<List<LearningCard>>
+    public class LearningCardsService : IProcessService<LearningCardCollection>
     {
         private readonly List<BaseContent> _content;
+        private readonly StatisticModel _statisticModel;
+        private readonly MetaDataModel _metaDataModel;
 
         private const string PathSeparator = "→";
 
-        public LearningCardsService(List<BaseContent> content)
+        public LearningCardsService(StatisticModel statisticModel, MetaDataModel metaDataModel, List<BaseContent> content)
         {
+            _statisticModel = statisticModel;
+            _metaDataModel = metaDataModel;
             _content = content;
         }
 
-        public List<LearningCard> Process()
+        public LearningCardCollection Process()
         {
             var list = new List<LearningCard>();
             ToLearningCard(_content, list, "");
-            return list;
+            return new LearningCardCollection()
+            {
+                LearningCards = list,
+                MetaDataModel = _metaDataModel,
+                StatisticModel = _statisticModel
+            };
         }
 
         private void ToLearningCard(List<BaseContent> baseContents, List<LearningCard> cards, string path)
@@ -42,6 +52,11 @@ namespace Famoser.FexCompiler.Services
                         var section = (Section)baseContent;
                         var header = LineToString(section.Header);
 
+                        //adapt paths for recursive cards
+                        var sectionPath = header;
+                        if (path.Length > 0)
+                            sectionPath = path + " " + PathSeparator + " " + sectionPath;
+
                         //create a card if section has text
                         if (section.TextContent.Any())
                         {
@@ -50,14 +65,12 @@ namespace Famoser.FexCompiler.Services
                                 Title = header,
                                 Content = LinesToString(section.TextContent),
                                 ItemCount = section.TextContent.Count,
-                                Path = path
+                                Path = path,
+                                Identifier = sectionPath
                             });
                         }
 
-                        //adapt paths for recursive cards
-                        var sectionPath = header;
-                        if (path.Length > 0)
-                            sectionPath = path + " " + PathSeparator + " " + sectionPath;
+                        //recursively include content
                         ToLearningCard(section.Content, cards, sectionPath);
                     }
                 }
