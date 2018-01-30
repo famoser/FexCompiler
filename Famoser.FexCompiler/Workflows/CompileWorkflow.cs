@@ -35,10 +35,10 @@ namespace Famoser.FexCompiler.Workflows
                 StepCompleted();
 
                 StepStarted("check properties of " + metaData.Title);
-                var ser = new FexVersionService(metaData, path);
+                var fexVersionService = new FexVersionService(metaData, path);
                 StepCompleted();
 
-                if (ser.NoChangesNeeded())
+                if (fexVersionService.NoChangesNeeded())
                 {
                     WorkflowComplete(true, "no changes detected");
                     continue;
@@ -98,7 +98,16 @@ namespace Famoser.FexCompiler.Workflows
                 var latexCompileFeedback = latexCompilerService.Process();
                 StepCompleted(latexCompileFeedback);
 
-                WorkflowComplete(latexCompileFeedback && learningCardsFeedback);
+                var successful = latexCompileFeedback && learningCardsFeedback;
+
+                if (successful)
+                {
+                    StepStarted("saving version information");
+                    fexVersionService.MarkFexCompileSuccessful();
+                    StepCompleted();
+                }
+
+                WorkflowComplete(successful);
             }
         }
 
