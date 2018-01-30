@@ -60,16 +60,11 @@ namespace Famoser.FexCompiler.Services
                 if (section.Content.Any())
                 {
                     var sectionName = "section";
-                    if (level == 1)
-                        sectionName = "subsection";
-                    else if (level == 2)
-                        sectionName = "subsubsection";
-                    else if (level == 3)
-                        sectionName = "paragraph";
-                    else if (level == 4)
-                        sectionName = "subparagraph";
-                    else if (level > 4)
-                        sectionName = "subsubparagraph";
+                    //max sub is sub_sub_sub_sub_section
+                    for (int i = 0; i < level && i < 4; i++)
+                    {
+                        sectionName = "sub" + sectionName;
+                    }
 
                     res += "\\" + sectionName + "{" + ToLatex(section.Header) + "}\n";
                 }
