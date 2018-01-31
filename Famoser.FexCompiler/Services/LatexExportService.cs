@@ -69,16 +69,18 @@ namespace Famoser.FexCompiler.Services
                     }
 
                     if (p1.HasExited)
+                    {
                         break;
+                    }
 
                     Thread.Sleep(200);
                 }
 
                 return p1.ExitCode == Decimal.Zero && !failed;
             }
-            catch (Exception e)
+            catch
             {
-                Failed:
+                //too bad
                 return false;
             }
             finally
@@ -95,9 +97,9 @@ namespace Famoser.FexCompiler.Services
                 if (File.Exists(fileName))
                     File.Delete(fileName);
             }
-            catch (Exception e)
+            catch
             {
-                Console.WriteLine(e);
+                //well no one can say we did not try
             }
         }
     }

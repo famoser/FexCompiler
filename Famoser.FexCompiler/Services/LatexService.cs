@@ -163,9 +163,7 @@ namespace Famoser.FexCompiler.Services
 
         private string EscapeText(string text)
         {
-            /*
-             * & %  # _ { } ~ ^ \
-             * */
+            //first round replace
             var replaces = new Dictionary<string, string>()
             {
                 {"$", "\\textdollar "},
@@ -189,6 +187,7 @@ namespace Famoser.FexCompiler.Services
                 text = text.Replace(replace.Key, replace.Value);
             }
 
+            //replaces where hspace afterwards is needed
             var textReplaces = new Dictionary<string, string>()
             {
                 {"{", "\\textbraceleft"},
@@ -215,6 +214,18 @@ namespace Famoser.FexCompiler.Services
             }
 
             text = text.Replace("VSPACE_PLACEHOLDER", "\\hspace{3pt}");
+
+
+            //second round replace
+            var replaces2 = new Dictionary<string, string>()
+            {
+                {"[", "{[}"},
+                {"]", "{]}"}
+            };
+            foreach (var replace in replaces2)
+            {
+                text = text.Replace(replace.Key, replace.Value);
+            }
 
             return text;
         }

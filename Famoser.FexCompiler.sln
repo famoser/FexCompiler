@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.14
+VisualStudioVersion = 15.0.27130.2026
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Famoser.FexCompiler", "Famoser.FexCompiler\Famoser.FexCompiler.csproj", "{61A992BA-A8B6-4185-A126-DF0AE420DCDA}"
 EndProject
@@ -29,5 +29,8 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{7273C124-6B2A-4259-B864-9D43797B19CE} = {CACCD582-C222-40A3-AA1F-4E05A3FA8739}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C4A2DDA8-7851-4B37-978C-7713820E3BA8}
 	EndGlobalSection
 EndGlobal
