@@ -1,6 +1,6 @@
-﻿using Famoser.FexCompiler.Models.Content.Base;
+﻿using Famoser.FexCompiler.Models.Document.Content.Base;
 
-namespace Famoser.FexCompiler.Models.Content
+namespace Famoser.FexCompiler.Models.Document.Content
 {
     public class Code : BaseContent
     {

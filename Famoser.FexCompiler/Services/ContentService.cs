@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Famoser.FexCompiler.Models;
-using Famoser.FexCompiler.Models.Content;
-using Famoser.FexCompiler.Models.TextRepresentation;
+using Famoser.FexCompiler.Models.Document.Content;
+using Famoser.FexCompiler.Models.Document.TextRepresentation;
 using Famoser.FexCompiler.Services.Interface;
 
 namespace Famoser.FexCompiler.Services

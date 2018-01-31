@@ -8,10 +8,7 @@ using System.Threading.Tasks;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
-using Famoser.FexCompiler.Models.Content;
-using Famoser.FexCompiler.Models.Content.Base;
-using Famoser.FexCompiler.Models.Export;
-using Famoser.FexCompiler.Models.TextRepresentation;
+using Famoser.FexCompiler.Models.LearningCard;
 using Famoser.FexCompiler.Services.Interface;
 using Newtonsoft.Json;
 

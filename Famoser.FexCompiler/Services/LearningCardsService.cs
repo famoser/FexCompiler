@@ -4,11 +4,11 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Famoser.FexCompiler.Models.Content;
-using Famoser.FexCompiler.Models.Content.Base;
 using Famoser.FexCompiler.Models.Document;
-using Famoser.FexCompiler.Models.Export;
-using Famoser.FexCompiler.Models.TextRepresentation;
+using Famoser.FexCompiler.Models.Document.Content;
+using Famoser.FexCompiler.Models.Document.Content.Base;
+using Famoser.FexCompiler.Models.Document.TextRepresentation;
+using Famoser.FexCompiler.Models.LearningCard;
 using Famoser.FexCompiler.Services.Interface;
 using Newtonsoft.Json;
 

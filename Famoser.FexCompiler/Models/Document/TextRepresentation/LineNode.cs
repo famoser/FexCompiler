@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Famoser.FexCompiler.Models.TextRepresentation
+namespace Famoser.FexCompiler.Models.Document.TextRepresentation
 {
     public class LineNode
     {

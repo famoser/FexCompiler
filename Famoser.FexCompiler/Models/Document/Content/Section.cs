@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using Famoser.FexCompiler.Models.Content.Base;
-using Famoser.FexCompiler.Models.TextRepresentation;
+using Famoser.FexCompiler.Models.Document.Content.Base;
+using Famoser.FexCompiler.Models.Document.TextRepresentation;
 
-namespace Famoser.FexCompiler.Models.Content
+namespace Famoser.FexCompiler.Models.Document.Content
 {
     public class Section : BaseContent
     {
