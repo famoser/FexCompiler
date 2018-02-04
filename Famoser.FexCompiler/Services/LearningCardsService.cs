@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Famoser.FexCompiler.Models.Document;
 using Famoser.FexCompiler.Models.Document.Content;
 using Famoser.FexCompiler.Models.Document.Content.Base;
 using Famoser.FexCompiler.Models.Document.TextRepresentation;
 using Famoser.FexCompiler.Models.LearningCard;
 using Famoser.FexCompiler.Services.Interface;
-using Newtonsoft.Json;
 
 namespace Famoser.FexCompiler.Services
 {

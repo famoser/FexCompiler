@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using Famoser.FexCompiler.Helpers;
 using Famoser.FexCompiler.Models;
-using Famoser.FexCompiler.Services.Interface;
 using Newtonsoft.Json;
 
 namespace Famoser.FexCompiler.Services
