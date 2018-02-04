@@ -64,6 +64,19 @@ namespace Famoser.FexCompiler.Services
                                 Identifier = sectionPath
                             });
                         }
+                        //create card if no text, but children
+                        else if (section.Content.Count > 1)
+                        {
+                            cards.Add(new LearningCard()
+                            {
+                                Title = header,
+                                Content = ContentHeaderToString(section.Content),
+                                ItemCount = section.Content.Count,
+                                Path = path,
+                                Identifier = sectionPath
+                            });
+                        }
+
 
                         //recursively include content
                         ToLearningCard(section.Content, cards, sectionPath);
@@ -85,6 +98,22 @@ namespace Famoser.FexCompiler.Services
                 res += LineToString(node) + "\n";
             }
             res = res.Substring(0, res.Length - 1);
+            return res;
+        }
+
+        private string ContentHeaderToString(List<BaseContent> content)
+        {
+            var res = "";
+            foreach (var node in content)
+            {
+                if (node is Section)
+                {
+                    var section = (Section)node;
+                    res += LineToString(section.Header) + "\n";
+                }
+            }
+            if (res.Length > 0)
+                res = res.Substring(0, res.Length - 1);
             return res;
         }
     }
