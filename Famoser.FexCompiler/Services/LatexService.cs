@@ -20,7 +20,6 @@ namespace Famoser.FexCompiler.Services
         private readonly List<BaseContent> _content;
 
         private const int ParagraphOnParagraphSpacing = 5;
-        private const int SectionOnParagraphSpacing = 8;
 
         public LatexService(StatisticModel statisticModel, MetaDataModel metaDataModel, List<BaseContent> content)
         {
@@ -50,14 +49,14 @@ namespace Famoser.FexCompiler.Services
             return template;
         }
 
-        private string ToLatex(BaseContent content, int level = 0)
+        private string ToLatex(BaseContent content, int level = 0, bool paragraphsDisabled = false)
         {
             var res = "";
             if (content is Section)
             {
                 var section = (Section)content;
 
-                if (section.Content.Any())
+                if (section.Content.Any() || paragraphsDisabled)
                 {
                     var sectionName = "section";
                     //max sub is sub_sub_sub_sub_section (no _, just here for easier counting)
@@ -84,34 +83,32 @@ namespace Famoser.FexCompiler.Services
                         section.Content[0] is Section &&
                         !((Section)section.Content[0]).Content.Any())
                     {
-                        res += "\\vspace{" + ParagraphOnParagraphSpacing + "pt}";
+                        res += "\\vspace{" + ParagraphOnParagraphSpacing + "pt}\n";
                     }
                 }
 
-                //add higher levels recursively
-                for (var index = 0; index < section.Content.Count; index++)
-                {
-                    var baseContent = section.Content[index];
-                    res += ToLatex(baseContent, level + 1);
 
-                    //check if spacing needed
-                    var beforeSection = baseContent as Section;
-                    var afterSection = index + 1 < section.Content.Count ? section.Content[index + 1] as Section : null;
-                    if (beforeSection != null && afterSection != null)
+                //disable the collapsing to paragraph if section before was not a paragraph
+                //this ensures the user is not confused (a "chapter" could then look like as it would belong to the chapter before)
+                bool onlyParagraphs = true;
+                foreach (var baseContent in section.Content)
+                {
+                    var mySection = baseContent as Section;
+                    if (mySection != null && mySection.Content.Any())
                     {
-                        //if after is paragraph, need to add spacing
-                        if (!afterSection.Content.Any())
-                        {
-                            //if before is paragraph too, only little spacing needed
-                            if (!beforeSection.Content.Any())
-                            {
-                                res += "\\vspace{" + ParagraphOnParagraphSpacing + "pt}";
-                            }
-                            else
-                            {
-                                res += "\\vspace{" + SectionOnParagraphSpacing + "pt}";
-                            }
-                        }
+                        onlyParagraphs = false;
+                    }
+                }
+
+                //add content recursively
+                foreach (var baseContent in section.Content)
+                {
+                    res += ToLatex(baseContent, level + 1, !onlyParagraphs);
+
+                    //add spacing if paragraphs
+                    if (onlyParagraphs)
+                    {
+                        res += "\\vspace{" + ParagraphOnParagraphSpacing + "pt}\n";
                     }
                 }
             }
@@ -157,6 +154,9 @@ namespace Famoser.FexCompiler.Services
                 }
                 content += " ";
             }
+
+            if (content.Length > 0)
+                content = content.Substring(0, content.Length - 1);
 
             return content;
         }
