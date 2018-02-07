@@ -5,10 +5,10 @@ using System.IO;
 using System.Linq;
 using Famoser.FexCompiler.Enum;
 using Famoser.FexCompiler.Helpers;
-using Famoser.FexCompiler.Models.Content;
-using Famoser.FexCompiler.Models.Content.Base;
 using Famoser.FexCompiler.Models.Document;
-using Famoser.FexCompiler.Models.TextRepresentation;
+using Famoser.FexCompiler.Models.Document.Content;
+using Famoser.FexCompiler.Models.Document.Content.Base;
+using Famoser.FexCompiler.Models.Document.TextRepresentation;
 using Famoser.FexCompiler.Services.Interface;
 
 namespace Famoser.FexCompiler.Services
@@ -171,8 +171,8 @@ namespace Famoser.FexCompiler.Services
                 {"∙", "*" },
                 {"→", "$\\to$" },
                 {"->", "$\\to$" },
+                {"<=>", "$\\Leftrightarrow$" },
                 {"=>", "$\\Rightarrow$" },
-                {"<=>", "$\\Leftrightarrow" },
                 {">=", "$\\ge$"},
                 {"<=", " $\\le$"},
                 {"&",  "\\&"},

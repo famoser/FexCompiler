@@ -1,6 +1,6 @@
 ﻿using Famoser.FexCompiler.Enum;
 
-namespace Famoser.FexCompiler.Models.TextRepresentation
+namespace Famoser.FexCompiler.Models.Document.TextRepresentation
 {
     public class TextNode
     {

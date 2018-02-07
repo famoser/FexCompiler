@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Famoser.FexCompiler.Models.Document;
 
-namespace Famoser.FexCompiler.Models.Export
+namespace Famoser.FexCompiler.Models.LearningCard
 {
     public class LearningCardCollection
     {

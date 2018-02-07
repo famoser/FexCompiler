@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using Famoser.FexCompiler.Models.Content;
-using Famoser.FexCompiler.Models.Content.Base;
 using Famoser.FexCompiler.Models.Document;
-using Famoser.FexCompiler.Models.TextRepresentation;
+using Famoser.FexCompiler.Models.Document.Content;
 
 namespace Famoser.FexCompiler.Models
 {
