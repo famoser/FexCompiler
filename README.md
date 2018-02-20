@@ -32,8 +32,6 @@ why you should use .fex:
 
 
 ### Example
-The fex format in a real world setting
-
 ```
 language concepts
 	enable and facilitate the application of core concepts
