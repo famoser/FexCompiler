@@ -83,8 +83,7 @@ namespace Famoser.FexCompiler.Workflows
 
                 //latex create
                 StepStarted("creating latex");
-                var latexService = new LatexService(document.StatisticModel, document.MetaDataModel,
-                    document.RootSection.Content);
+                var latexService = new LatexService(document.StatisticModel, document.MetaDataModel, document.RootSection.Content);
                 var latex = latexService.Process();
                 StepCompleted();
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Famoser.FexCompiler.Models;
@@ -22,6 +23,7 @@ namespace Famoser.FexCompiler.Services
             var fexLines = ConvertToFexLines(_lines);
             NormalizeFexLineLevels(fexLines);
             TightenFexLineLevels(fexLines);
+            FixFexLineLevels(fexLines);
             ProcessColon(fexLines);
             return fexLines;
         }
@@ -72,10 +74,13 @@ namespace Famoser.FexCompiler.Services
                     var removePrefix = new string('\t', fexLine.Level);
 
                     //collapse rest of code into this line
-                    for (; index < fileInput.Length;)
+                    var foundEnd = false;
+                    for (; index < fileInput.Length; index++)
                     {
-                        if (fileInput[index].Trim() == "CODE_STOP")
+                        var test = fileInput[index].Trim();
+                        if (test == "CODE_STOP" || test == "CODE_END")
                         {
+                            foundEnd = true;
                             break;
                         }
 
@@ -90,11 +95,23 @@ namespace Famoser.FexCompiler.Services
                             //prefix not found; just add it like this
                             fexLine.Text += fileInput[index];
                         }
+
+                        //append newline
+                        fexLine.Text += "\n";
+                    }
+
+                    //cut off last "\n"
+                    if (fexLine.Text.Length > 0)
+                        fexLine.Text = fexLine.Text.Substring(0, fexLine.Text.Length - 1);
+
+                    //issue warning because no code end found
+                    if (!foundEnd)
+                    {
+                        Console.WriteLine("no end of CODE_START found, use CODE_END or CODE_STOP");
                     }
                 }
-
                 //if level is 0, this could be a header
-                if (fexLine.Level == 0)
+                else if (fexLine.Level == 0)
                 {
                     //check for next line if header mark is set
                     if (index + 1 < fileInput.Length)
@@ -193,6 +210,28 @@ namespace Famoser.FexCompiler.Services
                     lastLevel = lines[i].Level;
                 }
             } while (strangeLinesFound);
+        }
+
+        /// <summary>
+        /// tries to find any mistakes in levels
+        /// </summary>
+        /// <param name="lines"></param>
+        private void FixFexLineLevels(List<FexLine> lines)
+        {
+            if (lines.Count == 0)
+            {
+                return;
+            }
+
+            //1: ensure levels start at 0, else add dummy lines till it does
+            while (lines[0].Level > 0)
+            {
+                lines.Insert(0, new FexLine()
+                {
+                    Level = lines[0].Level - 1,
+                    Text = "unknown title"
+                });
+            }
         }
 
         /// <summary>

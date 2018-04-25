@@ -2,7 +2,6 @@
 using System.Linq;
 using Famoser.FexCompiler.Models.Document;
 using Famoser.FexCompiler.Models.Document.Content;
-using Famoser.FexCompiler.Models.Document.Content.Base;
 using Famoser.FexCompiler.Models.Document.TextRepresentation;
 using Famoser.FexCompiler.Models.LearningCard;
 using Famoser.FexCompiler.Services.Interface;
@@ -11,13 +10,13 @@ namespace Famoser.FexCompiler.Services
 {
     public class LearningCardsService : IProcessService<LearningCardCollection>
     {
-        private readonly List<BaseContent> _content;
+        private readonly List<Section> _content;
         private readonly StatisticModel _statisticModel;
         private readonly MetaDataModel _metaDataModel;
 
         private const string PathSeparator = "→";
 
-        public LearningCardsService(StatisticModel statisticModel, MetaDataModel metaDataModel, List<BaseContent> content)
+        public LearningCardsService(StatisticModel statisticModel, MetaDataModel metaDataModel, List<Section> content)
         {
             _statisticModel = statisticModel;
             _metaDataModel = metaDataModel;
@@ -36,57 +35,55 @@ namespace Famoser.FexCompiler.Services
             };
         }
 
-        private void ToLearningCard(List<BaseContent> baseContents, List<LearningCard> cards, string path)
+        private void ToLearningCard(List<Section> sections, List<LearningCard> cards, string path)
         {
-            if (baseContents.Any())
+            if (!sections.Any()) return;
+
+            foreach (var section in sections)
             {
-                foreach (var baseContent in baseContents)
+                var header = LineToString(section.Header);
+
+                //adapt paths for recursive cards
+                var sectionPath = header;
+                if (path.Length > 0)
+                    sectionPath = path + " " + PathSeparator + " " + sectionPath;
+
+                //create a card if section has text
+                if (section.TextContent.Any())
                 {
-                    if (baseContent is Section)
+                    cards.Add(new LearningCard()
                     {
-                        var section = (Section)baseContent;
-                        var header = LineToString(section.Header);
-
-                        //adapt paths for recursive cards
-                        var sectionPath = header;
-                        if (path.Length > 0)
-                            sectionPath = path + " " + PathSeparator + " " + sectionPath;
-
-                        //create a card if section has text
-                        if (section.TextContent.Any())
-                        {
-                            cards.Add(new LearningCard()
-                            {
-                                Title = header,
-                                Content = LinesToString(section.TextContent),
-                                ItemCount = section.TextContent.Count,
-                                Path = path,
-                                Identifier = sectionPath
-                            });
-                        }
-                        //create card if no text, but children
-                        else if (section.Content.Count > 1)
-                        {
-                            cards.Add(new LearningCard()
-                            {
-                                Title = header,
-                                Content = ContentHeaderToString(section.Content),
-                                ItemCount = section.Content.Count,
-                                Path = path,
-                                Identifier = sectionPath
-                            });
-                        }
-
-
-                        //recursively include content
-                        ToLearningCard(section.Content, cards, sectionPath);
-                    }
+                        Title = header,
+                        Content = LinesToString(section.TextContent),
+                        ItemCount = section.TextContent.Count,
+                        Path = path,
+                        Identifier = sectionPath
+                    });
                 }
+                //create card if no text, but children
+                else if (section.Content.Count > 1)
+                {
+                    cards.Add(new LearningCard()
+                    {
+                        Title = header,
+                        Content = ContentHeaderToString(section.Content),
+                        ItemCount = section.Content.Count,
+                        Path = path,
+                        Identifier = sectionPath
+                    });
+                }
+
+
+                //recursively include content
+                ToLearningCard(section.Content, cards, sectionPath);
+
             }
         }
 
         private string LineToString(LineNode lineNode)
         {
+            if (lineNode.TextNodes == null)
+                return "";
             return lineNode.TextNodes.Aggregate("", (a, b) => a + b.Text);
         }
 
@@ -101,16 +98,12 @@ namespace Famoser.FexCompiler.Services
             return res;
         }
 
-        private string ContentHeaderToString(List<BaseContent> content)
+        private string ContentHeaderToString(List<Section> content)
         {
             var res = "";
-            foreach (var node in content)
+            foreach (var section in content)
             {
-                if (node is Section)
-                {
-                    var section = (Section)node;
-                    res += LineToString(section.Header) + "\n";
-                }
+                res += LineToString(section.Header) + "\n";
             }
             if (res.Length > 0)
                 res = res.Substring(0, res.Length - 1);

@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
+using Famoser.FexCompiler.Enum;
 using Famoser.FexCompiler.Models;
 using Famoser.FexCompiler.Models.Document.Content;
 using Famoser.FexCompiler.Models.Document.TextRepresentation;
@@ -24,52 +26,45 @@ namespace Famoser.FexCompiler.Services
 
         private int FillSection(Section section, int start = 0, int rootLevel = 0)
         {
-            for (int i = start; i < _lines.Count; i++)
+            for (var i = start; i < _lines.Count; i++)
             {
                 var currentLine = _lines[i];
-                if (currentLine.IsCode)
+                if (currentLine.Level == rootLevel)
                 {
-                    section.Content.Add(new Code(_lines[i].Text));
-                }
-                else
-                {
-                    if (currentLine.Level == rootLevel)
-                    {
-                        //create new section
-                        var newSection = new Section(GetLineNode(currentLine));
-                        i++;
+                    //create new section
+                    var newSection = new Section(GetLineNode(currentLine));
+                    i++;
 
-                        //fill section
-                        for (; i < _lines.Count; i++)
+                    //fill section
+                    for (; i < _lines.Count; i++)
+                    {
+                        var innerLine = _lines[i];
+                        if (innerLine.Level == rootLevel + 1)
                         {
-                            var innerLine = _lines[i];
-                            if (innerLine.Level == rootLevel + 1)
+                            if (i + 1 < _lines.Count && _lines[i + 1].Level > rootLevel + 1)
                             {
-                                if (i + 1 < _lines.Count && _lines[i + 1].Level > rootLevel + 1)
-                                {
-                                    //currentLine is a header of a new section, process this by recursive call
-                                    i = FillSection(newSection, i, rootLevel + 1);
-                                    i--;
-                                }
-                                else
-                                {
-                                    //safe to insert, as currentLine is no header for sure
-                                    newSection.TextContent.Add(GetLineNode(innerLine));
-                                }
+                                //currentLine is a header of a new section, process this by recursive call
+                                i = FillSection(newSection, i, rootLevel + 1);
+                                i--;
                             }
                             else
                             {
-                                //new section; restart loop
-                                i--;
-                                break;
+                                //safe to insert, as currentLine is no header for sure
+                                newSection.TextContent.Add(GetLineNode(innerLine));
                             }
                         }
-                        section.Content.Add(newSection);
+                        else
+                        {
+                            //new section; restart loop
+                            i--;
+                            break;
+                        }
                     }
-                    else
-                    {
-                        return i;
-                    }
+                    section.Content.Add(newSection);
+                }
+                else
+                {
+                    return i;
                 }
             }
 
@@ -78,15 +73,12 @@ namespace Famoser.FexCompiler.Services
 
         private LineNode GetLineNode(FexLine line)
         {
-            return new LineNode(GetTextNode(line.Text));
+            return line.IsCode ? new LineNode(new Code(line.Text)) : new LineNode(GetTextNode(line.Text));
         }
 
         private List<TextNode> GetTextNode(string str)
         {
-            return new List<TextNode>()
-            {
-                new TextNode(str.Trim())
-            };
+            return new List<TextNode> { new TextNode(str.Trim()) };
         }
     }
 }

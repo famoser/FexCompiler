@@ -7,7 +7,6 @@ using Famoser.FexCompiler.Enum;
 using Famoser.FexCompiler.Helpers;
 using Famoser.FexCompiler.Models.Document;
 using Famoser.FexCompiler.Models.Document.Content;
-using Famoser.FexCompiler.Models.Document.Content.Base;
 using Famoser.FexCompiler.Models.Document.TextRepresentation;
 using Famoser.FexCompiler.Services.Interface;
 
@@ -17,11 +16,11 @@ namespace Famoser.FexCompiler.Services
     {
         private readonly StatisticModel _statisticModel;
         private readonly MetaDataModel _metaDataModel;
-        private readonly List<BaseContent> _content;
+        private readonly List<Section> _content;
 
         private const int ParagraphOnParagraphSpacing = 5;
 
-        public LatexService(StatisticModel statisticModel, MetaDataModel metaDataModel, List<BaseContent> content)
+        public LatexService(StatisticModel statisticModel, MetaDataModel metaDataModel, List<Section> content)
         {
             _statisticModel = statisticModel;
             _metaDataModel = metaDataModel;
@@ -49,79 +48,63 @@ namespace Famoser.FexCompiler.Services
             return template;
         }
 
-        private string ToLatex(BaseContent content, int level = 0, bool paragraphsDisabled = false)
+        private string ToLatex(Section section, int level = 0, bool paragraphsDisabled = false)
         {
             var res = "";
-            if (content is Section)
+
+            if (section.Content.Any() || paragraphsDisabled)
             {
-                var section = (Section)content;
-
-                if (section.Content.Any() || paragraphsDisabled)
+                var sectionName = "section";
+                //max sub is sub_sub_sub_sub_section (no _, just here for easier counting)
+                for (int i = 0; i < level && i < 4; i++)
                 {
-                    var sectionName = "section";
-                    //max sub is sub_sub_sub_sub_section (no _, just here for easier counting)
-                    for (int i = 0; i < level && i < 4; i++)
-                    {
-                        sectionName = "sub" + sectionName;
-                    }
-
-                    res += "\\" + sectionName + "{" + ToLatex(section.Header) + "}\n";
-                }
-                else
-                {
-                    //use bold only when no sub content
-                    res += "\\textbf{" + ToLatex(section.Header) + "}\\\\\n";
+                    sectionName = "sub" + sectionName;
                 }
 
-                if (section.TextContent.Any())
-                {
-                    //add section description
-                    res += ToLatex(section.TextContent);
-
-                    //add spacer if bold is following afterwards
-                    if (section.Content.Any() &&
-                        section.Content[0] is Section &&
-                        !((Section)section.Content[0]).Content.Any())
-                    {
-                        res += "\\vspace{" + ParagraphOnParagraphSpacing + "pt}\n";
-                    }
-                }
-
-
-                //disable the collapsing to paragraph if section before was not a paragraph
-                //this ensures the user is not confused (a "chapter" could then look like as it would belong to the chapter before)
-                bool onlyParagraphs = true;
-                foreach (var baseContent in section.Content)
-                {
-                    var mySection = baseContent as Section;
-                    if (mySection != null && mySection.Content.Any())
-                    {
-                        onlyParagraphs = false;
-                    }
-                }
-
-                //add content recursively
-                foreach (var baseContent in section.Content)
-                {
-                    res += ToLatex(baseContent, level + 1, !onlyParagraphs);
-
-                    //add spacing if paragraphs
-                    if (onlyParagraphs)
-                    {
-                        res += "\\vspace{" + ParagraphOnParagraphSpacing + "pt}\n";
-                    }
-                }
-            }
-            else if (content is Code)
-            {
-                var code = (Code)content;
-                res += "\\onecolumn{}\n\\begin{verbatim}\n";
-                res += code.Text;
-                res += "\\end{verbatim}\n\\twocolumn{}\n";
+                res += "\\" + sectionName + "{" + ToLatex(section.Header.TextNodes) + "}\n";
             }
             else
             {
-                Debug.Fail("unknown content type");
+                //use bold only when no sub content
+                res += "\\textbf{" + ToLatex(section.Header.TextNodes) + "}\\\\\n";
+            }
+
+            if (section.TextContent.Any())
+            {
+                //add section description
+                res += ToLatex(section.TextContent);
+
+                //add spacer if bold is following afterwards
+                if (section.Content.Any() &&
+                    !section.Content[0].Content.Any())
+                {
+                    res += "\\vspace{" + ParagraphOnParagraphSpacing + "pt}\n";
+                }
+            }
+
+
+            //disable the collapsing to paragraph if section before was not a paragraph
+            //this ensures the user is not confused (a "chapter" could then look like as it would belong to the chapter before)
+            bool onlyParagraphs = true;
+            foreach (var baseContent in section.Content)
+            {
+                var mySection = baseContent;
+                if (mySection != null && mySection.Content.Any())
+                {
+                    onlyParagraphs = false;
+                }
+            }
+
+            //add content recursively
+            foreach (var baseContent in section.Content)
+            {
+                res += ToLatex(baseContent, level + 1, !onlyParagraphs);
+
+                //add spacing if paragraphs
+                if (onlyParagraphs)
+                {
+                    res += "\\vspace{" + ParagraphOnParagraphSpacing + "pt}\n";
+                }
             }
 
             return res;
@@ -132,26 +115,42 @@ namespace Famoser.FexCompiler.Services
             var content = "";
             foreach (var lineNode in lines)
             {
-                content += ToLatex(lineNode);
-                //latex newline + OS newline
-                content += "\\\\ " + Environment.NewLine;
+                //write text
+                var textContent = ToLatex(lineNode.TextNodes);
+                if (textContent != "")
+                    //latex newline + OS newline
+                    content += textContent + "\\\\ " + Environment.NewLine;
+
+                //write code (typically only one property is not empty / not null)
+                if (lineNode.CodeNode != null)
+                {
+                    content += "\\begin{verbatim}\n" +
+                               lineNode.CodeNode.Text +
+                               "\n\\end{verbatim}";
+                }
             }
             return content;
         }
 
-        private string ToLatex(LineNode line)
+        private string ToLatex(List<TextNode> textNodes)
         {
+            if (textNodes == null)
+                return "";
+
             var content = "";
-            foreach (var textNode in line.TextNodes)
+            foreach (var textNode in textNodes)
             {
-                if (textNode.TextType == TextType.Normal)
+                switch (textNode.TextType)
                 {
-                    content += EscapeText(textNode.Text);
+                    case TextType.Bold:
+                        content += "\\textbf{" + EscapeText(textNode.Text) + "}";
+                        break;
+                    case TextType.Normal:
+                    default:
+                        content += EscapeText(textNode.Text);
+                        break;
                 }
-                else if (textNode.TextType == TextType.Bold)
-                {
-                    content += "\\textbf{" + EscapeText(textNode.Text) + "}";
-                }
+
                 content += " ";
             }
 

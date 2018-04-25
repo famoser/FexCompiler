@@ -3,7 +3,6 @@
     public enum TextType
     {
         Normal = 0,
-        Bold = 1,
-        Cursive = 2
+        Bold = 1
     }
 }

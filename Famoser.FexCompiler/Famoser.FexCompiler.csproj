@@ -29,8 +29,8 @@
     <PublisherName>famoser</PublisherName>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>13</ApplicationRevision>
-    <ApplicationVersion>2.2.0.%2a</ApplicationVersion>
+    <ApplicationRevision>14</ApplicationRevision>
+    <ApplicationVersion>2.3.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
@@ -110,8 +110,7 @@
     <Compile Include="Models\Document\MetaDataModel.cs" />
     <Compile Include="Models\Document\StatisticModel.cs" />
     <Compile Include="Models\FexLine.cs" />
-    <Compile Include="Models\Document\Content\Base\BaseContent.cs" />
-    <Compile Include="Models\Document\Content\Code.cs" />
+    <Compile Include="Models\Document\TextRepresentation\Code.cs" />
     <Compile Include="Models\Document\TextRepresentation\LineNode.cs" />
     <Compile Include="Models\Document\Content\Section.cs" />
     <Compile Include="Models\Document\TextRepresentation\TextNode.cs" />
