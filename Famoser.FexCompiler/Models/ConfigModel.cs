@@ -4,6 +4,7 @@
     {
         public string CompilePath { get; set; }
         public string Author { get; set; }
+        public bool IncludeHandoutFormat { get; set; }
 
         public bool IsComplete()
         {

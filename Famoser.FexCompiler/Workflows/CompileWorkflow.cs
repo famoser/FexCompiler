@@ -93,7 +93,25 @@ namespace Famoser.FexCompiler.Workflows
                 var latexCompileFeedback = latexCompilerService.Process();
                 StepCompleted(latexCompileFeedback);
 
+                //output handout if requested
+                if (_configModel.IncludeHandoutFormat)
+                {
+                    //recreate latex with new template name
+                    StepStarted("creating handout latex");
+                    latexService.SetTemplateName("Handout");
+                    latex = latexService.Process();
+                    StepCompleted();
+
+                    //compile with new latex
+                    StepStarted("compiling latex");
+                    latexCompilerService.SetFilenameAppendix("_handout");
+                    latexCompilerService.SetContent(latex);
+                    latexCompileFeedback = latexCompilerService.Process();
+                    StepCompleted(latexCompileFeedback);
+                }
+               
                 var successful = latexCompileFeedback && learningCardsFeedback;
+
 
                 if (successful)
                 {

@@ -9,7 +9,8 @@ namespace Famoser.FexCompiler.Services
     public class LatexExportService : IProcessService<bool>
     {
         private readonly string _path;
-        private readonly string _content;
+        private string _content;
+        private string _fileNameAppendix = "";
 
         public LatexExportService(string path, string content)
         {
@@ -17,15 +18,26 @@ namespace Famoser.FexCompiler.Services
             _content = content;
         }
 
+        public void SetFilenameAppendix(string appendix)
+        {
+            _fileNameAppendix = appendix;
+        }
+
+        public void SetContent(string content)
+        {
+            _content = content;
+        }
+
         public bool Process()
         {
             //create .tex file
             var baseFileName = _path.Substring(0, _path.LastIndexOf(".", StringComparison.Ordinal));
-            var texFile = baseFileName + ".tex";
+            var newFilename = baseFileName + _fileNameAppendix;
+            var texFile = newFilename + ".tex";
             File.WriteAllText(texFile, _content);
 
             //clean up old compilations
-            var auxFile = baseFileName + ".aux";
+            var auxFile = newFilename + ".aux";
             TryRemove(auxFile);
 
             //create bat file with commands

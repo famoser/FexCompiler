@@ -17,6 +17,8 @@ namespace Famoser.FexCompiler.Services
         private readonly StatisticModel _statisticModel;
         private readonly MetaDataModel _metaDataModel;
         private readonly List<Section> _content;
+        private string _renderedContent;
+        private string _templateName = "Summary";
 
         private const int ParagraphOnParagraphSpacing = 5;
 
@@ -27,9 +29,14 @@ namespace Famoser.FexCompiler.Services
             _content = content;
         }
 
+        public void SetTemplateName(string templateName)
+        {
+            _templateName = templateName;
+        }
+
         public string Process()
         {
-            var path = Path.Combine(PathHelper.GetAssemblyPath(), "Templates/template_Article.tex");
+            var path = Path.Combine(PathHelper.GetAssemblyPath(), "Templates/template_" + _templateName + ".tex");
             var template = File.ReadAllText(path);
 
             template = template.Replace("TITLE", _metaDataModel.Title);
@@ -38,15 +45,20 @@ namespace Famoser.FexCompiler.Services
             template = template.Replace("WORD_COUNT", _statisticModel.WordCount.ToString());
             template = template.Replace("LINE_COUNT", _statisticModel.LineCount.ToString());
 
-            var content = "";
-            foreach (var baseContent in _content)
+            if (_renderedContent == null)
             {
-                content += ToLatex(baseContent);
+                _renderedContent = "";
+                foreach (var baseContent in _content)
+                {
+                    _renderedContent += ToLatex(baseContent);
+                }
             }
 
-            template = template.Replace("CONTENT", content);
+            template = template.Replace("CONTENT", _renderedContent);
             return template;
         }
+
+
 
         private string ToLatex(Section section, int level = 0, bool paragraphsDisabled = false)
         {
@@ -222,6 +234,16 @@ namespace Famoser.FexCompiler.Services
                 {"]", "{]}"}
             };
             foreach (var replace in replaces2)
+            {
+                text = text.Replace(replace.Key, replace.Value);
+            }
+
+            //text replaces
+            var replaces3 = new Dictionary<string, string>()
+            {
+                {"element\\_of", "$\\in$"}
+            };
+            foreach (var replace in replaces3)
             {
                 text = text.Replace(replace.Key, replace.Value);
             }
