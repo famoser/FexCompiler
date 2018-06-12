@@ -177,8 +177,8 @@ namespace Famoser.FexCompiler.Services
             //first round replace
             var replaces = new Dictionary<string, string>()
             {
-                {"$", "\\textdollar "},
                 {"\\", "\\textbackslash "},
+                {"$", "\\textdollar "},
                 {"∙", "*" },
                 {"→", "$\\to$" },
                 {"->", "$\\to$" },
@@ -241,6 +241,7 @@ namespace Famoser.FexCompiler.Services
             //text replaces
             var replaces3 = new Dictionary<string, string>()
             {
+                {"not\\_element\\_of", "$\\not\\in$"},
                 {"element\\_of", "$\\in$"}
             };
             foreach (var replace in replaces3)
