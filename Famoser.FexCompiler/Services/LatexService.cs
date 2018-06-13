@@ -186,7 +186,6 @@ namespace Famoser.FexCompiler.Services
                 {"<-", "$\\leftarrow$" },
                 {"<=>", "$\\Leftrightarrow$" },
                 {"=>", "$\\Rightarrow$" },
-                {"<=", "$\\Leftarrow$" },
                 {">=", "$\\ge$"},
                 {"<=", " $\\le$"},
                 {"&",  "\\&"},
