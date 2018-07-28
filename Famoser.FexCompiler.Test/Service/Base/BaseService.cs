@@ -2,6 +2,7 @@
 
 namespace Famoser.FexCompiler.Test.Service.Base
 {
+    [TestClass]
     public abstract class BaseService
     {
         [TestMethod]
