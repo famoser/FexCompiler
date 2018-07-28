@@ -1,4 +1,4 @@
-image: Visual Studio 2015
+image: Visual Studio 2017
 
 before_build:
 - nuget restore
@@ -11,4 +11,4 @@ build:
 
 test_script:
 - OpenCover.Console.exe -register:user -target:"%xunit20%\xunit.console.x86.exe" -targetargs:".\Famoser.FexCompiler.Test\bin\Debug\Famoser.FexCompiler.Test.dll -noshadow" -filter:"+[Famoser.FexCompiler*]* -[Famoser.FexCompiler.Test*]*" -output:".\MyProject_coverage.xml"
-- codecov -f "MyProject_coverage.xml
+- codecov -f "MyProject_coverage.xml"
