@@ -155,11 +155,11 @@ namespace Famoser.FexCompiler.Services
                 switch (textNode.TextType)
                 {
                     case TextType.Bold:
-                        content += "\\textbf{" + EscapeText(textNode.Text) + "}";
+                        content += "\\textbf{" + ToLatex(textNode.Text) + "}";
                         break;
                     case TextType.Normal:
                     default:
-                        content += EscapeText(textNode.Text);
+                        content += ToLatex(textNode.Text);
                         break;
                 }
 
@@ -172,8 +172,115 @@ namespace Famoser.FexCompiler.Services
             return content;
         }
 
+        private bool IsValidExponent(string content)
+        {
+            var maxChars = 3;
+            var maxNumbers = 10;
+            for (var index = 0; index < content.Length; index++)
+            {
+                var item = content[index];
+                if (item >= 'a' && item <= 'z' || //alpha 
+                    item >= 'A' && item <= 'Z') //ALPHA
+                {
+                    if (maxChars-- <= 0)
+                    {
+                        return false;
+                    }
+                }
+                else if (item >= '0' && item <= '9') //numbers
+                {
+                    if (maxNumbers-- <= 0)
+                    {
+                        return false;
+                    }
+                }
+                else if (item == '-')
+                {
+                    if (index > 0)
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private bool IsValidVariable(string content)
+        {
+            foreach (var item in content)
+            {
+                if (
+                    item >= 'a' && item <= 'z' || //alpha 
+                    item >= 'A' && item <= 'Z' || //ALPHA
+                    item >= '0' && item <= '9' ||
+                    item >= '_')
+                {
+                    //valid
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private string EscapeVariable(string content)
+        {
+            return content.Replace("_", "\\_");
+        }
+
+        private string ToLatex(string de)
+        {
+            var text = "";
+
+            foreach (var source in de.Split(' '))
+            {
+                //check for sub
+                if (source.Contains('_'))
+                {
+                    var subs = source.Split('_');
+                    if (subs.Length == 2 && IsValidVariable(subs[0]) && IsValidExponent(subs[1]))
+                    {
+                        text += "$" + EscapeVariable(subs[0]) + "_{" + subs[1] + "}" + "$";
+                    }
+                    else
+                    {
+                        text += EscapeText(source) + " ";
+                    }
+                }
+                //check for pow
+                else if (source.Contains('^'))
+                {
+                    var subs = source.Split('^');
+                    if (subs.Length == 2 && IsValidVariable(subs[0]) && IsValidExponent(subs[1]))
+                    {
+                        text += "$" + EscapeVariable(subs[0]) + "^{" + subs[1] + "}" + "$";
+                    }
+                    else
+                    {
+                        text += EscapeText(source) + " ";
+                    }
+                }
+                else
+                {
+                    text += EscapeText(source) + " ";
+                }
+            }
+
+            return text;
+        }
+
         private string EscapeText(string text)
         {
+            var start = "";
+
             //first round replace
             var replaces = new Dictionary<string, string>()
             {

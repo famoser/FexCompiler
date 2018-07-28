@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helpers\TestHelper.cs" />
+    <Compile Include="Service\TestLatexService.cs" />
     <Compile Include="Service\TestContentService.cs" />
     <Compile Include="Service\TestFexLinesService.cs" />
     <Compile Include="Service\Base\BaseService.cs" />
@@ -72,6 +73,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Input\code.fex">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Input\formulas.fex">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="packages.config" />
