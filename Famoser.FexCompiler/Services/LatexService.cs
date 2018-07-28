@@ -238,7 +238,7 @@ namespace Famoser.FexCompiler.Services
 
         private string ToLatex(string de)
         {
-            var text = "";
+            var text = new List<string>();
 
             foreach (var source in de.Split(' '))
             {
@@ -248,11 +248,11 @@ namespace Famoser.FexCompiler.Services
                     var subs = source.Split('_');
                     if (subs.Length == 2 && IsValidVariable(subs[0]) && IsValidExponent(subs[1]))
                     {
-                        text += "$" + EscapeVariable(subs[0]) + "_{" + subs[1] + "}" + "$";
+                        text.Add("$" + EscapeVariable(subs[0]) + "_{" + subs[1] + "}" + "$");
                     }
                     else
                     {
-                        text += EscapeText(source) + " ";
+                        text.Add(EscapeText(source));
                     }
                 }
                 //check for pow
@@ -261,20 +261,20 @@ namespace Famoser.FexCompiler.Services
                     var subs = source.Split('^');
                     if (subs.Length == 2 && IsValidVariable(subs[0]) && IsValidExponent(subs[1]))
                     {
-                        text += "$" + EscapeVariable(subs[0]) + "^{" + subs[1] + "}" + "$";
+                        text.Add("$" + EscapeVariable(subs[0]) + "^{" + subs[1] + "}" + "$");
                     }
                     else
                     {
-                        text += EscapeText(source) + " ";
+                        text.Add(EscapeText(source));
                     }
                 }
                 else
                 {
-                    text += EscapeText(source) + " ";
+                    text.Add(EscapeText(source));
                 }
             }
 
-            return text;
+            return String.Join(" ", text);
         }
 
         private string EscapeText(string text)
