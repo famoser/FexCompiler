@@ -4,34 +4,46 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/987fgimtc5rk546d?svg=true)](https://ci.appveyor.com/project/famoser/fexcompiler)
 [![codecov](https://codecov.io/gh/famoser/FexCompiler/branch/master/graph/badge.svg)](https://codecov.io/gh/famoser/FexCompiler)
 
-The FexCompiler processes .fex files to create various useful files like a printable pdf or a flash card collection.
+Fex was created specifically to write summaries. 
+Its setup helps you to structure content effectively and then allows to generate a printable .pdf and learning cards.
 
-## Fex
-### Motivation
-Fex was created specifically for fast creation of summaries in a text editor.  There is no support for images, math or other non-text content to force the user to formulate out everything.
+It is awesome because:
+
+- (re-)structure content easily & fast
+- do it in the text editor of your choice
+- export it for printing or flash cards
+
+There is no support for images, math or other non-text content; use your own words!
 
 ### Basic idea
-The summary is broken down into concepts and their descriptions. You may create concepts which are described again as a collection of concepts. You may describe a concept on a single line (like `fex: a format to write summaries` or you may use multiple lines, and use tabs to define affiliation. For example:
+
+There are only two rules:
+
+- You may describe a concept on a single line (like `fex: a format to write summaries` or you may use multiple lines (indented by tabs).
+- You may do this recusively.
+
+For example:
 
 ```
-why you should use .fex:
-	your summaries are written faster than ever before
-	various export formats are available
+.fex:
+	format to write summaries faster than ever before
+	export formats:
+		.pdf to print your summary
+		.xlsx to import the concepts of your summary into a flash card service
 ```
-
-### Why fex is awesome
-- (re-)structuring of content is easy and fast to do.
-- faster to write than using word or latex
-- helps you to structure content effectively
-- helps you to explain a concept short and concise
 
 ### Export formats
-- **.pdf**: optimized for printing. As a side effect forces you to keep descriptions short as else the introduced line breaks look ugly
-- **.json**: used it with https://github.com/famoser/FexFlashcards to memorize your summary with flash card functionality
-- **.xlsx**: collection of your concepts so you can import then in a flash card service
+
+- **.pdf**: optimized for printing.
+
+if you use the file ending `.l.fex`, additionally:
+
+- **.json**: used it with https://github.com/famoser/FexFlashcards to memorize your summary with flash card functionality.
+- **.xlsx**: collection of your concepts so you can import then in a flash card service.
 
 
-### Example
+### Real-World Example
+
 ```
 language concepts
 	enable and facilitate the application of core concepts
@@ -42,4 +54,4 @@ language concepts
 		inhertiance has been replaced by code duplication
 		subtyping needed casts, same memory layout of super & subclasses needed
 ```
-(except from https://github.com/famoser/eth-summaries/blob/master/2017-2%20Concepts%20of%20Object-Oriented%20Programming.fex)
+(excerpt from https://github.com/famoser/eth-summaries/blob/master/2017-2%20Concepts%20of%20Object-Oriented%20Programming.fex)

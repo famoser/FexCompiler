@@ -21,6 +21,8 @@ namespace Famoser.FexCompiler.Workflows
             var paths = _fileService.GetAllFexFilePaths(_configModel.CompilePath);
             for (var index = 0; index < paths.Count; index++)
             {
+                var successful = true;
+
                 var path = paths[index];
                 WorkflowStarted(path);
 
@@ -68,17 +70,22 @@ namespace Famoser.FexCompiler.Workflows
                 document.RootSection = contentService.Process();
                 StepCompleted();
 
-                //learning cards create
-                StepStarted("creating learning cards");
-                var learningCardsService = new LearningCardsService(document.StatisticModel, document.MetaDataModel, document.RootSection.Content);
-                var cards = learningCardsService.Process();
-                StepCompleted();
+                if (path.EndsWith(".l.fex"))
+                {
+                    //learning cards create
+                    StepStarted("creating learning cards");
+                    var learningCardsService = new LearningCardsService(document.StatisticModel, document.MetaDataModel, document.RootSection.Content);
+                    var cards = learningCardsService.Process();
+                    StepCompleted();
 
-                //learning cards persist
-                StepStarted("persisting learning cards");
-                var learningCardsExportService = new LearningCardsExportService(cards, path);
-                var learningCardsFeedback = learningCardsExportService.Process();
-                StepCompleted(learningCardsFeedback);
+                    //learning cards persist
+                    StepStarted("persisting learning cards");
+                    var learningCardsExportService = new LearningCardsExportService(cards, path);
+                    var learningCardsFeedback = learningCardsExportService.Process();
+                    StepCompleted(learningCardsFeedback);
+
+                    successful &= learningCardsFeedback;
+                }
 
                 //latex create
                 StepStarted("creating latex");
@@ -91,6 +98,8 @@ namespace Famoser.FexCompiler.Workflows
                 var latexCompilerService = new LatexExportService(path, latex);
                 var latexCompileFeedback = latexCompilerService.Process();
                 StepCompleted(latexCompileFeedback);
+
+                successful &= latexCompileFeedback;
 
                 //output handout if requested
                 if (_configModel.IncludeHandoutFormat)
@@ -108,8 +117,6 @@ namespace Famoser.FexCompiler.Workflows
                     latexCompileFeedback = latexCompilerService.Process();
                     StepCompleted(latexCompileFeedback);
                 }
-
-                var successful = latexCompileFeedback && learningCardsFeedback;
 
 
                 if (successful)

@@ -88,7 +88,15 @@ namespace Famoser.FexCompiler.Services
                     Thread.Sleep(200);
                 }
 
-                return p1.ExitCode == Decimal.Zero && !failed;
+                if (failed)
+                {
+                    return false;
+                }
+
+                TryRemove(newFilename + ".log");
+                TryRemove(newFilename + ".tex");
+
+                return true;
             }
             catch
             {
