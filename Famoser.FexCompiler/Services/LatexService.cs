@@ -299,6 +299,7 @@ namespace Famoser.FexCompiler.Services
                 {"%",  "\\%"},
                 {"#",  "\\#"},
                 {"_",  "\\_"},
+                {"°", " \\degree"},
                 {"‘",  "'"},
                 {"‚",  ","} //<- this is not a comma: , (other UTF-8 code)
             };
