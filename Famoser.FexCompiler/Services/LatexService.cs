@@ -293,16 +293,16 @@ namespace Famoser.FexCompiler.Services
 
         private static string PrintCombineChar(char? combineChar, string activeWord, string prefix, char? entry)
         {
-
             var replaces = new Dictionary<char, string>()
             {
                 {'_',  "\\_"},
                 {'^', "\\textasciicircum"}
             };
+
             string result;
             if (combineChar == null)
             {
-                result = activeWord + entry;
+                result = (activeWord + entry);
             }
             else if (activeWord.Length > 0)
             {
@@ -312,9 +312,6 @@ namespace Famoser.FexCompiler.Services
             {
                 result = prefix + replaces[combineChar.Value] + activeWord + entry;
             }
-
-
-
 
             return result;
         }
