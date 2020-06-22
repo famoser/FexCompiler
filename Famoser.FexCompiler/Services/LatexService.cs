@@ -58,8 +58,6 @@ namespace Famoser.FexCompiler.Services
             return template;
         }
 
-
-
         private string ToLatex(Section section, int level = 0, bool paragraphsDisabled = false)
         {
             var res = "";
@@ -157,7 +155,6 @@ namespace Famoser.FexCompiler.Services
                     case TextType.Bold:
                         content += "\\textbf{" + ToLatex(textNode.Text) + "}";
                         break;
-                    case TextType.Normal:
                     default:
                         content += ToLatex(textNode.Text);
                         break;
@@ -236,51 +233,94 @@ namespace Famoser.FexCompiler.Services
             return content.Replace("_", "\\_");
         }
 
+        private bool ValidSubscriptChar(char entry)
+        {
+            return entry >= 'a' && entry <= 'z' || //alpha 
+                   entry >= 'A' && entry <= 'Z' || //ALPHA
+                   entry >= '0' && entry <= '9';
+        }
+
         private string ToLatex(string de)
         {
-            var text = new List<string>();
+            var line = EscapeText(de);
 
-            foreach (var source in de.Split(' '))
+            var result = "";
+            var prefix = "";
+            var activeWord = "";
+            char? combineChar = null;
+            bool blocked = false;
+            foreach (var entry in line)
             {
-                //check for sub
-                if (source.Contains('_'))
+                if (
+                    entry == ' ' || entry == ',' ||
+                    entry == '(' || entry == ')' ||
+                    entry == '[' || entry == ']' ||
+                    entry == '{' || entry == '}'
+                )
                 {
-                    var subs = source.Split('_');
-                    if (subs.Length == 2 && IsValidVariable(subs[0]) && IsValidExponent(subs[1]))
-                    {
-                        text.Add("$" + EscapeVariable(subs[0]) + "_{" + subs[1] + "}" + "$");
-                    }
-                    else
-                    {
-                        text.Add(EscapeText(source));
-                    }
+                    result += PrintCombineChar(combineChar, activeWord, prefix, entry);
+                    combineChar = null;
+                    activeWord = "";
+                    blocked = false;
+                    continue;
                 }
-                //check for pow
-                else if (source.Contains('^'))
+
+                if ((entry == '_' || entry == '^') && !blocked)
                 {
-                    var subs = source.Split('^');
-                    if (subs.Length == 2 && IsValidVariable(subs[0]) && IsValidExponent(subs[1]))
+                    if (combineChar == null)
                     {
-                        text.Add("$" + EscapeVariable(subs[0]) + "^{" + subs[1] + "}" + "$");
+                        prefix = activeWord;
+                        activeWord = "";
+                        combineChar = entry;
                     }
                     else
                     {
-                        text.Add(EscapeText(source));
+                        activeWord = prefix + combineChar;
+                        combineChar = null;
+                        blocked = true;
                     }
                 }
                 else
                 {
-                    text.Add(EscapeText(source));
+                    activeWord += entry;
                 }
             }
 
-            return String.Join(" ", text);
+            result += PrintCombineChar(combineChar, activeWord, prefix, null);
+
+            return result;
+        }
+
+        private static string PrintCombineChar(char? combineChar, string activeWord, string prefix, char? entry)
+        {
+
+            var replaces = new Dictionary<char, string>()
+            {
+                {'_',  "\\_"},
+                {'^', "\\textasciicircum"}
+            };
+            string result;
+            if (combineChar == null)
+            {
+                result = activeWord + entry;
+            }
+            else if (activeWord.Length > 0)
+            {
+                result = "$" + prefix + combineChar + "{" + activeWord + "}" + "$" + entry;
+            }
+            else
+            {
+                result = prefix + replaces[combineChar.Value] + activeWord + entry;
+            }
+
+
+
+
+            return result;
         }
 
         private string EscapeText(string text)
         {
-            var start = "";
-
             //first round replace
             var replaces = new Dictionary<string, string>()
             {
@@ -298,7 +338,6 @@ namespace Famoser.FexCompiler.Services
                 {"&",  "\\&"},
                 {"%",  "\\%"},
                 {"#",  "\\#"},
-                {"_",  "\\_"},
                 {"°", " \\degree"},
                 {"‘",  "'"},
                 {"‚",  ","} //<- this is not a comma: , (other UTF-8 code)
@@ -317,7 +356,6 @@ namespace Famoser.FexCompiler.Services
                 {"β", "\\textbeta" },
                 {"σ", "\\textsigma" },
                 {"~", "\\textasciitilde"},
-                {"^", "\\textasciicircum"},
                 {">", "\\textgreater"},
                 {"<", "\\textless"},
                 {"*", "\\textasteriskcentered"},
