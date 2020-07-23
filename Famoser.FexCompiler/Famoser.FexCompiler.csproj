@@ -100,10 +100,10 @@
     <Compile Include="Services\FexService.cs" />
     <Compile Include="Services\FileService.cs" />
     <Compile Include="Services\Interface\IProcessService.cs" />
-    <Compile Include="Services\LearningCardsExportService.cs" />
-    <Compile Include="Services\LearningCardsService.cs" />
-    <Compile Include="Services\LatexExportService.cs" />
-    <Compile Include="Services\LatexService.cs" />
+    <Compile Include="Services\LearningCards\ExportService.cs" />
+    <Compile Include="Services\LearningCards\GenerationService.cs" />
+    <Compile Include="Services\Latex\CompilationService.cs" />
+    <Compile Include="Services\Latex\GenerationService.cs" />
     <Compile Include="Services\MetaDataService.cs" />
     <Compile Include="Services\StatisticService.cs" />
     <Compile Include="Models\ConfigModel.cs" />

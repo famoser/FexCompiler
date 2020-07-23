@@ -4,9 +4,9 @@ using Famoser.FexCompiler.Models.Document;
 using Famoser.FexCompiler.Models.LearningCard;
 using Famoser.FexCompiler.Services.Interface;
 
-namespace Famoser.FexCompiler.Services
+namespace Famoser.FexCompiler.Services.LearningCards
 {
-    public class LearningCardsService : IProcessService<LearningCardCollection>
+    public class GenerationService : IProcessService<LearningCardCollection>
     {
         private readonly List<Section> _content;
         private readonly StatisticModel _statisticModel;
@@ -14,7 +14,7 @@ namespace Famoser.FexCompiler.Services
 
         private const string PathSeparator = "→";
 
-        public LearningCardsService(StatisticModel statisticModel, MetaDataModel metaDataModel, List<Section> content)
+        public GenerationService(StatisticModel statisticModel, MetaDataModel metaDataModel, List<Section> content)
         {
             _statisticModel = statisticModel;
             _metaDataModel = metaDataModel;

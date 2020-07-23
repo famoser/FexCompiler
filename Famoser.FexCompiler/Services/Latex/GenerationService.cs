@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Famoser.FexCompiler.Enum;
 using Famoser.FexCompiler.Helpers;
 using Famoser.FexCompiler.Models.Document;
 using Famoser.FexCompiler.Services.Interface;
 
-namespace Famoser.FexCompiler.Services
+namespace Famoser.FexCompiler.Services.Latex
 {
-    public class LatexService : IProcessService<string>
+    public class GenerationService : IProcessService<string>
     {
         private readonly StatisticModel _statisticModel;
         private readonly MetaDataModel _metaDataModel;
@@ -19,7 +18,7 @@ namespace Famoser.FexCompiler.Services
 
         private const int ParagraphOnParagraphSpacing = 5;
 
-        public LatexService(StatisticModel statisticModel, MetaDataModel metaDataModel, List<Section> content)
+        public GenerationService(StatisticModel statisticModel, MetaDataModel metaDataModel, List<Section> content)
         {
             _statisticModel = statisticModel;
             _metaDataModel = metaDataModel;
@@ -55,62 +54,42 @@ namespace Famoser.FexCompiler.Services
             return template;
         }
 
-        private string ToLatex(Section section, int level = 0, bool paragraphsDisabled = false)
+        private string ToLatex(Section section, int level = 0)
         {
             var res = "";
 
-            if (section.Children.Any() || paragraphsDisabled)
+            // print title
+            var sectionName = "section";
+            for (var i = 0; i < level && i < 4; i++)
             {
-                var sectionName = "section";
-                //max sub is sub_sub_sub_sub_section (no _, just here for easier counting)
-                for (int i = 0; i < level && i < 4; i++)
-                {
-                    sectionName = "sub" + sectionName;
-                }
+                sectionName = "sub" + sectionName;
+            }
+            var title = "\\" + sectionName + "{" + ToLatex(section.Header.Text) + "}\n";
+            res += title;
 
-                res += "\\" + sectionName + "{" + ToLatex(section.Header.Text) + "}\n";
+            // print content
+            var content = ToLatex(section.Content);
+            res += content;
+
+            // if children have no children, output last level: paragraphs
+            if (section.Children.All(c => !c.Children.Any()))
+            {
+                var paragraphSpacer = "\\vspace{" + ParagraphOnParagraphSpacing + "pt}\n";
+                res += paragraphSpacer;
+
+                foreach (var sectionChild in section.Children)
+                {
+                    res += "\\textbf{" + ToLatex(sectionChild.Header.Text) + "}\\\\\n";
+                    res += ToLatex(sectionChild.Content);
+                    res += paragraphSpacer;
+                }
             }
             else
             {
-                //use bold only when no sub content
-                res += "\\textbf{" + ToLatex(section.Header.Text) + "}\\\\\n";
-            }
-
-            if (section.Content.Any())
-            {
-                //add section description
-                res += ToLatex(section.Content);
-
-                //add spacer if bold is following afterwards
-                if (section.Children.Any() &&
-                    !section.Children[0].Children.Any())
+                // else recurse
+                foreach (var sectionChild in section.Children)
                 {
-                    res += "\\vspace{" + ParagraphOnParagraphSpacing + "pt}\n";
-                }
-            }
-
-
-            //disable the collapsing to paragraph if section before was not a paragraph
-            //this ensures the user is not confused (a "chapter" could then look like as it would belong to the chapter before)
-            bool onlyParagraphs = true;
-            foreach (var baseContent in section.Children)
-            {
-                var mySection = baseContent;
-                if (mySection != null && mySection.Children.Any())
-                {
-                    onlyParagraphs = false;
-                }
-            }
-
-            //add content recursively
-            foreach (var baseContent in section.Children)
-            {
-                res += ToLatex(baseContent, level + 1, !onlyParagraphs);
-
-                //add spacing if paragraphs
-                if (onlyParagraphs)
-                {
-                    res += "\\vspace{" + ParagraphOnParagraphSpacing + "pt}\n";
+                    res += ToLatex(sectionChild, level + 1);
                 }
             }
 
@@ -127,87 +106,21 @@ namespace Famoser.FexCompiler.Services
                     //write text
                     var textContent = ToLatex(lineNode.Text);
                     if (textContent != "")
+                    {
                         //latex newline + OS newline
                         content += textContent + "\\\\ " + Environment.NewLine;
-                } else if (lineNode.ContentType == ContentType.Code)
+                    }
+
+                }
+                else if (lineNode.ContentType == ContentType.Code)
                 {
                     content += "\\begin{verbatim}\n" +
                                lineNode.Text +
                                "\n\\end{verbatim}";
                 }
             }
+
             return content;
-        }
-
-        private bool IsValidExponent(string content)
-        {
-            var maxChars = 3;
-            var maxNumbers = 10;
-            for (var index = 0; index < content.Length; index++)
-            {
-                var item = content[index];
-                if (item >= 'a' && item <= 'z' || //alpha 
-                    item >= 'A' && item <= 'Z') //ALPHA
-                {
-                    if (maxChars-- <= 0)
-                    {
-                        return false;
-                    }
-                }
-                else if (item >= '0' && item <= '9') //numbers
-                {
-                    if (maxNumbers-- <= 0)
-                    {
-                        return false;
-                    }
-                }
-                else if (item == '-')
-                {
-                    if (index > 0)
-                    {
-                        return false;
-                    }
-                }
-                else
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        private bool IsValidVariable(string content)
-        {
-            foreach (var item in content)
-            {
-                if (
-                    item >= 'a' && item <= 'z' || //alpha 
-                    item >= 'A' && item <= 'Z' || //ALPHA
-                    item >= '0' && item <= '9' ||
-                    item >= '_')
-                {
-                    //valid
-                }
-                else
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        private string EscapeVariable(string content)
-        {
-            return content.Replace("_", "\\_");
-        }
-
-        private bool ValidSubscriptChar(char entry)
-        {
-            return entry >= 'a' && entry <= 'z' || //alpha 
-                   entry >= 'A' && entry <= 'Z' || //ALPHA
-                   entry >= '0' && entry <= '9';
         }
 
         private string ToLatex(string de)
@@ -307,7 +220,7 @@ namespace Famoser.FexCompiler.Services
                 {"#",  "\\#"},
                 {"°", " \\degree"},
                 {"‘",  "'"},
-                {"‚",  ","} //<- this is not a comma: , (other UTF-8 codeContent)
+                {"‚",  ","} //<- this is not a comma: , (other UTF-8 code)
             };
             foreach (var replace in replaces)
             {
@@ -356,8 +269,8 @@ namespace Famoser.FexCompiler.Services
             //text replaces
             var replaces3 = new Dictionary<string, string>()
             {
-                {"not\\_element\\_of", "$\\not\\in$"},
-                {"element\\_of", "$\\in$"}
+                {"not_element_of", "$\\notin$"},
+                {"element_of", "$\\in$"}
             };
             foreach (var replace in replaces3)
             {
@@ -365,6 +278,77 @@ namespace Famoser.FexCompiler.Services
             }
 
             return text;
+        }
+
+        private bool IsValidExponent(string content)
+        {
+            var maxChars = 3;
+            var maxNumbers = 10;
+            for (var index = 0; index < content.Length; index++)
+            {
+                var item = content[index];
+                if (item >= 'a' && item <= 'z' || //alpha 
+                    item >= 'A' && item <= 'Z') //ALPHA
+                {
+                    if (maxChars-- <= 0)
+                    {
+                        return false;
+                    }
+                }
+                else if (item >= '0' && item <= '9') //numbers
+                {
+                    if (maxNumbers-- <= 0)
+                    {
+                        return false;
+                    }
+                }
+                else if (item == '-')
+                {
+                    if (index > 0)
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private bool IsValidVariable(string content)
+        {
+            foreach (var item in content)
+            {
+                if (
+                    item >= 'a' && item <= 'z' || //alpha 
+                    item >= 'A' && item <= 'Z' || //ALPHA
+                    item >= '0' && item <= '9' ||
+                    item >= '_')
+                {
+                    //valid
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private string EscapeVariable(string content)
+        {
+            return content.Replace("_", "\\_");
+        }
+
+        private bool ValidSubscriptChar(char entry)
+        {
+            return entry >= 'a' && entry <= 'z' || //alpha 
+                   entry >= 'A' && entry <= 'Z' || //ALPHA
+                   entry >= '0' && entry <= '9';
         }
     }
 }

@@ -4,15 +4,15 @@ using System.IO;
 using System.Threading;
 using Famoser.FexCompiler.Services.Interface;
 
-namespace Famoser.FexCompiler.Services
+namespace Famoser.FexCompiler.Services.Latex
 {
-    public class LatexExportService : IProcessService<bool>
+    public class CompilationService : IProcessService<bool>
     {
         private readonly string _path;
         private string _content;
         private string _fileNameAppendix = "";
 
-        public LatexExportService(string path, string content)
+        public CompilationService(string path, string content)
         {
             _path = path;
             _content = content;
