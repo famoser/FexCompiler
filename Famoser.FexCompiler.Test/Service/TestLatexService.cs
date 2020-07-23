@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Famoser.FexCompiler.Models.Document;
-using Famoser.FexCompiler.Models.Document.Content;
 using Famoser.FexCompiler.Services;
 using Famoser.FexCompiler.Test.Helpers;
 using Famoser.FexCompiler.Test.Service.Base;
@@ -26,7 +25,7 @@ namespace Famoser.FexCompiler.Test.Service
             var fexLines = fexService.Process();
             var contentService = new ContentService(fexLines);
             var root = contentService.Process();
-            var latexService = new LatexService(new StatisticModel(), new MetaDataModel(), root.Content);
+            var latexService = new LatexService(new StatisticModel(), new MetaDataModel(), root.Children);
             var dict = new Dictionary<string, string[]>()
             {
                 {

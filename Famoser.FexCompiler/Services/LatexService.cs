@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Famoser.FexCompiler.Enum;
 using Famoser.FexCompiler.Helpers;
 using Famoser.FexCompiler.Models.Document;
-using Famoser.FexCompiler.Models.Document.Content;
-using Famoser.FexCompiler.Models.Document.TextRepresentation;
 using Famoser.FexCompiler.Services.Interface;
 
 namespace Famoser.FexCompiler.Services
@@ -62,7 +59,7 @@ namespace Famoser.FexCompiler.Services
         {
             var res = "";
 
-            if (section.Content.Any() || paragraphsDisabled)
+            if (section.Children.Any() || paragraphsDisabled)
             {
                 var sectionName = "section";
                 //max sub is sub_sub_sub_sub_section (no _, just here for easier counting)
@@ -71,22 +68,22 @@ namespace Famoser.FexCompiler.Services
                     sectionName = "sub" + sectionName;
                 }
 
-                res += "\\" + sectionName + "{" + ToLatex(section.Header.TextNodes) + "}\n";
+                res += "\\" + sectionName + "{" + ToLatex(section.Header.Text) + "}\n";
             }
             else
             {
                 //use bold only when no sub content
-                res += "\\textbf{" + ToLatex(section.Header.TextNodes) + "}\\\\\n";
+                res += "\\textbf{" + ToLatex(section.Header.Text) + "}\\\\\n";
             }
 
-            if (section.TextContent.Any())
+            if (section.Content.Any())
             {
                 //add section description
-                res += ToLatex(section.TextContent);
+                res += ToLatex(section.Content);
 
                 //add spacer if bold is following afterwards
-                if (section.Content.Any() &&
-                    !section.Content[0].Content.Any())
+                if (section.Children.Any() &&
+                    !section.Children[0].Children.Any())
                 {
                     res += "\\vspace{" + ParagraphOnParagraphSpacing + "pt}\n";
                 }
@@ -96,17 +93,17 @@ namespace Famoser.FexCompiler.Services
             //disable the collapsing to paragraph if section before was not a paragraph
             //this ensures the user is not confused (a "chapter" could then look like as it would belong to the chapter before)
             bool onlyParagraphs = true;
-            foreach (var baseContent in section.Content)
+            foreach (var baseContent in section.Children)
             {
                 var mySection = baseContent;
-                if (mySection != null && mySection.Content.Any())
+                if (mySection != null && mySection.Children.Any())
                 {
                     onlyParagraphs = false;
                 }
             }
 
             //add content recursively
-            foreach (var baseContent in section.Content)
+            foreach (var baseContent in section.Children)
             {
                 res += ToLatex(baseContent, level + 1, !onlyParagraphs);
 
@@ -120,52 +117,25 @@ namespace Famoser.FexCompiler.Services
             return res;
         }
 
-        private string ToLatex(List<LineNode> lines)
+        private string ToLatex(List<Content> lines)
         {
             var content = "";
             foreach (var lineNode in lines)
             {
-                //write text
-                var textContent = ToLatex(lineNode.TextNodes);
-                if (textContent != "")
-                    //latex newline + OS newline
-                    content += textContent + "\\\\ " + Environment.NewLine;
-
-                //write code (typically only one property is not empty / not null)
-                if (lineNode.CodeNode != null)
+                if (lineNode.ContentType == ContentType.Text)
+                {
+                    //write text
+                    var textContent = ToLatex(lineNode.Text);
+                    if (textContent != "")
+                        //latex newline + OS newline
+                        content += textContent + "\\\\ " + Environment.NewLine;
+                } else if (lineNode.ContentType == ContentType.Code)
                 {
                     content += "\\begin{verbatim}\n" +
-                               lineNode.CodeNode.Text +
+                               lineNode.Text +
                                "\n\\end{verbatim}";
                 }
             }
-            return content;
-        }
-
-        private string ToLatex(List<TextNode> textNodes)
-        {
-            if (textNodes == null)
-                return "";
-
-            var content = "";
-            foreach (var textNode in textNodes)
-            {
-                switch (textNode.TextType)
-                {
-                    case TextType.Bold:
-                        content += "\\textbf{" + ToLatex(textNode.Text) + "}";
-                        break;
-                    default:
-                        content += ToLatex(textNode.Text);
-                        break;
-                }
-
-                content += " ";
-            }
-
-            if (content.Length > 0)
-                content = content.Substring(0, content.Length - 1);
-
             return content;
         }
 
@@ -337,7 +307,7 @@ namespace Famoser.FexCompiler.Services
                 {"#",  "\\#"},
                 {"°", " \\degree"},
                 {"‘",  "'"},
-                {"‚",  ","} //<- this is not a comma: , (other UTF-8 code)
+                {"‚",  ","} //<- this is not a comma: , (other UTF-8 codeContent)
             };
             foreach (var replace in replaces)
             {

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Famoser.FexCompiler.Models.Document.Content;
+using Famoser.FexCompiler.Models.Document;
 using Famoser.FexCompiler.Services;
 using Famoser.FexCompiler.Test.Helpers;
 using Famoser.FexCompiler.Test.Service.Base;
@@ -23,8 +23,8 @@ namespace Famoser.FexCompiler.Test.Service
             var content = contentService.Process();
 
             //assert 
-            Assert.IsTrue(content.Content.Count > 0);
-            Assert.IsTrue(content.TextContent.Count == 0);
+            Assert.IsTrue(content.Children.Count > 0);
+            Assert.IsTrue(content.Content.Count == 0);
             Assert.IsTrue(content.Header == null);
 
             var dic = new Dictionary<string, int>()
@@ -32,9 +32,9 @@ namespace Famoser.FexCompiler.Test.Service
                 {"simple.fex", 1},
                 {"advanced.fex", 1},
                 {"long.fex", 2},
-                {"code.fex", 1}
+                {"codeContent.fex", 1}
             };
-            Assert.AreEqual(content.Content.Count, dic[fileName]);
+            Assert.AreEqual(content.Children.Count, dic[fileName]);
         }
 
         [TestMethod]
@@ -51,22 +51,18 @@ namespace Famoser.FexCompiler.Test.Service
             var content = contentService.Process();
 
             //assert 
-            Assert.IsTrue(content.Content[0] is Section);
-            var section1 = content.Content[0];
+            Assert.IsTrue(content.Children[0] is Section);
+            var section1 = content.Children[0];
 
-            Assert.AreEqual(section1.Header.TextNodes.Count, 1);
-            Assert.AreEqual(section1.Header.TextNodes[0].Text, "H1");
-            Assert.AreEqual(section1.TextContent.Count, 0);
-            Assert.AreEqual(section1.Content.Count, 1);
-            Assert.IsTrue(section1.Content[0] is Section);
+            Assert.AreEqual(section1.Header.Text, "H1");
+            Assert.AreEqual(section1.Content.Count, 0);
+            Assert.AreEqual(section1.Children.Count, 1);
+            Assert.IsTrue(section1.Children[0] is Section);
 
-            var section2 = section1.Content[0];
-            Assert.AreEqual(section2.Header.TextNodes.Count, 1);
-            Assert.AreEqual(section2.Header.TextNodes[0].Text, "H2");
-            Assert.AreEqual(section2.TextContent[0].TextNodes.Count, 1);
-            Assert.AreEqual(section2.TextContent[0].TextNodes[0].Text, "hallo");
-            Assert.AreEqual(section2.TextContent[1].TextNodes.Count, 1);
-            Assert.AreEqual(section2.TextContent[1].TextNodes[0].Text, "welt");
+            var section2 = section1.Children[0];
+            Assert.AreEqual(section2.Header.Text, "H2");
+            Assert.AreEqual(section2.Content[0].Text, "hallo");
+            Assert.AreEqual(section2.Content[1].Text, "welt");
         }
 
         [TestMethod]
@@ -83,27 +79,31 @@ namespace Famoser.FexCompiler.Test.Service
             var content = contentService.Process();
 
             //assert 
-            Assert.IsTrue(content.Content[0] != null);
-            var section1 = content.Content[0];
+            Assert.IsTrue(content.Children[0] != null);
+            var section1 = content.Children[0];
 
-            Assert.AreEqual(section1.Header.TextNodes.Count, 1);
-            Assert.AreEqual(section1.Header.TextNodes[0].Text, "H1");
-            Assert.AreEqual(section1.TextContent.Count, 0);
-            Assert.AreEqual(section1.Content.Count, 1);
-            Assert.IsTrue(section1.Content[0] != null);
+            Assert.AreEqual(section1.Header.ContentType, ContentType.Text);
+            Assert.AreEqual(section1.Header.Text, "H1");
+            Assert.AreEqual(section1.Content.Count, 0);
+            Assert.AreEqual(section1.Children.Count, 1);
+            Assert.IsTrue(section1.Children[0] != null);
 
-            var section2 = section1.Content[0];
-            Assert.AreEqual(section2.Header.TextNodes.Count, 1);
-            Assert.AreEqual(section2.Header.TextNodes[0].Text, "H2");
-            Assert.AreEqual(section2.TextContent.Count, 4);
-            Assert.AreEqual(section2.TextContent[0].TextNodes.Count, 1);
-            Assert.AreEqual(section2.TextContent[0].TextNodes[0].Text, "text");
-            Assert.AreNotEqual(section2.TextContent[1].CodeNode, null);
-            Assert.AreEqual(section2.TextContent[1].CodeNode.Text, "var code = true;\n\tcode = false><;");
-            Assert.AreEqual(section2.TextContent[2].TextNodes.Count, 1);
-            Assert.AreEqual(section2.TextContent[2].TextNodes[0].Text, "normal text continues");
-            Assert.AreEqual(section2.TextContent[3].TextNodes.Count, 1);
-            Assert.AreEqual(section2.TextContent[3].TextNodes[0].Text, "and further");
+            var section2 = section1.Children[0];
+            Assert.AreEqual(section2.Header.ContentType, ContentType.Text);
+            Assert.AreEqual(section2.Header.Text, "H2");
+            Assert.AreEqual(section2.Content.Count, 4);
+            
+            Assert.AreEqual(section2.Content[0].ContentType, ContentType.Text);
+            Assert.AreEqual(section2.Content[0].Text, "text");
+
+            Assert.AreEqual(section2.Content[1].ContentType, ContentType.Code);
+            Assert.AreEqual(section2.Content[1].Text, "var code = true;\n\tcode = false><;");
+
+            Assert.AreEqual(section2.Content[2].ContentType, ContentType.Text);
+            Assert.AreEqual(section2.Content[2].Text, "normal text continues");
+
+            Assert.AreEqual(section2.Content[3].ContentType, ContentType.Text);
+            Assert.AreEqual(section2.Content[3].Text, "and further");
         }
 
         [TestMethod]
@@ -120,48 +120,42 @@ namespace Famoser.FexCompiler.Test.Service
             var content = contentService.Process();
 
             //assert 
-            Assert.IsTrue(content.Content[0] != null);
-            Assert.IsTrue(content.Content[1] != null);
-            var section1 = content.Content[0];
-            var section4 = content.Content[1];
+            Assert.IsTrue(content.Children[0] != null);
+            Assert.IsTrue(content.Children[1] != null);
+            var section1 = content.Children[0];
+            var section4 = content.Children[1];
 
-            Assert.AreEqual(section1.Header.TextNodes.Count, 1);
-            Assert.AreEqual(section1.Header.TextNodes[0].Text, "H1");
-            Assert.AreEqual(section1.TextContent.Count, 0);
-            Assert.AreEqual(section1.Content.Count, 2);
-            Assert.IsTrue(section1.Content[0] != null);
-            Assert.IsTrue(section1.Content[1] != null);
+            Assert.AreEqual(section1.Header.Text, "H1");
+            Assert.AreEqual(section1.Content.Count, 0);
+            Assert.AreEqual(section1.Children.Count, 2);
+            Assert.IsTrue(section1.Children[0] != null);
+            Assert.IsTrue(section1.Children[1] != null);
 
-            var section2 = section1.Content[0];
-            Assert.AreEqual(section2.Header.TextNodes.Count, 1);
-            Assert.AreEqual(section2.Header.TextNodes[0].Text, "H2");
-            Assert.AreEqual(section2.TextContent.Count, 0);
-            Assert.AreEqual(section2.Content.Count, 1);
-            Assert.IsTrue(section2.Content[0] != null);
+            var section2 = section1.Children[0];
+            Assert.AreEqual(section2.Header.Text, "H2");
+            Assert.AreEqual(section2.Content.Count, 0);
+            Assert.AreEqual(section2.Children.Count, 1);
+            Assert.IsTrue(section2.Children[0] != null);
             
-            var section21 = section2.Content[0];
-            Assert.AreEqual(section21.Header.TextNodes.Count, 1);
-            Assert.AreEqual(section21.Header.TextNodes[0].Text, "H2.1");
-            Assert.AreEqual(section21.TextContent.Count, 2); //skip textContent inspection
-            Assert.AreEqual(section21.Content.Count, 0);
+            var section21 = section2.Children[0];
+            Assert.AreEqual(section21.Header.Text, "H2.1");
+            Assert.AreEqual(section21.Content.Count, 2); //skip textContent inspection
+            Assert.AreEqual(section21.Children.Count, 0);
 
-            var section3 = section1.Content[1];
-            Assert.AreEqual(section3.Header.TextNodes.Count, 1);
-            Assert.AreEqual(section3.Header.TextNodes[0].Text, "H3");
-            Assert.AreEqual(section3.TextContent.Count, 2);
-            Assert.AreEqual(section3.Content.Count, 0);
+            var section3 = section1.Children[1];
+            Assert.AreEqual(section3.Header.Text, "H3");
+            Assert.AreEqual(section3.Content.Count, 2);
+            Assert.AreEqual(section3.Children.Count, 0);
             
-            Assert.AreEqual(section4.Header.TextNodes.Count, 1);
-            Assert.AreEqual(section4.Header.TextNodes[0].Text, "H4");
-            Assert.AreEqual(section4.TextContent.Count, 0);
-            Assert.AreEqual(section4.Content.Count, 1);
-            Assert.IsTrue(section4.Content[0] != null);
+            Assert.AreEqual(section4.Header.Text, "H4");
+            Assert.AreEqual(section4.Content.Count, 0);
+            Assert.AreEqual(section4.Children.Count, 1);
+            Assert.IsTrue(section4.Children[0] != null);
 
-            var section5 = section4.Content[0];
-            Assert.AreEqual(section5.Header.TextNodes.Count, 1);
-            Assert.AreEqual(section5.Header.TextNodes[0].Text, "H5");
-            Assert.AreEqual(section5.TextContent.Count, 2);
-            Assert.AreEqual(section5.Content.Count, 0);
+            var section5 = section4.Children[0];
+            Assert.AreEqual(section5.Header.Text, "H5");
+            Assert.AreEqual(section5.Content.Count, 2);
+            Assert.AreEqual(section5.Children.Count, 0);
         }
     }
 }

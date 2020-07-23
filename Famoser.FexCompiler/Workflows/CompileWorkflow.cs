@@ -74,7 +74,7 @@ namespace Famoser.FexCompiler.Workflows
                 {
                     //learning cards create
                     StepStarted("creating learning cards");
-                    var learningCardsService = new LearningCardsService(document.StatisticModel, document.MetaDataModel, document.RootSection.Content);
+                    var learningCardsService = new LearningCardsService(document.StatisticModel, document.MetaDataModel, document.RootSection.Children);
                     var cards = learningCardsService.Process();
                     StepCompleted();
 
@@ -89,7 +89,7 @@ namespace Famoser.FexCompiler.Workflows
 
                 //latex create
                 StepStarted("creating latex");
-                var latexService = new LatexService(document.StatisticModel, document.MetaDataModel, document.RootSection.Content);
+                var latexService = new LatexService(document.StatisticModel, document.MetaDataModel, document.RootSection.Children);
                 var latex = latexService.Process();
                 StepCompleted();
 

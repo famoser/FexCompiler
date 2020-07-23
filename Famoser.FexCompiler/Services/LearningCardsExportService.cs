@@ -69,7 +69,7 @@ namespace Famoser.FexCompiler.Services
 
                 row.Append(
                     ConstructCell("Title"),
-                    ConstructCell("Content"),
+                    ConstructCell("Children"),
                     ConstructCell("ItemCount"),
                     ConstructCell("Path"),
                     ConstructCell("Identifier")
