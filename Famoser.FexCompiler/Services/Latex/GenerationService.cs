@@ -270,7 +270,9 @@ namespace Famoser.FexCompiler.Services.Latex
             var replaces3 = new Dictionary<string, string>()
             {
                 {"not_element_of", "$\\notin$"},
-                {"element_of", "$\\in$"}
+                {"element_of", "$\\in$"},
+                {"exists", "$\\in$"},
+                {"for_all", "$\\in$"}
             };
             foreach (var replace in replaces3)
             {
