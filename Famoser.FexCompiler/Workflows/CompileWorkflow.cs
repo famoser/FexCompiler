@@ -1,7 +1,10 @@
 ﻿using System;
 using Famoser.FexCompiler.Models;
 using Famoser.FexCompiler.Services;
+using Famoser.FexCompiler.Services.Latex;
+using Famoser.FexCompiler.Services.LearningCards;
 using Famoser.FexCompiler.Workflows.Interface;
+using GenerationService = Famoser.FexCompiler.Services.LearningCards.GenerationService;
 
 namespace Famoser.FexCompiler.Workflows
 {
@@ -74,13 +77,13 @@ namespace Famoser.FexCompiler.Workflows
                 {
                     //learning cards create
                     StepStarted("creating learning cards");
-                    var learningCardsService = new LearningCardsService(document.StatisticModel, document.MetaDataModel, document.RootSection.Content);
+                    var learningCardsService = new GenerationService(document.StatisticModel, document.MetaDataModel, document.RootSection.Children);
                     var cards = learningCardsService.Process();
                     StepCompleted();
 
                     //learning cards persist
                     StepStarted("persisting learning cards");
-                    var learningCardsExportService = new LearningCardsExportService(cards, path);
+                    var learningCardsExportService = new ExportService(cards, path);
                     var learningCardsFeedback = learningCardsExportService.Process();
                     StepCompleted(learningCardsFeedback);
 
@@ -89,13 +92,13 @@ namespace Famoser.FexCompiler.Workflows
 
                 //latex create
                 StepStarted("creating latex");
-                var latexService = new LatexService(document.StatisticModel, document.MetaDataModel, document.RootSection.Content);
+                var latexService = new Services.Latex.GenerationService(document.StatisticModel, document.MetaDataModel, document.RootSection.Children);
                 var latex = latexService.Process();
                 StepCompleted();
 
                 //latex compile
                 StepStarted("compiling latex");
-                var latexCompilerService = new LatexExportService(path, latex);
+                var latexCompilerService = new CompilationService(path, latex);
                 var latexCompileFeedback = latexCompilerService.Process();
                 StepCompleted(latexCompileFeedback);
 

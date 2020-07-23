@@ -30,7 +30,7 @@ namespace Famoser.FexCompiler.Services
 
         /// <summary>
         /// convert the array to fexLine objects
-        /// cleans up empty lines, takes care of headers and code sections
+        /// cleans up empty lines, takes care of headers and codeContent sections
         /// </summary>
         /// <param name="fileInput"></param>
         /// <returns></returns>
@@ -60,20 +60,20 @@ namespace Famoser.FexCompiler.Services
                 //set text
                 fexLine.Text = currentLine.Trim();
 
-                //code detected
+                //codeContent detected
                 if (fexLine.Text.StartsWith("CODE_START"))
                 {
-                    //skip code header
+                    //skip codeContent header
                     fexLine.Text = "";
                     index++;
 
-                    //mark node as to be code
+                    //mark node as to be codeContent
                     fexLine.IsCode = true;
 
                     //prefix which can be cleared up
                     var removePrefix = new string('\t', fexLine.Level);
 
-                    //collapse rest of code into this line
+                    //collapse rest of codeContent into this line
                     var foundEnd = false;
                     for (; index < fileInput.Length; index++)
                     {
@@ -104,7 +104,7 @@ namespace Famoser.FexCompiler.Services
                     if (fexLine.Text.Length > 0)
                         fexLine.Text = fexLine.Text.Substring(0, fexLine.Text.Length - 1);
 
-                    //issue warning because no code end found
+                    //issue warning because no codeContent end found
                     if (!foundEnd)
                     {
                         Console.WriteLine("no end of CODE_START found, use CODE_END or CODE_STOP");

@@ -1,9 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel;
-using Famoser.FexCompiler.Enum;
 using Famoser.FexCompiler.Models;
-using Famoser.FexCompiler.Models.Document.Content;
-using Famoser.FexCompiler.Models.Document.TextRepresentation;
+using Famoser.FexCompiler.Models.Document;
 using Famoser.FexCompiler.Services.Interface;
 
 namespace Famoser.FexCompiler.Services
@@ -50,7 +47,7 @@ namespace Famoser.FexCompiler.Services
                             else
                             {
                                 //safe to insert, as currentLine is no header for sure
-                                newSection.TextContent.Add(GetLineNode(innerLine));
+                                newSection.Content.Add(GetLineNode(innerLine));
                             }
                         }
                         else
@@ -60,7 +57,7 @@ namespace Famoser.FexCompiler.Services
                             break;
                         }
                     }
-                    section.Content.Add(newSection);
+                    section.Children.Add(newSection);
                 }
                 else
                 {
@@ -71,14 +68,9 @@ namespace Famoser.FexCompiler.Services
             return _lines.Count;
         }
 
-        private LineNode GetLineNode(FexLine line)
+        private Content GetLineNode(FexLine line)
         {
-            return line.IsCode ? new LineNode(new Code(line.Text)) : new LineNode(GetTextNode(line.Text));
-        }
-
-        private List<TextNode> GetTextNode(string str)
-        {
-            return new List<TextNode> { new TextNode(str.Trim()) };
+            return line.IsCode ? Content.FromCode(line.Text) : Content.FromText(line.Text.Trim());
         }
     }
 }

@@ -22,7 +22,12 @@ namespace Famoser.FexCompiler.Services
         public List<string> GetAllFexFilePaths(string basePath)
         {
             var res = new List<string>();
-            DirectoryInfo dir = new DirectoryInfo(basePath);
+            var dir = new DirectoryInfo(basePath);
+
+            if (!dir.Exists)
+            {
+                return res;
+            }
 
             foreach (FileInfo file in dir.GetFiles("*.fex"))
             {

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Famoser.FexCompiler.Models.Document;
-using Famoser.FexCompiler.Models.Document.Content;
 
 namespace Famoser.FexCompiler.Models
 {

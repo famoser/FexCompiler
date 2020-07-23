@@ -7,16 +7,14 @@ using Famoser.FexCompiler.Models.LearningCard;
 using Famoser.FexCompiler.Services.Interface;
 using Newtonsoft.Json;
 
-namespace Famoser.FexCompiler.Services
+namespace Famoser.FexCompiler.Services.LearningCards
 {
-    public class LearningCardsExportService : IProcessService<bool>
+    public class ExportService : IProcessService<bool>
     {
         private readonly LearningCardCollection _learningCardCollection;
         private readonly string _path;
 
-        private const string PathSeparator = "→";
-
-        public LearningCardsExportService(LearningCardCollection learningCardCollection, string path)
+        public ExportService(LearningCardCollection learningCardCollection, string path)
         {
             _path = path;
             _learningCardCollection = learningCardCollection;
@@ -69,7 +67,7 @@ namespace Famoser.FexCompiler.Services
 
                 row.Append(
                     ConstructCell("Title"),
-                    ConstructCell("Content"),
+                    ConstructCell("Children"),
                     ConstructCell("ItemCount"),
                     ConstructCell("Path"),
                     ConstructCell("Identifier")
