@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Famoser.FexCompiler.Helpers;
 using Famoser.FexCompiler.Models.Document;
 using Famoser.FexCompiler.Services.Interface;
@@ -125,87 +126,160 @@ namespace Famoser.FexCompiler.Services.Latex
 
         private string ToLatex(string de)
         {
-            var line = EscapeText(de);
+            var line = de;
+
+            /*
+             * small statemachine for parsing single line.
+             *
+             * 0 for valid word chars (initial)
+             * 1 for valid word (at least 3 valid word chars)
+             * 2 for valid combine char
+             * 3 for valid exponent
+             *
+             * 0->0 on valid word char
+             * 0->1 on valid word char
+             *
+             * 1->2 on combine char
+             * 1->1 on valid word char
+             * 1->-1 else
+             *
+             * 2->3 on valid exponent
+             * 2->-1 else
+             *
+             * 3->3 on valid exponent
+             * 3->-1 else; if end char then OUTPUT
+             */
+
+            var state = 0;
+            var invalidPrefix = "";
+            var variable = "";
+            char? combineChar = null;
+            var exponent = "";
 
             var result = "";
-            var prefix = "";
-            var activeWord = "";
-            char? combineChar = null;
-            bool blocked = false;
+
             foreach (var entry in line)
             {
-                if (
-                    entry == ' ' || entry == ',' ||
-                    entry == '(' || entry == ')' ||
-                    entry == '[' || entry == ']' ||
-                    entry == '{' || entry == '}'
-                )
+                switch (state)
                 {
-                    result += PrintCombineChar(combineChar, activeWord, prefix, entry);
-                    combineChar = null;
-                    activeWord = "";
-                    blocked = false;
-                    continue;
-                }
+                    case 0:
+                        variable += entry;
+                        if (!IsVariableChar(entry))
+                        {
+                            invalidPrefix += variable;
+                            variable = "";
+                        }
+                        else if (variable.Length >= 1)
+                        {
+                            state = 1;
+                        }
 
-                if ((entry == '_' || entry == '^') && !blocked)
-                {
-                    if (combineChar == null)
-                    {
-                        prefix = activeWord;
-                        activeWord = "";
-                        combineChar = entry;
-                    }
-                    else
-                    {
-                        activeWord = prefix + combineChar;
-                        combineChar = null;
-                        blocked = true;
-                    }
-                }
-                else
-                {
-                    activeWord += entry;
+                        break;
+                    case 1:
+                        if (entry == '_' || entry == '^')
+                        {
+                            combineChar = entry;
+                            state = 2;
+                        }
+                        else if (IsVariableChar(entry))
+                        {
+                            variable += entry;
+                        }
+                        else
+                        {
+                            invalidPrefix += variable + entry;
+                            variable = "";
+                            state = 0;
+                        }
+
+                        break;
+                    case 2:
+                        exponent += entry;
+                        if (IsVariableChar(entry))
+                        {
+                            state = 3;
+                        }
+                        else
+                        {
+                            invalidPrefix += variable + combineChar + exponent;
+                            variable = "";
+                            combineChar = null;
+                            exponent = "";
+                            state = 0;
+                        }
+
+                        break;
+                    case 3:
+                        if (IsVariableChar(entry))
+                        {
+                            exponent += entry;
+                        }
+                        else
+                        {
+                            if (IsEndChar(entry) && !ReservedWord(variable, combineChar, exponent))
+                            {
+                                result += EscapeText(invalidPrefix);
+                                result += "${" + variable + "}" + combineChar + "{" + exponent + "}$";
+                                invalidPrefix = entry.ToString();
+                            }
+                            else
+                            {
+                                invalidPrefix += variable + combineChar + exponent + entry;
+                            }
+
+                            state = 0;
+                            variable = "";
+                            combineChar = null;
+                            exponent = "";
+                        }
+
+                        break;
                 }
             }
 
-            result += PrintCombineChar(combineChar, activeWord, prefix, null);
+            if (combineChar != null && exponent.Length > 0)
+            {
+                result += EscapeText(invalidPrefix);
+                result += "${" + variable + "}" + combineChar + "{" + exponent + "}$";
+            }
+            else
+            {
+
+                invalidPrefix += variable;
+                if (combineChar != null)
+                {
+                    invalidPrefix += combineChar + exponent;
+                }
+
+                result += EscapeText(invalidPrefix);
+            }
 
             return result;
         }
 
-        private static string PrintCombineChar(char? combineChar, string activeWord, string prefix, char? entry)
+        private bool ReservedWord(string variable, char? combineChar, string exponent)
         {
-            var replaces = new Dictionary<char, string>()
-            {
-                {'_',  "\\_"},
-                {'^', "\\textasciicircum"}
-            };
-
-            string result;
-            if (combineChar == null)
-            {
-                result = (activeWord + entry);
-            }
-            else if (activeWord.Length > 0)
-            {
-                result = "$" + prefix + combineChar + "{" + activeWord + "}" + "$" + entry;
-            }
-            else
-            {
-                result = prefix + replaces[combineChar.Value] + activeWord + entry;
-            }
-
-            return result;
+            var word = variable + combineChar + exponent;
+            return word == "sum_of" || word == "for_all" || word == "element_of";
         }
 
         private string EscapeText(string text)
         {
-            //first round replace
+            // replace characters which are used in later replaces
             var replaces = new Dictionary<string, string>()
             {
-                {"\\", "\\textbackslash "},
-                {"$", "\\textdollar "},
+                {"\\", "\\textbackslash"},
+                {"$", "\\textdollar"},
+                {"not_element_of", "$\\notin$"},
+                {"element_of", "$\\in$"},
+                {"exists", "$\\in$"},
+                {"for_all", "$\\in$"},
+                {"sum_of", "$\\sum$"},
+                {"_", "\\_"},
+                {"{", "\\textbraceleft"},
+                {"}", "\\textbraceright"},
+                {"[", "{[}"},
+                {"]", "{]}"},
                 {"∙", "*" },
                 {"→", "$\\rightarrow$" },
                 {"<->", "$\\leftrightarrow$" },
@@ -220,18 +294,7 @@ namespace Famoser.FexCompiler.Services.Latex
                 {"#",  "\\#"},
                 {"°", " \\degree"},
                 {"‘",  "'"},
-                {"‚",  ","} //<- this is not a comma: , (other UTF-8 code)
-            };
-            foreach (var replace in replaces)
-            {
-                text = text.Replace(replace.Key, replace.Value);
-            }
-
-            //replaces where hspace afterwards is needed
-            var textReplaces = new Dictionary<string, string>()
-            {
-                {"{", "\\textbraceleft"},
-                {"}", "\\textbraceright"},
+                {"‚",  ","}, //<- this is not a comma: , (other UTF-8 code)
                 {"α", "\\textalpha" },
                 {"β", "\\textbeta" },
                 {"σ", "\\textsigma" },
@@ -243,114 +306,41 @@ namespace Famoser.FexCompiler.Services.Latex
                 {"—", "\\textemdash"},
                 {"“", "\\textquotedblleft"},
                 {"”", "\\textquotedblright"},
-                {"„",  "\\textquotedblleft"}
+                {"„",  "\\textquotedblleft"},
+                {"^", "\\textasciicircum"}
             };
 
-            foreach (var textReplace in textReplaces)
+            foreach (var textReplace in replaces)
             {
-                text = text.Replace(textReplace.Key + " ", textReplace.Value + " " + "VSPACE_PLACEHOLDER");
-                text = text.Replace(textReplace.Key, textReplace.Value + " ");
+                var replace = textReplace.Value;
+                if (replace.Contains("text"))
+                {
+                    replace += " VSPACEPLACEHOLDER";
+                }
+
+                text = text.Replace(textReplace.Key, replace);
             }
 
-            text = text.Replace("VSPACE_PLACEHOLDER", "\\hspace{3pt}");
-
-
-            //second round replace
-            var replaces2 = new Dictionary<string, string>()
-            {
-                {"[", "{[}"},
-                {"]", "{]}"}
-            };
-            foreach (var replace in replaces2)
-            {
-                text = text.Replace(replace.Key, replace.Value);
-            }
-
-            //text replaces
-            var replaces3 = new Dictionary<string, string>()
-            {
-                {"not_element_of", "$\\notin$"},
-                {"element_of", "$\\in$"},
-                {"exists", "$\\in$"},
-                {"for_all", "$\\in$"}
-            };
-            foreach (var replace in replaces3)
-            {
-                text = text.Replace(replace.Key, replace.Value);
-            }
+            text = text.Replace(" VSPACEPLACEHOLDER ", " \\hspace{0pt} ");
+            text = text.Replace(" VSPACEPLACEHOLDER", " ");
 
             return text;
         }
 
-        private bool IsValidExponent(string content)
+        private bool IsEndChar(char entry)
         {
-            var maxChars = 3;
-            var maxNumbers = 10;
-            for (var index = 0; index < content.Length; index++)
-            {
-                var item = content[index];
-                if (item >= 'a' && item <= 'z' || //alpha 
-                    item >= 'A' && item <= 'Z') //ALPHA
-                {
-                    if (maxChars-- <= 0)
-                    {
-                        return false;
-                    }
-                }
-                else if (item >= '0' && item <= '9') //numbers
-                {
-                    if (maxNumbers-- <= 0)
-                    {
-                        return false;
-                    }
-                }
-                else if (item == '-')
-                {
-                    if (index > 0)
-                    {
-                        return false;
-                    }
-                }
-                else
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return entry == ' ' || entry == ',' ||
+                   entry == '(' || entry == ')' ||
+                   entry == '[' || entry == ']' ||
+                   entry == '|' ||
+                   entry == '{' || entry == '}';
         }
 
-        private bool IsValidVariable(string content)
+        private bool IsVariableChar(char item)
         {
-            foreach (var item in content)
-            {
-                if (
-                    item >= 'a' && item <= 'z' || //alpha 
-                    item >= 'A' && item <= 'Z' || //ALPHA
-                    item >= '0' && item <= '9' ||
-                    item >= '_')
-                {
-                    //valid
-                }
-                else
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        private string EscapeVariable(string content)
-        {
-            return content.Replace("_", "\\_");
-        }
-
-        private bool ValidSubscriptChar(char entry)
-        {
-            return entry >= 'a' && entry <= 'z' || //alpha 
-                   entry >= 'A' && entry <= 'Z' || //ALPHA
-                   entry >= '0' && entry <= '9';
+            return item >= 'a' && item <= 'z' || //alpha 
+                   item >= 'A' && item <= 'Z' || //ALPHA
+                   item >= '0' && item <= '9'; // numbers
         }
     }
 }
