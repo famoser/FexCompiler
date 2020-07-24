@@ -33,37 +33,37 @@ namespace Famoser.FexCompiler.Test.Service
                     "simple.fex",
                     new []
                     {
-                        @"\textbf{H2}\\",
-                        @"hallo\\",
-                        @"welt\\"
+                        @"\textbf{${H}_{2}$ }\\",
+                        @"hallo \\",
+                        @"welt \\"
                     }
                 },
                 {
                     "advanced.fex",
                     new []
                     {
-                        @"\section{H1}",
-                        @"\subsection{H2}",
-                        @"\subsubsection{text}",
-                        @"\textbf{because it has further}"
+                        @"\section{${H}_{1}$",
+                        @"\subsection{${H}_{2}$",
+                        @"\subsubsection{text",
+                        @"\textbf{because it has further"
                     }
                 },
                 {
                     "long.fex",
                     new []
                     {
-                        @"\subsection{H3}",
-                        @"H3.1\\",
-                        @"\section{H4}"
+                        @"\subsection{${H}_{3}$ }",
+                        @"H3.1 \\",
+                        @"\section{${H}_{4}$ }"
                     }
                 },
                 {
                     "formulas.fex",
                     new []
                     {
-                        @"$B_{ak}$",
-                        @"$x^{-2t}$",
-                        @"$n^{-1000}$",
+                        @"${B}_{ak}$",
+                        @"${x}^{-2t}$",
+                        @"${n}^{-1000}$",
                     }
                 },
             };

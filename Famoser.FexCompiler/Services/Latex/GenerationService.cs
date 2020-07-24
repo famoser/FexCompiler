@@ -205,6 +205,10 @@ namespace Famoser.FexCompiler.Services.Latex
                         {
                             state = 3;
                         }
+                        else if (exponent.Length == 1 && entry == '-')
+                        {
+                            // all fine; allow exponent to start with -
+                        }
                         else
                         {
                             invalidPrefix += variable + combineChar + exponent;
@@ -331,7 +335,7 @@ namespace Famoser.FexCompiler.Services.Latex
             return entry == ' ' || entry == ',' ||
                    entry == '(' || entry == ')' ||
                    entry == '[' || entry == ']' ||
-                   entry == '|' ||
+                   entry == '|' || entry == ';' ||
                    entry == '{' || entry == '}';
         }
 
