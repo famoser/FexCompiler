@@ -45,10 +45,7 @@ namespace Famoser.FexCompiler.Services.Latex
             if (_renderedContent == null)
             {
                 _renderedContent = "";
-                foreach (var baseContent in _content)
-                {
-                    _renderedContent += ToLatex(baseContent);
-                }
+                foreach (var baseContent in _content) _renderedContent += ToLatex(baseContent);
             }
 
             template = template.Replace("CONTENT", _renderedContent);
@@ -61,10 +58,7 @@ namespace Famoser.FexCompiler.Services.Latex
 
             // print title
             var sectionName = "section";
-            for (var i = 0; i < level && i < 4; i++)
-            {
-                sectionName = "sub" + sectionName;
-            }
+            for (var i = 0; i < level && i < 4; i++) sectionName = "sub" + sectionName;
             var title = "\\" + sectionName + "{" + ToLatex(section.Header.Text) + "}\n";
             res += title;
 
@@ -76,7 +70,12 @@ namespace Famoser.FexCompiler.Services.Latex
             if (section.Children.All(c => !c.Children.Any()))
             {
                 var paragraphSpacer = "\\vspace{" + ParagraphOnParagraphSpacing + "pt}\n";
-                res += paragraphSpacer;
+
+                // if text before, add spacer now
+                if (content != "")
+                {
+                    res += paragraphSpacer;
+                }
 
                 foreach (var sectionChild in section.Children)
                 {
@@ -88,10 +87,7 @@ namespace Famoser.FexCompiler.Services.Latex
             else
             {
                 // else recurse
-                foreach (var sectionChild in section.Children)
-                {
-                    res += ToLatex(sectionChild, level + 1);
-                }
+                foreach (var sectionChild in section.Children) res += ToLatex(sectionChild, level + 1);
             }
 
             return res;
@@ -101,17 +97,13 @@ namespace Famoser.FexCompiler.Services.Latex
         {
             var content = "";
             foreach (var lineNode in lines)
-            {
                 if (lineNode.ContentType == ContentType.Text)
                 {
                     //write text
                     var textContent = ToLatex(lineNode.Text);
                     if (textContent != "")
-                    {
                         //latex newline + OS newline
                         content += textContent + "\\\\ " + Environment.NewLine;
-                    }
-
                 }
                 else if (lineNode.ContentType == ContentType.Code)
                 {
@@ -119,14 +111,13 @@ namespace Famoser.FexCompiler.Services.Latex
                                lineNode.Text +
                                "\n\\end{verbatim}";
                 }
-            }
 
             return content;
         }
 
         private string ToLatex(string de)
         {
-            var line = de;
+            var line = de + " ";
 
             /*
              * small statemachine for parsing single line.
@@ -147,6 +138,7 @@ namespace Famoser.FexCompiler.Services.Latex
              * 2->-1 else
              *
              * 3->3 on valid exponent
+             * 3->0 on too long exponent 
              * 3->-1 else; if end char then OUTPUT
              */
 
@@ -158,8 +150,9 @@ namespace Famoser.FexCompiler.Services.Latex
 
             var result = "";
 
+            var variableRegex = new Regex("([a-zA-Z]){1,3}([0-9]){1}$");
+
             foreach (var entry in line)
-            {
                 switch (state)
                 {
                     case 0:
@@ -187,7 +180,20 @@ namespace Famoser.FexCompiler.Services.Latex
                         }
                         else
                         {
-                            invalidPrefix += variable + entry;
+                            // check if variable is of the form d1, d2, ...
+                            if (IsEndChar(entry) && variableRegex.IsMatch(variable))
+                            {
+                                result += EscapeText(invalidPrefix);
+                                invalidPrefix = entry.ToString();
+
+                                result += "${" + variable.Substring(0, variable.Length - 1) + "}_{" +
+                                          variable.Substring(variable.Length - 1) + "}$";
+                            }
+                            else
+                            {
+                                invalidPrefix += variable + entry;
+                            }
+
                             variable = "";
                             state = 0;
                         }
@@ -213,6 +219,16 @@ namespace Famoser.FexCompiler.Services.Latex
                         if (IsVariableChar(entry))
                         {
                             exponent += entry;
+
+                            if (exponent.Length > 5)
+                            {
+                                invalidPrefix += variable + combineChar + exponent;
+
+                                state = 0;
+                                variable = "";
+                                combineChar = null;
+                                exponent = "";
+                            }
                         }
                         else
                         {
@@ -235,24 +251,9 @@ namespace Famoser.FexCompiler.Services.Latex
 
                         break;
                 }
-            }
 
-            if (combineChar != null && exponent.Length > 0)
-            {
-                result += EscapeText(invalidPrefix);
-                result += "${" + variable + "}" + combineChar + "{" + exponent + "}$";
-            }
-            else
-            {
 
-                invalidPrefix += variable;
-                if (combineChar != null)
-                {
-                    invalidPrefix += combineChar + exponent;
-                }
-
-                result += EscapeText(invalidPrefix);
-            }
+            result += EscapeText(invalidPrefix);
 
             return result;
         }
@@ -260,7 +261,7 @@ namespace Famoser.FexCompiler.Services.Latex
         private bool ReservedWord(string variable, char? combineChar, string exponent)
         {
             var word = variable + combineChar + exponent;
-            return word == "sum_of" || word == "for_all" || word == "element_of";
+            return word == "sum_of" || word == "for_all" || word == "element_of" || word == "mul_of" || word == "there_is";
         }
 
         private string EscapeText(string text)
@@ -272,32 +273,33 @@ namespace Famoser.FexCompiler.Services.Latex
                 {"$", "\\textdollar"},
                 {"not_element_of", "$\\notin$"},
                 {"element_of", "$\\in$"},
-                {"exists", "$\\in$"},
+                {"there_is", "$\\exists$"},
                 {"for_all", "$\\in$"},
                 {"sum_of", "$\\sum$"},
+                {"mul_of", "$\\prod$"},
                 {"_", "\\_"},
                 {"{", "\\textbraceleft"},
                 {"}", "\\textbraceright"},
                 {"[", "{[}"},
                 {"]", "{]}"},
-                {"∙", "*" },
-                {"→", "$\\rightarrow$" },
-                {"<->", "$\\leftrightarrow$" },
-                {"->", "$\\rightarrow$" },
-                {"<-", "$\\leftarrow$" },
-                {"<=>", "$\\Leftrightarrow$" },
-                {"=>", "$\\Rightarrow$" },
+                {"∙", "*"},
+                {"→", "$\\rightarrow$"},
+                {"<->", "$\\leftrightarrow$"},
+                {"->", "$\\rightarrow$"},
+                {"<-", "$\\leftarrow$"},
+                {"<=>", "$\\Leftrightarrow$"},
+                {"=>", "$\\Rightarrow$"},
                 {">=", "$\\ge$"},
                 {"<=", " $\\le$"},
-                {"&",  "\\&"},
-                {"%",  "\\%"},
-                {"#",  "\\#"},
+                {"&", "\\&"},
+                {"%", "\\%"},
+                {"#", "\\#"},
                 {"°", " \\degree"},
-                {"‘",  "'"},
-                {"‚",  ","}, //<- this is not a comma: , (other UTF-8 code)
-                {"α", "\\textalpha" },
-                {"β", "\\textbeta" },
-                {"σ", "\\textsigma" },
+                {"‘", "'"},
+                {"‚", ","}, //<- this is not a comma: , (other UTF-8 code)
+                {"α", "\\textalpha"},
+                {"β", "\\textbeta"},
+                {"σ", "\\textsigma"},
                 {"~", "\\textasciitilde"},
                 {">", "\\textgreater"},
                 {"<", "\\textless"},
@@ -306,17 +308,14 @@ namespace Famoser.FexCompiler.Services.Latex
                 {"—", "\\textemdash"},
                 {"“", "\\textquotedblleft"},
                 {"”", "\\textquotedblright"},
-                {"„",  "\\textquotedblleft"},
+                {"„", "\\textquotedblleft"},
                 {"^", "\\textasciicircum"}
             };
 
             foreach (var textReplace in replaces)
             {
                 var replace = textReplace.Value;
-                if (replace.Contains("text"))
-                {
-                    replace += " VSPACEPLACEHOLDER";
-                }
+                if (replace.Contains("text")) replace += " VSPACEPLACEHOLDER";
 
                 text = text.Replace(textReplace.Key, replace);
             }
