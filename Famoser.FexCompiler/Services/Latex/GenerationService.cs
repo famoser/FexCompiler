@@ -122,12 +122,15 @@ namespace Famoser.FexCompiler.Services.Latex
             /*
              * small statemachine for parsing single line.
              *
+             * -1 for invalid words
              * 0 for valid word chars (initial)
              * 1 for valid word (at least 3 valid word chars)
              * 2 for valid combine char
              * 3 for valid exponent
              *
-             * 0->0 on valid word char
+             * -1 -> 0 on end char
+             *
+             * 0->0 on invalid word char
              * 0->1 on valid word char
              *
              * 1->2 on combine char
@@ -138,7 +141,7 @@ namespace Famoser.FexCompiler.Services.Latex
              * 2->-1 else
              *
              * 3->3 on valid exponent
-             * 3->0 on too long exponent 
+             * 3->-1 on too long exponent 
              * 3->-1 else; if end char then OUTPUT
              */
 
@@ -155,6 +158,14 @@ namespace Famoser.FexCompiler.Services.Latex
             foreach (var entry in line)
                 switch (state)
                 {
+                    case -1:
+                        invalidPrefix += entry;
+                        if (IsStartOrEndChar(entry))
+                        {
+                            state = 0;
+                        }
+
+                        break;
                     case 0:
                         variable += entry;
                         if (!IsVariableChar(entry))
@@ -228,7 +239,7 @@ namespace Famoser.FexCompiler.Services.Latex
                             {
                                 invalidPrefix += variable + combineChar + exponent;
 
-                                state = 0;
+                                state = -1;
                                 variable = "";
                                 combineChar = null;
                                 exponent = "";
@@ -247,7 +258,7 @@ namespace Famoser.FexCompiler.Services.Latex
                                 invalidPrefix += variable + combineChar + exponent + entry;
                             }
 
-                            state = 0;
+                            state = IsEndChar(entry) ? 0 : -1;
                             variable = "";
                             combineChar = null;
                             exponent = "";
@@ -333,10 +344,17 @@ namespace Famoser.FexCompiler.Services.Latex
         private bool IsEndChar(char entry)
         {
             return entry == ' ' || entry == ',' ||
-                   entry == '(' || entry == ')' ||
-                   entry == '[' || entry == ']' ||
-                   entry == '|' || entry == ';' ||
-                   entry == '{' || entry == '}';
+                   entry == ')' || entry == ']' || entry == '}' ||
+                   entry == ':' || entry == ';' ||
+                   entry == '+' || entry == '-' ||
+                   entry == '*' || entry == '/' ||
+                   entry == '|' || entry == '¦';
+        }
+
+        private bool IsStartOrEndChar(char entry)
+        {
+            return IsEndChar(entry) ||
+                   entry == '(' || entry == '[' || entry == '{';
         }
 
         private bool IsVariableChar(char item)
