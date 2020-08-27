@@ -289,7 +289,7 @@ namespace Famoser.FexCompiler.Services.Latex
                 {"not_element_of", "$\\notin$"},
                 {"element_of", "$\\in$"},
                 {"there_is", "$\\exists$"},
-                {"for_all", "$\\in$"},
+                {"for_all", "$\\forall$"},
                 {"sum_of", "$\\sum$"},
                 {"mul_of", "$\\prod$"},
                 {"_", "\\_"},
