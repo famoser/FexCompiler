@@ -11,7 +11,7 @@ build:
   verbosity: minimal
 
 test_script: 
-    - .\packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:"C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\MSTest.exe" -targetargs:"/noresults /noisolation /testcontainer:"".\Famoser.FexCompiler.Test\bin\Debug\Famoser.FexCompiler.Test.dll" -filter:"+[Famoser.FexCompiler]*  -[Famoser.FexCompiler]Famoser.FexCompiler.Properties.*" -excludebyattribute:*.ExcludeFromCodeCoverage* -hideskipped:All -output:.\project_coverage.xml -returntargetcode
+    - .\packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\MSTest.exe" -targetargs:"/noresults /noisolation /testcontainer:"".\Famoser.FexCompiler.Test\bin\Debug\Famoser.FexCompiler.Test.dll" -filter:"+[Famoser.FexCompiler]*  -[Famoser.FexCompiler]Famoser.FexCompiler.Properties.*" -excludebyattribute:*.ExcludeFromCodeCoverage* -hideskipped:All -output:.\project_coverage.xml -returntargetcode
     - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
     - pip install codecov
     - codecov -f "project_coverage.xml"  
