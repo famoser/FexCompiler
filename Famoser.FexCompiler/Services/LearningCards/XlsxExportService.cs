@@ -1,11 +1,9 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Famoser.FexCompiler.Models.LearningCard;
 using Famoser.FexCompiler.Services.Interface;
-using Newtonsoft.Json;
 
 namespace Famoser.FexCompiler.Services.LearningCards
 {

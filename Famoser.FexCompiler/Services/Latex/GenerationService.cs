@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
-using Famoser.FexCompiler.Helpers;
 using Famoser.FexCompiler.Models.Document;
 using Famoser.FexCompiler.Services.Interface;
 using Famoser.FexCompiler.Services.Latex.Tree;

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Famoser.FexCompiler.Models.Document;
 using Famoser.FexCompiler.Services;
 using Famoser.FexCompiler.Services.Latex;
 using Famoser.FexCompiler.Test.Helpers;
