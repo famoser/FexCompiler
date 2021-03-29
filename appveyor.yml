@@ -11,10 +11,10 @@ build:
   verbosity: minimal
 
 test_script: 
-    - .\packages\OpenCover.4.7.922\tools\OpenCover.Console.exe -register:user -target:vstest.console.exe -targetargs:"Famoser.FexCompiler.Test.dll /logger:Appveyor /tests:UnitTests /Parallel /InIsolation" -targetdir:"Famoser.FexCompiler.Test\bin\Debug" -mergebyhash -skipautoprops -output:coverage.xml -filter:"+[Famoser.FexCompiler]* +[Famoser.FexCompiler]Famoser.FexCompiler.Properties.* -[Tests*]* -excludebyattribute:*.ExcludeFromCodeCoverage*" -hideskipped:All -output:.\project_coverage.xml -returntargetcode
+    - .\packages\OpenCover.4.7.922\tools\OpenCover.Console.exe -register:user -target:vstest.console.exe -targetargs:"Famoser.FexCompiler.Test.dll /logger:Appveyor /tests:UnitTests /Parallel /InIsolation" -targetdir:"Famoser.FexCompiler.Test\bin\Debug" -mergebyhash -skipautoprops -output:coverage.xml -filter:"+[Famoser.FexCompiler]* +[Famoser.FexCompiler]Famoser.FexCompiler.Properties.* -[Tests*]* -excludebyattribute:*.ExcludeFromCodeCoverage*" -hideskipped:All -returntargetcode
     - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
     - pip install codecov
-    - codecov -f "project_coverage.xml"  
+    - codecov -f "coverage.xml"  
 
 # preserve "packages" directory in the root of build folder but will reset it if packages.config is modified
 cache:
