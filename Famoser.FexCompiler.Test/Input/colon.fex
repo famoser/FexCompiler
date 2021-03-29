@@ -1,4 +1,9 @@
 ﻿H1:
 	my menu
-	my entry: and more : stuff
-	please escap :: this
+	remove colon if last place: 
+		more chapter content
+		more
+	but not required
+		chapter content
+	ignore if within : line
+	remove always if at end of line:

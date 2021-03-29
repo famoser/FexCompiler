@@ -2,7 +2,11 @@
 ===
 
 H2
-	x^2*y^23
-	B_ak K_ab_ab
+	x^2
+	x^2^32
+	x^2_32
+	K_ab_ab
 	x^-2t
 	n^-1000
+	\epsilon
+	hello \theta how are you

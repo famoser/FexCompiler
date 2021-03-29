@@ -33,17 +33,17 @@ namespace Famoser.FexCompiler.Test.Service
                     "simple.fex",
                     new []
                     {
-                        @"\textbf{${H}_{2}$ }\\",
-                        @"hallo \\",
-                        @"welt \\"
+                        @"\textbf{H2}\\",
+                        @"hallo\\",
+                        @"welt\\"
                     }
                 },
                 {
                     "advanced.fex",
                     new []
                     {
-                        @"\section{${H}_{1}$",
-                        @"\subsection{${H}_{2}$",
+                        @"\section{H1",
+                        @"\subsection{H2",
                         @"\subsubsection{text",
                         @"\textbf{because it has further"
                     }
@@ -52,13 +52,27 @@ namespace Famoser.FexCompiler.Test.Service
                     "long.fex",
                     new []
                     {
-                        @"\subsection{${H}_{3}$ }",
-                        @"H3.1 \\",
-                        @"\section{${H}_{4}$ }"
+                        @"\subsection{H3}",
+                        @"H3.1\\",
+                        @"\section{H4}"
                     }
                 },
                 {
                     "formulas.fex",
+                    new []
+                    {
+                        @"$x^2$\\",
+                        @"$x^{2^{32}}$\\",
+                        @"$x^{2_{32}}$\\",
+                        @"$K_{{ab}_{ab}}$\\",
+                        @"$x^{-2t}$\\",
+                        @"$n^{-1000}$\\",
+                        @"$\epsilon$\\",
+                        @"hello $\theta$ how are you\\",
+                    }
+                },
+                {
+                    "realworld.fex",
                     new []
                     {
                         @"${B}_{ak}$",

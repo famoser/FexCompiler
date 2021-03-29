@@ -1,0 +1,8 @@
+﻿H1
+===
+
+H2
+	B -> A: g^y, {g^y, g^x, A}_sk(B)
+	S -> B: M, {N_A, K_AB}_AS, {N_B, K_AB}_BS
+	{A, B}_sk
+	{A, B}_sk(B)

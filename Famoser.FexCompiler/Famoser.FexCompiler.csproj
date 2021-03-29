@@ -44,6 +44,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -53,6 +54,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <SignManifests>false</SignManifests>
@@ -100,6 +102,13 @@
     <Compile Include="Services\FexService.cs" />
     <Compile Include="Services\FileService.cs" />
     <Compile Include="Services\Interface\IProcessService.cs" />
+    <Compile Include="Services\Latex\TextToLatexCompiler.cs" />
+    <Compile Include="Services\Latex\Tree\EncapsulatedTerm.cs" />
+    <Compile Include="Services\Latex\Tree\DividerTerm.cs" />
+    <Compile Include="Services\Latex\Tree\CompositeTerm.cs" />
+    <Compile Include="Services\Latex\Tree\LeftRightTerm.cs" />
+    <Compile Include="Services\Latex\Tree\RawTerm.cs" />
+    <Compile Include="Services\Latex\Tree\Term.cs" />
     <Compile Include="Services\LearningCards\ExportService.cs" />
     <Compile Include="Services\LearningCards\GenerationService.cs" />
     <Compile Include="Services\Latex\CompilationService.cs" />

@@ -24,7 +24,7 @@ namespace Famoser.FexCompiler.Services
             NormalizeFexLineLevels(fexLines);
             TightenFexLineLevels(fexLines);
             FixFexLineLevels(fexLines);
-            ProcessColon(fexLines);
+            RemoveColonAtEndOfLines(fexLines);
             return fexLines;
         }
 
@@ -240,7 +240,7 @@ namespace Famoser.FexCompiler.Services
         /// split at colon if not inside brackets
         /// </summary>
         /// <param name="lines"></param>
-        private void ProcessColon(List<FexLine> lines)
+        private void RemoveColonAtEndOfLines(List<FexLine> lines)
         {
             //split on colon if there is content afterwards
             for (int i = 0; i < lines.Count; i++)
@@ -254,34 +254,6 @@ namespace Famoser.FexCompiler.Services
                 {
                     //only split if its single :
                     var textToProcess = lines[i].Text;
-                    var splitIndex = -1;
-                    var insideBracketLevel = 0; //(), {}
-                    //Length - 2 because we don't want index exceptions (see four lines below)
-                    //and because the last color could be escaped too
-                    for (int j = 0; j < textToProcess.Length - 2; j++)
-                    {
-                        switch (textToProcess[j])
-                        {
-                            case ':':
-                                if (textToProcess[j + 1] == ':')
-                                    //remove, because :: treated as escape for :
-                                    textToProcess = textToProcess.Remove(j, 1);
-                                else if (textToProcess[j + 1] == ' ' && insideBracketLevel == 0 && splitIndex < 0)
-                                    //only split if space following afterwards
-                                    //not inside brackets, therefore can split here
-                                    splitIndex = j;
-
-                                break;
-                            case '(':
-                            case '{':
-                                insideBracketLevel++;
-                                break;
-                            case ')':
-                            case '}':
-                                insideBracketLevel--;
-                                break;
-                        }
-                    }
 
                     //cut off last :
                     if (textToProcess[textToProcess.Length - 1] == ':')
@@ -289,31 +261,7 @@ namespace Famoser.FexCompiler.Services
                         textToProcess = textToProcess.Substring(0, textToProcess.Length - 1);
                     }
 
-
-                    if (splitIndex > 0)
-                    {
-                        //split at defined index
-                        var before = textToProcess.Substring(0, splitIndex);
-                        var after = textToProcess.Substring(splitIndex + 2);
-
-                        lines[i].Text = before;
-                        if (after.Length > 0)
-                        {
-                            //inset into lines
-                            lines.Insert(i + 1, new FexLine()
-                            {
-                                Level = lines[i].Level + 1,
-                                Text = after
-                            });
-                        }
-
-                        //skip next line, as want only to break once
-                        i++;
-                    }
-                    else
-                    {
-                        lines[i].Text = textToProcess;
-                    }
+                    lines[i].Text = textToProcess;
                 }
             }
         }

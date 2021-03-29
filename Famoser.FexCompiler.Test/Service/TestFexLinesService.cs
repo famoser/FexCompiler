@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Famoser.FexCompiler.Services;
 using Famoser.FexCompiler.Test.Helpers;
 using Famoser.FexCompiler.Test.Service.Base;
@@ -71,19 +72,15 @@ namespace Famoser.FexCompiler.Test.Service
             var fexLines = fexService.Process();
 
             //assert 
-            Assert.IsTrue(fexLines.Count == 5);
+            Assert.AreEqual(9, fexLines.Count);
 
-            var levelList = new List<int>() { 0, 1, 1, 2, 1 };
+            var levelList = new List<int>() { 0, 1, 1, 2, 2, 1, 2, 1, 1 };
             for (int i = 0; i < fexLines.Count; i++)
             {
                 Assert.AreEqual(levelList[i], fexLines[i].Level);
             }
 
-            var contentList = new List<string>() { "H1", "my menu", "my entry", "and more : stuff", "please escap : this" };
-            for (int i = 0; i < fexLines.Count; i++)
-            {
-                Assert.AreEqual(contentList[i], fexLines[i].Text);
-            }
+            Assert.AreEqual(0, fexLines.Count(l => l.Text.EndsWith(":")));
         }
 
         [TestMethod]
