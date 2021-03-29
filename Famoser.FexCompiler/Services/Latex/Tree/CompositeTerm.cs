@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Famoser.FexCompiler.Services.Latex.Visitor;
 
 namespace Famoser.FexCompiler.Services.Latex.Tree
 {
@@ -9,6 +10,11 @@ namespace Famoser.FexCompiler.Services.Latex.Tree
         public CompositeTerm(List<Term> terms)
         {
             Terms = terms;
+        }
+
+        public override void Accept(TermVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

@@ -80,11 +80,12 @@ namespace Famoser.FexCompiler.Test.Service
                     "realworld.fex",
                     new []
                     {
+                        @"some condition \textasciicircum",
                         @"${\{N\}}_{\{A\}}$\\",
                         @"S $\rightarrow$ B: M, ${\{N_A, K_{AB}\}}_{AS}$, ${\{N_B, K_{AB}\}}_{BS}$\\",
                         @"${\{N\}}_1$\\",
                         @"${\{N_A\}}_1$\\",
-                        @"B $\rightarrow$ A:$g^y$, ${\{g^y, g^x, A\}}_{sk(B)}$\\",
+                        @"B $\rightarrow$ A: $g^y$, ${\{g^y, g^x, A\}}_{sk(B)}$\\",
                         @"${\{A, B\}}_{sk}$\\",
                         @"${\{A, B\}}_{sk(B)}$\\",
                         @"${p(2)\{2\}}_{20p(8)(9)asd}$ hello\\"

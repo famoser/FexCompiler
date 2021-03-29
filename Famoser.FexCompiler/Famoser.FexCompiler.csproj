@@ -110,6 +110,9 @@
     <Compile Include="Services\Latex\Tree\LeftRightTerm.cs" />
     <Compile Include="Services\Latex\Tree\RawTerm.cs" />
     <Compile Include="Services\Latex\Tree\Term.cs" />
+    <Compile Include="Services\Latex\Visitor\ExpandLeftRightTermVisitor.cs" />
+    <Compile Include="Services\Latex\Visitor\MergeRawTermVisitor.cs" />
+    <Compile Include="Services\Latex\Visitor\TermVisitor.cs" />
     <Compile Include="Services\LearningCards\JsonExportService.cs" />
     <Compile Include="Services\LearningCards\XlsxExportService.cs" />
     <Compile Include="Services\LearningCards\GenerationService.cs" />

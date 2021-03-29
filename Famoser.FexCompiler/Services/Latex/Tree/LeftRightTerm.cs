@@ -1,4 +1,6 @@
-﻿namespace Famoser.FexCompiler.Services.Latex.Tree
+﻿using Famoser.FexCompiler.Services.Latex.Visitor;
+
+namespace Famoser.FexCompiler.Services.Latex.Tree
 {
     class LeftRightTerm: Term
     {
@@ -16,6 +18,11 @@
         public static bool IsConnector(char candidate)
         {
             return candidate == '^' || candidate == '_';
+        }
+
+        public override void Accept(TermVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

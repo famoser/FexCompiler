@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Famoser.FexCompiler.Services.Latex.Visitor;
 
 namespace Famoser.FexCompiler.Services.Latex.Tree
 {
@@ -8,71 +9,19 @@ namespace Famoser.FexCompiler.Services.Latex.Tree
     {
         public string Compile(string text)
         {
+            if (text.StartsWith("$") && text.EndsWith("$"))
+            {
+                return text;
+            }
+
             var tree = TextToTerm(text);
+
+            tree.Accept(new MergeRawTermVisitor());
             tree = AddLeftRightTerms(tree);
-            ExpandLeftRightTerms(tree);
+
+            tree.Accept(new ExpandLeftRightTermVisitor());
 
             return TermToLatex(tree);
-        }
-
-        private void ExpandLeftRightTerms(Term term)
-        {
-            if (term is not CompositeTerm composite)
-            {
-                return;
-            }
-
-            var prefix = new CompositeTerm(new List<Term>());
-            CompositeTerm suffix = null;
-
-            for (int i = 0; i < composite.Terms.Count; i++)
-            {
-                if (composite.Terms[i] is DividerTerm)
-                {
-                    prefix = new CompositeTerm(new List<Term>());
-                    suffix = null;
-                }
-                else if (composite.Terms[i] is LeftRightTerm newLeftRightTerm)
-                {
-                    if (newLeftRightTerm.Left is not RawTerm { Content: "" })
-                    {
-                        prefix.Terms.Add(newLeftRightTerm.Left);
-                    }
-
-                    composite.Terms.RemoveRange(i - prefix.Terms.Count, prefix.Terms.Count);
-                    i -= prefix.Terms.Count;
-
-                    suffix = new CompositeTerm(new List<Term>());
-                    if (newLeftRightTerm.Right is not RawTerm { Content: "" })
-                    {
-                        suffix.Terms.Add(newLeftRightTerm.Right);
-                    }
-
-                    composite.Terms[i] = new LeftRightTerm(newLeftRightTerm.Connector, prefix, suffix);
-                }
-                else
-                {
-                    if (suffix != null)
-                    {
-                        suffix.Terms.Add(composite.Terms[i]);
-                        composite.Terms.RemoveAt(i);
-                        i--;
-                    }
-                    else
-                    {
-                        prefix.Terms.Add(composite.Terms[i]);
-                    }
-                }
-            }
-
-            for (int i = 0; i < composite.Terms.Count; i++)
-            {
-                if (composite.Terms[i] is LeftRightTerm { Right: CompositeTerm rightComposite } leftRightTerm && rightComposite.Terms.Count == 1)
-                {
-                    var newRight = rightComposite.Terms.Single();
-                    composite.Terms[i] = new LeftRightTerm(leftRightTerm.Connector, leftRightTerm.Left, newRight);
-                }
-            }
         }
 
         private Term TextToTerm(string text)
@@ -134,8 +83,17 @@ namespace Famoser.FexCompiler.Services.Latex.Tree
 
             if (encapsulator != null)
             {
+                terms.Add(new RawTerm(encapsulator.ToString()));
+
                 var innerTerm = TextToTerm(encapsulationText);
-                terms.Add(new EncapsulatedTerm(encapsulator.Value, innerTerm));
+                if (innerTerm is CompositeTerm composite)
+                {
+                    terms.AddRange(composite.Terms);
+                }
+                else
+                {
+                    terms.Add(innerTerm);
+                }
             }
 
             if (currentText.Length > 0)
@@ -215,11 +173,14 @@ namespace Famoser.FexCompiler.Services.Latex.Tree
 
         private string EscapeString(string text, bool mathMode)
         {
-            if (text.StartsWith("\\") && !mathMode)
+            var mathModeForced = false;
+            if (text.Contains("\\") && !mathMode)
             {
-                text = "$" + text + "$";
+                mathModeForced = true;
                 mathMode = true;
             }
+
+            text = text.Replace("$", "\\$");
 
             var mathShortcuts = new Dictionary<string, string>()
             {
@@ -234,7 +195,7 @@ namespace Famoser.FexCompiler.Services.Latex.Tree
 
             foreach (var mathShortcut in mathShortcuts)
             {
-                var replace = mathMode ? mathShortcut.Value : "$" + mathShortcut.Value + "$";
+                var replace = mathMode ? mathShortcut.Value + " " : "$" + mathShortcut.Value + "$";
                 text = text.Replace(mathShortcut.Key, replace);
             }
 
@@ -245,10 +206,10 @@ namespace Famoser.FexCompiler.Services.Latex.Tree
                 {
                     {"{", "\\{"},
                     {"}", "\\}"},
-                    {"α", "\\alpha"},
-                    {"β", "\\beta"},
-                    {"σ", "\\sigma"},
-                    {"~", "\\textasciitilde"},
+                    {"α", "\\alpha "},
+                    {"β", "\\beta "},
+                    {"σ", "\\sigma "},
+                    {"~", "\\textasciitilde "},
                     {"^", "\\hat{}"}
                 };
 
@@ -279,11 +240,14 @@ namespace Famoser.FexCompiler.Services.Latex.Tree
                     {"^", "\\textasciicircum"}
                 };
 
+                const string hSpacePlaceholder = "H_SPACE_PLACEHOLDER"; // need placeholder, else } will be replaced recursively
                 foreach (var textCharacterReplace in textCharacterReplaces)
                 {
-                    var replace = textCharacterReplace.Value + " \\hspace{0pt}";
+                    var replace = textCharacterReplace.Value + " " + hSpacePlaceholder;
                     text = text.Replace(textCharacterReplace.Key, replace);
                 }
+
+                text = text.Replace(hSpacePlaceholder, "\\hspace{0pt}");
             }
 
 
@@ -297,7 +261,7 @@ namespace Famoser.FexCompiler.Services.Latex.Tree
                 {"&", "\\&"},
                 {"%", "\\%"},
                 {"#", "\\#"},
-                {"°", " \\degree"},
+                {"°", " \\degree "},
                 {"‘", "'"},
                 {"‚", ","}, //<- this is not a comma: , (other UTF-8 code)
             };
@@ -307,7 +271,7 @@ namespace Famoser.FexCompiler.Services.Latex.Tree
                 text = text.Replace(specialCharacterReplace.Key, specialCharacterReplace.Value);
             }
 
-            return text;
+            return mathModeForced ? "$" + text + "$" : text;
         }
     }
 }

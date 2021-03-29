@@ -1,4 +1,5 @@
 ﻿using System;
+using Famoser.FexCompiler.Services.Latex.Visitor;
 
 namespace Famoser.FexCompiler.Services.Latex.Tree
 {
@@ -39,6 +40,11 @@ namespace Famoser.FexCompiler.Services.Latex.Tree
         public static bool IsEncapsulatorEnd(char candidate, char start)
         {
             return GetEncapsulatorEnd(start) == candidate;
+        }
+
+        public override void Accept(TermVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }
