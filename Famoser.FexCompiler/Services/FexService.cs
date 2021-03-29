@@ -61,7 +61,7 @@ namespace Famoser.FexCompiler.Services
                 fexLine.Text = currentLine.Trim();
 
                 //codeContent detected
-                if (fexLine.Text.StartsWith("CODE_START"))
+                if (fexLine.Text == "```")
                 {
                     //skip codeContent header
                     fexLine.Text = "";
@@ -78,7 +78,7 @@ namespace Famoser.FexCompiler.Services
                     for (; index < fileInput.Length; index++)
                     {
                         var test = fileInput[index].Trim();
-                        if (test == "CODE_STOP" || test == "CODE_END")
+                        if (test == "```")
                         {
                             foundEnd = true;
                             break;
@@ -107,7 +107,7 @@ namespace Famoser.FexCompiler.Services
                     //issue warning because no codeContent end found
                     if (!foundEnd)
                     {
-                        Console.WriteLine("no end of CODE_START found, use CODE_END or CODE_STOP");
+                        Console.WriteLine("no end for ``` found");
                     }
                 }
                 //if level is 0, this could be a header

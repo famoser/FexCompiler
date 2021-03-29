@@ -3,9 +3,9 @@
 
 H2
 	text
-	CODE_START
+	```
 	var code = true;
 		code = false><;
-	CODE_END
+	```
 	normal text continues
 	and further

@@ -9,9 +9,70 @@ namespace Famoser.FexCompiler.Services.Latex.Tree
         public string Compile(string text)
         {
             var tree = TextToTerm(text);
-            tree = ParseRawTerms(tree);
+            tree = AddLeftRightTerms(tree);
+            ExpandLeftRightTerms(tree);
 
             return TermToLatex(tree);
+        }
+
+        private void ExpandLeftRightTerms(Term term)
+        {
+            if (term is not CompositeTerm composite)
+            {
+                return;
+            }
+
+            var prefix = new CompositeTerm(new List<Term>());
+            CompositeTerm suffix = null;
+
+            for (int i = 0; i < composite.Terms.Count; i++)
+            {
+                if (composite.Terms[i] is DividerTerm)
+                {
+                    prefix = new CompositeTerm(new List<Term>());
+                    suffix = null;
+                }
+                else if (composite.Terms[i] is LeftRightTerm newLeftRightTerm)
+                {
+                    if (newLeftRightTerm.Left is not RawTerm { Content: "" })
+                    {
+                        prefix.Terms.Add(newLeftRightTerm.Left);
+                    }
+
+                    composite.Terms.RemoveRange(i - prefix.Terms.Count, prefix.Terms.Count);
+                    i -= prefix.Terms.Count;
+
+                    suffix = new CompositeTerm(new List<Term>());
+                    if (newLeftRightTerm.Right is not RawTerm { Content: "" })
+                    {
+                        suffix.Terms.Add(newLeftRightTerm.Right);
+                    }
+
+                    composite.Terms[i] = new LeftRightTerm(newLeftRightTerm.Connector, prefix, suffix);
+                }
+                else
+                {
+                    if (suffix != null)
+                    {
+                        suffix.Terms.Add(composite.Terms[i]);
+                        composite.Terms.RemoveAt(i);
+                        i--;
+                    }
+                    else
+                    {
+                        prefix.Terms.Add(composite.Terms[i]);
+                    }
+                }
+            }
+
+            for (int i = 0; i < composite.Terms.Count; i++)
+            {
+                if (composite.Terms[i] is LeftRightTerm { Right: CompositeTerm rightComposite } leftRightTerm && rightComposite.Terms.Count == 1)
+                {
+                    var newRight = rightComposite.Terms.Single();
+                    composite.Terms[i] = new LeftRightTerm(leftRightTerm.Connector, leftRightTerm.Left, newRight);
+                }
+            }
         }
 
         private Term TextToTerm(string text)
@@ -35,6 +96,7 @@ namespace Famoser.FexCompiler.Services.Latex.Tree
 
                         encapsulator = null;
                         encapsulationText = "";
+                        encapsulationDepth = 0;
                     }
                     else
                     {
@@ -84,21 +146,19 @@ namespace Famoser.FexCompiler.Services.Latex.Tree
             return terms.Count == 1 ? terms.Single() : new CompositeTerm(terms);
         }
 
-        private Term ParseRawTerms(Term tree)
+        private Term AddLeftRightTerms(Term term)
         {
-            switch (tree)
+            switch (term)
             {
                 case CompositeTerm composite:
-                {
-                    var parsedTerms = composite.Terms.Select(ParseRawTerms);
+                    var parsedTerms = composite.Terms.Select(AddLeftRightTerms);
                     return new CompositeTerm(parsedTerms.ToList());
-                }
                 case EncapsulatedTerm encapsulated:
-                    return new EncapsulatedTerm(encapsulated.Encapsulator, ParseRawTerms(encapsulated.Term));
+                    return new EncapsulatedTerm(encapsulated.Encapsulator, AddLeftRightTerms(encapsulated.Term));
                 case RawTerm raw:
                     return ParseLeftRightTerms(raw.Content);
                 default:
-                    return tree;
+                    return term;
             }
         }
 
@@ -126,17 +186,15 @@ namespace Famoser.FexCompiler.Services.Latex.Tree
             switch (tree)
             {
                 case CompositeTerm composite:
-                {
                     var latexTerms = composite.Terms.Select(t => TermToLatex(t, mathMode));
                     return string.Join("", latexTerms);
-                }
                 case DividerTerm divider:
                     return divider.Divider.ToString();
                 case EncapsulatedTerm encapsulated:
                     var left = encapsulated.Encapsulator;
                     var right = EncapsulatedTerm.GetEncapsulatorEnd(left);
 
-                    return EscapeString(left.ToString(), mathMode) + 
+                    return EscapeString(left.ToString(), mathMode) +
                            TermToLatex(encapsulated.Term, mathMode) +
                            EscapeString(right.ToString(), mathMode);
                 case LeftRightTerm leftRightTerm:
@@ -180,31 +238,54 @@ namespace Famoser.FexCompiler.Services.Latex.Tree
                 text = text.Replace(mathShortcut.Key, replace);
             }
 
-            // replace characters which are used in later replaces
-            var textCharacterReplaces = new Dictionary<string, string>()
+            if (mathMode)
             {
-                {"{", "\\textbraceleft"},
-                {"}", "\\textbraceright"},
-                {"α", "\\textalpha"},
-                {"β", "\\textbeta"},
-                {"σ", "\\textsigma"},
-                {"~", "\\textasciitilde"},
-                {">", "\\textgreater"},
-                {"<", "\\textless"},
-                {"*", "\\textasteriskcentered"},
-                {"|", "\\textbar"},
-                {"—", "\\textemdash"},
-                {"“", "\\textquotedblleft"},
-                {"”", "\\textquotedblright"},
-                {"„", "\\textquotedblleft"},
-                {"^", "\\textasciicircum"}
-            };
+                // replace characters which are used in later replaces
+                var textCharacterReplaces = new Dictionary<string, string>()
+                {
+                    {"{", "\\{"},
+                    {"}", "\\}"},
+                    {"α", "\\alpha"},
+                    {"β", "\\beta"},
+                    {"σ", "\\sigma"},
+                    {"~", "\\textasciitilde"},
+                    {"^", "\\hat{}"}
+                };
 
-            foreach (var textCharacterReplace in textCharacterReplaces)
-            {
-                var replace = textCharacterReplace.Value + " \\hspace{0pt}";
-                text = text.Replace(textCharacterReplace.Key, replace);
+                foreach (var textCharacterReplace in textCharacterReplaces)
+                {
+                    text = text.Replace(textCharacterReplace.Key, textCharacterReplace.Value);
+                }
             }
+            else
+            {
+                // replace characters which are used in later replaces
+                var textCharacterReplaces = new Dictionary<string, string>()
+                {
+                    {"{", "\\textbraceleft"},
+                    {"}", "\\textbraceright"},
+                    {"α", "\\textalpha"},
+                    {"β", "\\textbeta"},
+                    {"σ", "\\textsigma"},
+                    {"~", "\\textasciitilde"},
+                    {">", "\\textgreater"},
+                    {"<", "\\textless"},
+                    {"*", "\\textasteriskcentered"},
+                    {"|", "\\textbar"},
+                    {"—", "\\textemdash"},
+                    {"“", "\\textquotedblleft"},
+                    {"”", "\\textquotedblright"},
+                    {"„", "\\textquotedblleft"},
+                    {"^", "\\textasciicircum"}
+                };
+
+                foreach (var textCharacterReplace in textCharacterReplaces)
+                {
+                    var replace = textCharacterReplace.Value + " \\hspace{0pt}";
+                    text = text.Replace(textCharacterReplace.Key, replace);
+                }
+            }
+
 
             // replace characters which are used in later replaces
             var specialCharacterReplaces = new Dictionary<string, string>()

@@ -24,7 +24,7 @@ The `.pdf` export uses latex under the hood; hence math expressions are possible
 
 There is no support for images or other non-text content; use your own words!
 
-### Export formats
+## Export formats
 
 Available exports are:
 - **.pdf**: optimized for printing.
@@ -34,7 +34,7 @@ Available exports are:
 
 You can declare exports before the `.fex` ending. For example, `summary.md-json.fex` will generate `summary.md` and `summary.json`. If you do not declare anything, then a PDF is generated.
 
-### Real-World Example
+## Real-World Example
 
 ```
 language concepts
@@ -47,3 +47,9 @@ language concepts
 		subtyping needed casts, same memory layout of super & subclasses needed
 ```
 (excerpt from https://github.com/famoser/eth-summaries/blob/master/2017-2%20Concepts%20of%20Object-Oriented%20Programming.fex)
+
+## Advanced features
+
+Some advanced features:
+- You can use triple-` to start and end a codeblock
+- Primary and secondary headers can be denoted by an immediately following line of `===` resp. `---` (at least 3 chars)

@@ -16,13 +16,12 @@ namespace Famoser.FexCompiler.Test.Service
             TestFex("formulas.fex");
         }
 
-        /**
         [TestMethod]
         public void TestRealWorld()
         {
             TestFex("realworld.fex");
         }
-        */
+
         protected override void TestFex(string fileName)
         {
             //arrange
@@ -33,7 +32,7 @@ namespace Famoser.FexCompiler.Test.Service
             var contentService = new ContentService(fexLines);
             var root = contentService.Process();
             var latexService = new GenerationService(root.Children);
-            var dict = new Dictionary<string, string[]>()
+            var dict = new Dictionary<string, string[]>
             {
                 {
                     "simple.fex",
@@ -81,9 +80,14 @@ namespace Famoser.FexCompiler.Test.Service
                     "realworld.fex",
                     new []
                     {
-                        @"${B}_{ak}$",
-                        @"${x}^{-2t}$",
-                        @"${n}^{-1000}$",
+                        @"${\{N\}}_{\{A\}}$\\",
+                        @"S $\rightarrow$ B: M, ${\{N_A, K_{AB}\}}_{AS}$, ${\{N_B, K_{AB}\}}_{BS}$\\",
+                        @"${\{N\}}_1$\\",
+                        @"${\{N_A\}}_1$\\",
+                        @"B $\rightarrow$ A:$g^y$, ${\{g^y, g^x, A\}}_{sk(B)}$\\",
+                        @"${\{A, B\}}_{sk}$\\",
+                        @"${\{A, B\}}_{sk(B)}$\\",
+                        @"${p(2)\{2\}}_{20p(8)(9)asd}$ hello\\"
                     }
                 },
             };

@@ -1,8 +1,11 @@
-﻿H1
+﻿Formulas
 ===
 
-H2
-	B -> A: g^y, {g^y, g^x, A}_sk(B)
-	S -> B: M, {N_A, K_AB}_AS, {N_B, K_AB}_BS
-	{A, B}_sk
-	{A, B}_sk(B)
+{N}_{A}
+S -> B: M, {N_A, K_AB}_AS, {N_B, K_AB}_BS
+{N}_1
+{N_A}_1
+B -> A: g^y, {g^y, g^x, A}_sk(B)
+{A, B}_sk
+{A, B}_sk(B)
+p(2){2}_20p(8)(9)asd hello
