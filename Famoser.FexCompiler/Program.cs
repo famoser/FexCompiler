@@ -26,17 +26,10 @@ namespace Famoser.FexCompiler
             //worker loop
             while (true)
             {
-                Console.WriteLine("Press (Enter) [+Shift] to compile with the existing configuration, (q) to quit or (c) to create new configuration");
+                Console.WriteLine("Press (Enter) to compile with the existing configuration, (q) to quit or (c) to create new configuration");
 
                 var key = Console.ReadKey();
-                if (key.Key == ConsoleKey.Enter && (key.Modifiers & ConsoleModifiers.Shift) != 0)
-                {
-                    Console.WriteLine("Including Handout format because (Shift) was pressed");
-                    configModel.IncludeHandoutFormat = true;
-                    compileWorkflow.DoWorkflow();
-                    configModel.IncludeHandoutFormat = false;
-                }
-                else if (key.Key == ConsoleKey.Enter)
+                if (key.Key == ConsoleKey.Enter)
                 {
                     compileWorkflow.DoWorkflow();
                 }

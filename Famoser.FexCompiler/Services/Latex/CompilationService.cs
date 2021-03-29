@@ -8,36 +8,26 @@ namespace Famoser.FexCompiler.Services.Latex
 {
     public class CompilationService : IProcessService<bool>
     {
-        private readonly string _path;
         private string _content;
-        private string _fileNameAppendix = "";
+        private readonly string _folder;
+        private readonly string _fileNamePrefix;
 
-        public CompilationService(string path, string content)
-        {
-            _path = path;
-            _content = content;
-        }
-
-        public void SetFilenameAppendix(string appendix)
-        {
-            _fileNameAppendix = appendix;
-        }
-
-        public void SetContent(string content)
+        public CompilationService(string content, string folder, string fileNamePrefix)
         {
             _content = content;
+            _folder = folder;
+            _fileNamePrefix = fileNamePrefix;
         }
 
         public bool Process()
         {
             //create .tex file
-            var baseFileName = _path.Substring(0, _path.LastIndexOf(".", StringComparison.Ordinal));
-            var newFilename = baseFileName + _fileNameAppendix;
-            var texFile = newFilename + ".tex";
+            var path = _folder + Path.DirectorySeparatorChar + _fileNamePrefix;
+            var texFile = path + ".tex";
             File.WriteAllText(texFile, _content);
 
             //clean up old compilations
-            var auxFile = newFilename + ".aux";
+            var auxFile = path + ".aux";
             TryRemove(auxFile);
 
             //create bat file with commands
@@ -93,8 +83,8 @@ namespace Famoser.FexCompiler.Services.Latex
                     return false;
                 }
 
-                TryRemove(newFilename + ".log");
-                TryRemove(newFilename + ".tex");
+                TryRemove(path + ".log");
+                TryRemove(path + ".tex");
 
                 return true;
             }

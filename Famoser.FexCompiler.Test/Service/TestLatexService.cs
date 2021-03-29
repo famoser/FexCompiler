@@ -17,6 +17,13 @@ namespace Famoser.FexCompiler.Test.Service
             TestFex("formulas.fex");
         }
 
+        /**
+        [TestMethod]
+        public void TestRealWorld()
+        {
+            TestFex("realworld.fex");
+        }
+        */
         protected override void TestFex(string fileName)
         {
             //arrange
@@ -26,7 +33,7 @@ namespace Famoser.FexCompiler.Test.Service
             var fexLines = fexService.Process();
             var contentService = new ContentService(fexLines);
             var root = contentService.Process();
-            var latexService = new GenerationService(new StatisticModel(), new MetaDataModel(), root.Children);
+            var latexService = new GenerationService(root.Children);
             var dict = new Dictionary<string, string[]>()
             {
                 {

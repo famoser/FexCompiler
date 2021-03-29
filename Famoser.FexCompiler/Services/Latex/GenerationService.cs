@@ -6,51 +6,26 @@ using System.Text.RegularExpressions;
 using Famoser.FexCompiler.Helpers;
 using Famoser.FexCompiler.Models.Document;
 using Famoser.FexCompiler.Services.Interface;
+using Famoser.FexCompiler.Services.Latex.Tree;
 
 namespace Famoser.FexCompiler.Services.Latex
 {
     public class GenerationService : IProcessService<string>
     {
-        private readonly StatisticModel _statisticModel;
-        private readonly MetaDataModel _metaDataModel;
         private readonly List<Section> _content;
-        private readonly TextToLatexCompiler _textToLatexCompiler = new TextToLatexCompiler();
-        private string _renderedContent;
-        private string _templateName = "Summary";
+        private readonly TextToLatexCompiler _textToLatexCompiler = new();
 
         private const int ParagraphOnParagraphSpacing = 5;
 
-        public GenerationService(StatisticModel statisticModel, MetaDataModel metaDataModel, List<Section> content)
+        public GenerationService(List<Section> content)
         {
-            _statisticModel = statisticModel;
-            _metaDataModel = metaDataModel;
             _content = content;
-        }
-
-        public void SetTemplateName(string templateName)
-        {
-            _templateName = templateName;
         }
 
         public string Process()
         {
-            var path = Path.Combine(PathHelper.GetAssemblyPath(), "Templates/template_" + _templateName + ".tex");
-            var template = File.ReadAllText(path);
-
-            template = template.Replace("TITLE", _metaDataModel.Title);
-            template = template.Replace("AUTHOR", _metaDataModel.Author);
-            template = template.Replace("CHARACTER_COUNT", _statisticModel.CharacterCount.ToString());
-            template = template.Replace("WORD_COUNT", _statisticModel.WordCount.ToString());
-            template = template.Replace("LINE_COUNT", _statisticModel.LineCount.ToString());
-
-            if (_renderedContent == null)
-            {
-                _renderedContent = "";
-                foreach (var baseContent in _content) _renderedContent += ToLatex(baseContent);
-            }
-
-            template = template.Replace("CONTENT", _renderedContent);
-            return template;
+            return _content
+                .Aggregate("", (current, baseContent) => current + ToLatex(baseContent));
         }
 
         private string ToLatex(Section section, int level = 0)

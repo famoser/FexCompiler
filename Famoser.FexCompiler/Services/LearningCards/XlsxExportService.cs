@@ -9,26 +9,30 @@ using Newtonsoft.Json;
 
 namespace Famoser.FexCompiler.Services.LearningCards
 {
-    public class ExportService : IProcessService<bool>
+    public class XlsxExportService : IProcessService<bool>
     {
         private readonly LearningCardCollection _learningCardCollection;
-        private readonly string _path;
+        private readonly string _folder;
+        private readonly string _fileNamePrefix;
 
-        public ExportService(LearningCardCollection learningCardCollection, string path)
+        public XlsxExportService(LearningCardCollection learningCardCollection, string folder, string fileNamePrefix)
         {
-            _path = path;
             _learningCardCollection = learningCardCollection;
+            _folder = folder;
+            _fileNamePrefix = fileNamePrefix;
         }
 
         public bool Process()
         {
-            //create .json file
-            var baseFileName = _path.Substring(0, _path.LastIndexOf(".", StringComparison.Ordinal));
-            var texFile = baseFileName + ".json";
-            File.WriteAllText(texFile, JsonConvert.SerializeObject(_learningCardCollection));
+            var path = _folder + Path.DirectorySeparatorChar + _fileNamePrefix + ".json";
+
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
 
             //create excel file
-            CreateExcelFile(baseFileName + ".xlsx");
+            CreateExcelFile(path);
 
             return true;
         }
@@ -36,9 +40,6 @@ namespace Famoser.FexCompiler.Services.LearningCards
 
         private void CreateExcelFile(string fileName)
         {
-            if (File.Exists(fileName))
-                File.Delete(fileName);
-
             using (var document = SpreadsheetDocument.Create(fileName, SpreadsheetDocumentType.Workbook))
             {
                 var workbookPart = document.AddWorkbookPart();
@@ -97,7 +98,7 @@ namespace Famoser.FexCompiler.Services.LearningCards
 
         private Cell ConstructCell(string value, CellValues dataType = CellValues.String)
         {
-            return new Cell()
+            return new()
             {
                 CellValue = new CellValue(value),
                 DataType = new EnumValue<CellValues>(dataType)

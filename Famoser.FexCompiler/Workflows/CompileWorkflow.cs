@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
 using Famoser.FexCompiler.Models;
 using Famoser.FexCompiler.Services;
 using Famoser.FexCompiler.Services.Latex;
@@ -73,7 +75,9 @@ namespace Famoser.FexCompiler.Workflows
                 document.RootSection = contentService.Process();
                 StepCompleted();
 
-                if (path.EndsWith(".l.fex"))
+                (string folder, string filenamePrefix, string[] exportFormats) = ParsePath(path);
+
+                if (exportFormats.Contains("json") || exportFormats.Contains("xlsx"))
                 {
                     //learning cards create
                     StepStarted("creating learning cards");
@@ -81,46 +85,71 @@ namespace Famoser.FexCompiler.Workflows
                     var cards = learningCardsService.Process();
                     StepCompleted();
 
-                    //learning cards persist
-                    StepStarted("persisting learning cards");
-                    var learningCardsExportService = new ExportService(cards, path);
-                    var learningCardsFeedback = learningCardsExportService.Process();
-                    StepCompleted(learningCardsFeedback);
+                    if (exportFormats.Contains("json"))
+                    {
+                        //learning cards persist
+                        StepStarted("persisting learning cards (json)");
+                        var learningCardsExportService = new JsonExportService(cards, folder, filenamePrefix);
+                        var learningCardsFeedback = learningCardsExportService.Process();
+                        StepCompleted(learningCardsFeedback);
 
-                    successful &= learningCardsFeedback;
+                        successful &= learningCardsFeedback;
+                    }
+
+                    if (exportFormats.Contains("xlsx"))
+                    {
+                        //learning cards persist
+                        StepStarted("persisting learning cards (xlsx)");
+                        var learningCardsExportService = new XlsxExportService(cards, folder, filenamePrefix);
+                        var learningCardsFeedback = learningCardsExportService.Process();
+                        StepCompleted(learningCardsFeedback);
+
+                        successful &= learningCardsFeedback;
+                    }
                 }
 
-                //latex create
-                StepStarted("creating latex");
-                var latexService = new Services.Latex.GenerationService(document.StatisticModel, document.MetaDataModel, document.RootSection.Children);
-                var latex = latexService.Process();
-                StepCompleted();
-
-                //latex compile
-                StepStarted("compiling latex");
-                var latexCompilerService = new CompilationService(path, latex);
-                var latexCompileFeedback = latexCompilerService.Process();
-                StepCompleted(latexCompileFeedback);
-
-                successful &= latexCompileFeedback;
-
-                //output handout if requested
-                if (_configModel.IncludeHandoutFormat)
+                if (exportFormats.Contains("pdf") || exportFormats.Contains("handout_pdf"))
                 {
-                    //recreate latex with new template name
-                    StepStarted("creating handout latex");
-                    latexService.SetTemplateName("Handout");
-                    latex = latexService.Process();
+                    //latex create
+                    StepStarted("creating latex");
+                    var latexService = new Services.Latex.GenerationService(document.RootSection.Children);
+                    var latex = latexService.Process();
                     StepCompleted();
 
-                    //compile with new latex
-                    StepStarted("compiling latex");
-                    latexCompilerService.SetFilenameAppendix("_handout");
-                    latexCompilerService.SetContent(latex);
-                    latexCompileFeedback = latexCompilerService.Process();
-                    StepCompleted(latexCompileFeedback);
-                }
+                    if (exportFormats.Contains("pdf"))
+                    {
+                        //latex template
+                        StepStarted("Insert into PDF template");
+                        var latexTemplateService = new TemplateService(latex, document.StatisticModel, document.MetaDataModel, TemplateService.DefaultTemplate);
+                        var templatedLatex = latexTemplateService.Process();
+                        StepCompleted();
 
+                        //latex compile
+                        StepStarted("compiling PDF latex");
+                        var latexCompilerService = new CompilationService(templatedLatex, folder, filenamePrefix);
+                        var latexCompileFeedback = latexCompilerService.Process();
+                        StepCompleted(latexCompileFeedback);
+
+                        successful &= latexCompileFeedback;
+                    }
+
+                    if (exportFormats.Contains("handout_pdf"))
+                    {
+                        //latex template
+                        StepStarted("Insert into handout PDF template");
+                        var latexTemplateService = new TemplateService(latex, document.StatisticModel, document.MetaDataModel, TemplateService.HandoutTemplate);
+                        var templatedLatex = latexTemplateService.Process();
+                        StepCompleted();
+
+                        //latex compile
+                        StepStarted("compiling handout PDF latex");
+                        var latexCompilerService = new CompilationService(templatedLatex, folder, filenamePrefix + "_handout");
+                        var latexCompileFeedback = latexCompilerService.Process();
+                        StepCompleted(latexCompileFeedback);
+
+                        successful &= latexCompileFeedback;
+                    }
+                }
 
                 if (successful)
                 {
@@ -131,6 +160,24 @@ namespace Famoser.FexCompiler.Workflows
 
                 WorkflowComplete(successful);
             }
+        }
+
+        private (string folder, string filenamePrefix, string[] exportFormats) ParsePath(string path)
+        {
+            var folder = path.Substring(0, path.LastIndexOf(Path.DirectorySeparatorChar));
+            var filename = path.Substring(folder.Length + 1);
+
+            var filenameComponents = filename.Split(new[] { "." }, StringSplitOptions.RemoveEmptyEntries);
+            if (filenameComponents.Length == 2)
+            {
+                return (folder, filenameComponents[0], new[] {"pdf"});
+            }
+
+            var filenamePrefix = string.Join(".", filenameComponents.Take(filenameComponents.Length - 2));
+            var exportFormats = filenameComponents[filenameComponents.Length - 2]
+                    .Split(new[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
+
+            return (folder, filenamePrefix, exportFormats);
         }
 
         private void WorkflowStarted(string name)

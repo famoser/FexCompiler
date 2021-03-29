@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Famoser.FexCompiler.Services.Latex.Tree;
 
-namespace Famoser.FexCompiler.Services.Latex
+namespace Famoser.FexCompiler.Services.Latex.Tree
 {
     public class TextToLatexCompiler
     {
