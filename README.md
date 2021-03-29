@@ -4,43 +4,35 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/987fgimtc5rk546d?svg=true)](https://ci.appveyor.com/project/famoser/fexcompiler)
 [![codecov](https://codecov.io/gh/famoser/FexCompiler/branch/master/graph/badge.svg)](https://codecov.io/gh/famoser/FexCompiler)
 
-Fex was created specifically to write summaries. 
-Its setup helps you to structure content effectively and then allows to generate a printable .pdf and learning cards.
+Fex helps your to write and restructure rapidly. 
+Its primary purpose is to write summaries of books and courses. 
 
-It is awesome because:
-
-- (re-)structure content easily & fast
-- do it in the text editor of your choice
-- export it for printing or flash cards
-
-There is no support for images, math or other non-text content; use your own words!
-
-### Basic idea
-
-There are only two rules:
-
-- You may describe a concept on a single line (like `fex: a format to write summaries` or you may use multiple lines (indented by tabs).
-- You may do this recusively.
-
-For example:
-
+The format works indentation-based:
 ```
 .fex:
 	format to write summaries faster than ever before
 	export formats:
 		.pdf to print your summary
-		.xlsx to import the concepts of your summary into a flash card service
+		.md for publishing in the web
+		.xlsx or .json to import into a flash card service
 ```
+
+You can grasp in an instant in which chapter you are, and how this chapter relates to others in terms of abstraction level. 
+Restructuring is blazingly fast: You only need to change the indentation (which nearly all editors have shortcuts for).
+
+The `.pdf` export uses latex under the hood; hence math expressions are possible. Simple expressions are even detected automatically so you do not have to write the cumbersome latex syntax yourself.
+
+There is no support for images or other non-text content; use your own words!
 
 ### Export formats
 
+Available exports are:
 - **.pdf**: optimized for printing.
-
-if you use the file ending `.l.fex`, additionally:
-
-- **.json**: used it with https://github.com/famoser/FexFlashcards to memorize your summary with flash card functionality.
+- **.md**: publish in the web
+- **.json**: use it with https://github.com/famoser/FexFlashcards to memorize your summary with flash card functionality.
 - **.xlsx**: collection of your concepts so you can import then in a flash card service.
 
+You can declare exports before the `.fex` ending. For example, `summary.md-json.fex` will generate `summary.md` and `summary.json`. If you do not declare anything, then a PDF is generated.
 
 ### Real-World Example
 
