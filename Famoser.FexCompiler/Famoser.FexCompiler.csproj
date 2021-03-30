@@ -118,6 +118,7 @@
     <Compile Include="Services\LearningCards\GenerationService.cs" />
     <Compile Include="Services\Latex\CompilationService.cs" />
     <Compile Include="Services\Latex\GenerationService.cs" />
+    <Compile Include="Services\Markdown\ExportService.cs" />
     <Compile Include="Services\MetaDataService.cs" />
     <Compile Include="Services\StatisticService.cs" />
     <Compile Include="Models\ConfigModel.cs" />

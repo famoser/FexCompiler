@@ -108,6 +108,17 @@ namespace Famoser.FexCompiler.Workflows
                     }
                 }
 
+                if (exportFormats.Contains("md"))
+                {
+                    //latex create
+                    StepStarted("creating & storing markdown");
+                    var markdownService = new Services.Markdown.ExportService(document.RootSection.Children, document.MetaDataModel.Title, folder, filenamePrefix);
+                    var markdownFeedback = markdownService.Process();
+                    StepCompleted();
+
+                    successful &= markdownFeedback;
+                }
+
                 if (exportFormats.Contains("pdf") || exportFormats.Contains("handout_pdf"))
                 {
                     //latex create
