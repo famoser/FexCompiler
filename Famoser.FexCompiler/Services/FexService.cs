@@ -20,12 +20,35 @@ namespace Famoser.FexCompiler.Services
 
         public List<FexLine> Process()
         {
-            var fexLines = ConvertToFexLines(_lines);
+            var normalizedLines = ConvertStartSpacesToTabs(_lines);
+            var fexLines = ConvertToFexLines(normalizedLines);
             NormalizeFexLineLevels(fexLines);
             TightenFexLineLevels(fexLines);
             FixFexLineLevels(fexLines);
             RemoveColonAtEndOfLines(fexLines);
             return fexLines;
+        }
+
+        private List<string> ConvertStartSpacesToTabs(string[] lines)
+        {
+            var result = new List<string>();
+
+            foreach (var line in lines)
+            {
+                var currentLine = line;
+                var tabCount = 0;
+                while (currentLine.StartsWith("    "))
+                {
+                    currentLine = currentLine.Substring(4);
+                    tabCount++;
+                }
+
+                var tabs = new string('\t', tabCount);
+                result.Add(tabs + currentLine);
+            }
+
+
+            return result;
         }
 
         /// <summary>
@@ -34,10 +57,10 @@ namespace Famoser.FexCompiler.Services
         /// </summary>
         /// <param name="fileInput"></param>
         /// <returns></returns>
-        private List<FexLine> ConvertToFexLines(string[] fileInput)
+        private List<FexLine> ConvertToFexLines(List<string> fileInput)
         {
             var res = new List<FexLine>();
-            for (var index = 0; index < fileInput.Length; index++)
+            for (var index = 0; index < fileInput.Count; index++)
             {
                 var currentLine = fileInput[index];
 
@@ -75,7 +98,7 @@ namespace Famoser.FexCompiler.Services
 
                     //collapse rest of codeContent into this line
                     var foundEnd = false;
-                    for (; index < fileInput.Length; index++)
+                    for (; index < fileInput.Count; index++)
                     {
                         var test = fileInput[index].Trim();
                         if (test == "```")
@@ -114,7 +137,7 @@ namespace Famoser.FexCompiler.Services
                 else if (fexLine.Level == 0)
                 {
                     //check for next line if header mark is set
-                    if (index + 1 < fileInput.Length)
+                    if (index + 1 < fileInput.Count)
                     {
                         var nextLine = fileInput[index + 1];
                         //if next line is only ===, but at least 3 then set level to -1
