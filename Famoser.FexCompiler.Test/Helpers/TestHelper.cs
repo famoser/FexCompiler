@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using Famoser.FexCompiler.Models;
 
@@ -27,7 +28,7 @@ namespace Famoser.FexCompiler.Test.Helpers
             return new ConfigModel()
             {
                 Author = "famoser",
-                CompilePaths = GetInputFolderPath()
+                CompilePaths = new List<string> {GetInputFolderPath()}
             };
         }
     }
