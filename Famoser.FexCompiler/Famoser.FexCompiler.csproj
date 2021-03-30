@@ -17,7 +17,7 @@
     <Install>true</Install>
     <InstallFrom>Web</InstallFrom>
     <UpdateEnabled>true</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
+    <UpdateMode>Background</UpdateMode>
     <UpdateInterval>7</UpdateInterval>
     <UpdateIntervalUnits>Days</UpdateIntervalUnits>
     <UpdatePeriodically>false</UpdatePeriodically>
@@ -25,11 +25,12 @@
     <MapFileExtensions>true</MapFileExtensions>
     <InstallUrl>http://publish.famoser.ch/FexCompiler/</InstallUrl>
     <SupportUrl>https://github.com/famoser/FexCompiler</SupportUrl>
+    <ErrorReportUrl>https://github.com/famoser/FexCompiler</ErrorReportUrl>
     <ProductName>FexCompiler</ProductName>
     <PublisherName>famoser</PublisherName>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>21</ApplicationRevision>
+    <ApplicationRevision>23</ApplicationRevision>
     <ApplicationVersion>3.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
