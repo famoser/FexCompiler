@@ -32,7 +32,6 @@ namespace Famoser.FexCompiler.Services
             foreach (FileInfo file in dir.GetFiles("*.fex"))
             {
                 res.Add(file.FullName);
-                Console.WriteLine("found {0}", file.Name);
             }
             foreach (var directoryInfo in dir.GetDirectories())
             {

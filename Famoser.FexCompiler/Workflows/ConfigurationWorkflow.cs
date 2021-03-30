@@ -37,6 +37,8 @@ namespace Famoser.FexCompiler.Workflows
 
             //persist
             _fileService.SetConfigModel(_configModel);
+
+            Console.WriteLine("\nSetup finished.\n\n");
         }
     }
 }
