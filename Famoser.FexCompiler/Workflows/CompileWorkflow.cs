@@ -49,12 +49,12 @@ namespace Famoser.FexCompiler.Workflows
 
         private bool? CompileFile(string path)
         {
-            var successful = true;
+            (string folder, string filenamePrefix, string[] exportFormats) = ParsePath(path);
 
             //get version information
             var metaDataService = new MetaDataService(_configModel, path);
             var metaData = metaDataService.Process();
-            var fexVersionService = new FexVersionService(metaData, path);
+            var fexVersionService = new FexVersionService(metaData, folder, filenamePrefix);
 
             if (fexVersionService.NoChangesNeeded())
             {
@@ -89,7 +89,7 @@ namespace Famoser.FexCompiler.Workflows
             document.RootSection = contentService.Process();
             StepCompleted();
 
-            (string folder, string filenamePrefix, string[] exportFormats) = ParsePath(path);
+            var successful = true;
 
             if (exportFormats.Contains("json") || exportFormats.Contains("xlsx"))
             {

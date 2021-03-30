@@ -10,12 +10,14 @@ namespace Famoser.FexCompiler.Services
     public class FexVersionService
     {
         private readonly MetaDataModel _metaDataModel;
-        private readonly string _path;
+        private readonly string _folder;
+        private readonly string _filenamePrefix;
 
-        public FexVersionService(MetaDataModel metaDataModel, string path)
+        public FexVersionService(MetaDataModel metaDataModel, string folder, string filenamePrefix)
         {
             _metaDataModel = metaDataModel;
-            _path = path;
+            _folder = folder;
+            _filenamePrefix = filenamePrefix;
         }
 
         public bool NoChangesNeeded()
@@ -47,16 +49,17 @@ namespace Famoser.FexCompiler.Services
 
         private string GetFexVersionPath()
         {
-            var baseFileName = _path.Substring(0, _path.LastIndexOf(".", StringComparison.Ordinal));
-            var fexVersionFile = baseFileName + "_version.json";
-            return fexVersionFile;
+            return _folder + Path.DirectorySeparatorChar + _filenamePrefix + ".version.json";
         }
 
         private string GetProgramVersion()
         {
             if (ApplicationDeployment.IsNetworkDeployed)
+            {
                 return ApplicationDeployment.CurrentDeployment.CurrentVersion.ToString();
-            var version = new Version(1, 1, 1, 1);
+            }
+
+            var version = new Version(2, 0, 0, 0);
             return version.ToString();
         }
     }
