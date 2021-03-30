@@ -27,7 +27,7 @@ namespace Famoser.FexCompiler.Test.Helpers
             return new ConfigModel()
             {
                 Author = "famoser",
-                CompilePath = GetInputFolderPath()
+                CompilePaths = GetInputFolderPath()
             };
         }
     }

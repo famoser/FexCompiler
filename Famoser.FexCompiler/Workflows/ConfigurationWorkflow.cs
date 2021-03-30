@@ -19,9 +19,20 @@ namespace Famoser.FexCompiler.Workflows
         public void DoWorkflow()
         {
             //configure
-            Console.WriteLine("Choose path to look for .fex files");
-            _configModel.CompilePath = Console.ReadLine();
-            Console.WriteLine("Choose your Author");
+            Console.WriteLine("Add path(s) to look for .fex files. Confirm with [Enter]. Confirm an empty line to continue.");
+            _configModel.CompilePaths.Clear();
+            while (true)
+            {
+                var path = Console.ReadLine();
+                if (string.IsNullOrEmpty(path))
+                {
+                    break;
+                }
+
+                _configModel.CompilePaths.Add(path);
+            }
+
+            Console.WriteLine("Choose your Author.");
             _configModel.Author = Console.ReadLine();
 
             //persist

@@ -1,13 +1,15 @@
-﻿namespace Famoser.FexCompiler.Models
+﻿using System.Collections.Generic;
+
+namespace Famoser.FexCompiler.Models
 {
     public class ConfigModel
     {
-        public string CompilePath { get; set; }
+        public List<string> CompilePaths { get; set; } = new();
         public string Author { get; set; }
 
         public bool IsComplete()
         {
-            return !(string.IsNullOrWhiteSpace(CompilePath) || string.IsNullOrWhiteSpace(Author));
+            return CompilePaths.Count > 0 && !string.IsNullOrWhiteSpace(Author);
         }
     }
 }
