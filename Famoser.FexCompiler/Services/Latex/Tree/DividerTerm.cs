@@ -1,4 +1,5 @@
-﻿using Famoser.FexCompiler.Services.Latex.Visitor;
+﻿using System;
+using Famoser.FexCompiler.Services.Latex.Visitor;
 
 namespace Famoser.FexCompiler.Services.Latex.Tree
 {
@@ -13,12 +14,17 @@ namespace Famoser.FexCompiler.Services.Latex.Tree
 
         public static bool IsDivider(char candidate)
         {
-            return candidate == ',' || candidate == ' ';
+            return candidate == ',' || candidate == ' ' || candidate == '|';
         }
 
         public override void Accept(TermVisitor visitor)
         {
             visitor.Visit(this);
+        }
+
+        public bool RequiresMathMode()
+        {
+            return Divider == '|';
         }
     }
 }

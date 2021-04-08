@@ -148,6 +148,10 @@ namespace Famoser.FexCompiler.Services.Latex.Tree
                     var latexTerms = composite.Terms.Select(t => TermToLatex(t, mathMode));
                     return string.Join("", latexTerms);
                 case DividerTerm divider:
+                    if (divider.RequiresMathMode() && !mathMode)
+                    {
+                        return "$" + divider.Divider + "$";
+                    }
                     return divider.Divider.ToString();
                 case EncapsulatedTerm encapsulated:
                     var term = TermToLatex(encapsulated.Term, mathMode);
