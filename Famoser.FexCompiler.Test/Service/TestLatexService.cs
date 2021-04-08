@@ -66,6 +66,8 @@ namespace Famoser.FexCompiler.Test.Service
                     "formulas.fex",
                     new []
                     {
+                        @"x$^{2_{32}}$", // looks weird, but rendering checks out
+                        @"x$^{2_{32}}$$_{bottom}$(a)",
                         @"$x^2$\\",
                         @"$x^{2^{32}}$\\",
                         @"$x^{2_{32}}$\\",

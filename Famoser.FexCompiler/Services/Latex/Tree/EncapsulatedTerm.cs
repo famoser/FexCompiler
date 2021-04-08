@@ -13,6 +13,8 @@ namespace Famoser.FexCompiler.Services.Latex.Tree
 
         public char Encapsulator { private set; get; }
 
+        public bool ShowEncapsulatorTerm { set; get; } = true;
+
         public Term Term { private set; get; }
         
         public static bool IsEncapsulatorStart(char candidate)

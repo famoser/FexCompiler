@@ -20,6 +20,7 @@ namespace Famoser.FexCompiler.Services.Latex.Tree
             tree = AddLeftRightTerms(tree);
 
             tree.Accept(new ExpandLeftRightTermVisitor());
+            tree.Accept(new CollapseEncapsulatedLeftRightTermVisitor());
 
             return TermToLatex(tree);
         }
@@ -149,12 +150,20 @@ namespace Famoser.FexCompiler.Services.Latex.Tree
                 case DividerTerm divider:
                     return divider.Divider.ToString();
                 case EncapsulatedTerm encapsulated:
-                    var left = encapsulated.Encapsulator;
-                    var right = EncapsulatedTerm.GetEncapsulatorEnd(left);
+                    var term = TermToLatex(encapsulated.Term, mathMode);
+                    if (encapsulated.ShowEncapsulatorTerm)
+                    {
+                        var left = encapsulated.Encapsulator;
+                        var right = EncapsulatedTerm.GetEncapsulatorEnd(left);
 
-                    return EscapeString(left.ToString(), mathMode) +
-                           TermToLatex(encapsulated.Term, mathMode) +
-                           EscapeString(right.ToString(), mathMode);
+                        return EscapeString(left.ToString(), mathMode) +
+                               term +
+                               EscapeString(right.ToString(), mathMode);
+                    }
+                    else
+                    {
+                        return term;
+                    }
                 case LeftRightTerm leftRightTerm:
                     var leftLatex = TermToLatex(leftRightTerm.Left, true);
                     leftLatex = leftLatex.Length > 1 ? "{" + leftLatex + "}" : leftLatex;
