@@ -51,7 +51,7 @@ namespace Famoser.FexCompiler.Services.Markdown
             {
                 foreach (var sectionChild in section.Children)
                 {
-                    result += sectionChild.Header.Text + "\n";
+                    result += sectionChild.Header.Text + "\n\n";
                     result += ToText(sectionChild.Content, "- ");
                     result += "\n";
                 }
@@ -76,7 +76,7 @@ namespace Famoser.FexCompiler.Services.Markdown
             {
                 if (lineNode.ContentType == ContentType.Text)
                 {
-                    content += textPrefix + lineNode.Text + "\n";
+                    content += textPrefix + lineNode.Text + "  \n";
                 }
                 else if (lineNode.ContentType == ContentType.Code)
                 {
