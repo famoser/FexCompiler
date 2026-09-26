@@ -184,7 +184,7 @@ namespace FexCompiler.Services
     public class Line
     {
         public int Level { get; set; }
-        public string Text { get; set; }
+        public string Text { get; set; } = "";
         public bool IsVerbatim { get; set; }
     }
 }
