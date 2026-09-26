@@ -6,3 +6,6 @@ obj
 .build
 *.zst
 pkg
+
+# IDE artefacts
+.idea

@@ -7,24 +7,25 @@ Fex
 ===
 
 purpose:
-	to write and restructure summaries rapidly
-	built for adademic courses
+	to write and restructure summaries (as text files)
+	to read (and possibly print) summaries (as pdf files)
+	for long-term memorization of adademic courses
 
 approach:
 	intendation to denote sections and sub-sections
 	example:
-		this README!
+		this part of the README!
 		each indent starts a new (sub-)section
 		use === and --- to denote headers and subheaders
 	advanced usage:
-		start and end verbatim-block with ```
-		no support non-text content (use words!)
+		start and end a verbatim-block with ```
+		name file and folder appropriately to derive the document title
+		no support for non-text content (use words!)
 
 impact:
-	nudges clear structure on summaries
-	nudges precise description of each concept on single line
-	helps to focus on relevant points
-	helps to memorization over the structure
+	nudges clear structure and decomposition of complex topics
+	nudges precise description of single concept per line
+	helps with focus and memorization
 ```
 
 ## Real-World Example
