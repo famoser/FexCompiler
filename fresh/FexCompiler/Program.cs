@@ -1,13 +1,20 @@
 ﻿using FexCompiler.Services;
 
-var options = ArgumentParser.ParseArguments(args);
-if (options is null)
+var configuration = ArgumentParser.ParseArguments(args);
+if (configuration is null)
 {
     return 1;
 }
 
-Console.WriteLine($"File: {options.FilePath}");
-Console.WriteLine($"Author: {options.Author}");
-Console.WriteLine($"Title: {options.Title}");
+var fileContent = await File.ReadAllLinesAsync(configuration.FilePath);
+var lines = Parser.Parse(fileContent);
+var document = DocumentService.Create(configuration.Title, configuration.Author, lines);
+var latex = LatexService.GenerateLatex(document);
+
+
+
+Console.WriteLine($"File: {configuration.FilePath}");
+Console.WriteLine($"Author: {configuration.Author}");
+Console.WriteLine($"Title: {configuration.Title}");
 
 return 0;
