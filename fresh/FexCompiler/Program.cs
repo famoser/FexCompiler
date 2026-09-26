@@ -9,12 +9,11 @@ if (configuration is null)
 var fileContent = await File.ReadAllLinesAsync(configuration.FilePath);
 var lines = Parser.Parse(fileContent);
 var document = DocumentService.Create(configuration.Title, configuration.Author, lines);
-var latex = LatexService.GenerateLatex(document);
-
-
-
-Console.WriteLine($"File: {configuration.FilePath}");
-Console.WriteLine($"Author: {configuration.Author}");
-Console.WriteLine($"Title: {configuration.Title}");
+var latex = LatexGenerator.Generate(document);
+var successful = LatexCompiler.Compile(latex, configuration.FilePath);
+if (successful)
+{
+    Console.WriteLine($"Created pdf for {configuration.FilePath}");
+}
 
 return 0;
