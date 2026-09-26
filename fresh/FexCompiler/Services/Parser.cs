@@ -1,25 +1,18 @@
-﻿using System.Diagnostics;
-using FexCompiler.Models;
+﻿using FexCompiler.Models;
 
 namespace FexCompiler.Services
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    public class FexService()
+    public abstract class Parser
     {
-        public List<FexLine> Process(string[] lines)
+        public static List<Line> Parse(string[] lines)
         {
             var normalizedLines = ConvertStartSpacesToTabs(lines);
             var fexLines = ConvertToFexLines(normalizedLines);
-            NormalizeFexLineLevels(fexLines);
-            TightenFexLineLevels(fexLines);
-            FixFexLineLevels(fexLines);
             RemoveColonAtEndOfLines(fexLines);
             return fexLines;
         }
 
-        private List<string> ConvertStartSpacesToTabs(string[] lines)
+        private static List<string> ConvertStartSpacesToTabs(string[] lines)
         {
             var result = new List<string>();
 
@@ -47,9 +40,9 @@ namespace FexCompiler.Services
         /// </summary>
         /// <param name="fileInput"></param>
         /// <returns></returns>
-        private List<FexLine> ConvertToFexLines(List<string> fileInput)
+        private static List<Line> ConvertToFexLines(List<string> fileInput)
         {
-            var res = new List<FexLine>();
+            var res = new List<Line>();
             for (var index = 0; index < fileInput.Count; index++)
             {
                 var currentLine = fileInput[index];
@@ -61,7 +54,7 @@ namespace FexCompiler.Services
                 }
 
                 //create our line
-                var fexLine = new FexLine();
+                var fexLine = new Line();
 
                 //set line level
                 while (currentLine.StartsWith("\t"))
@@ -73,20 +66,20 @@ namespace FexCompiler.Services
                 //set text
                 fexLine.Text = currentLine.Trim();
 
-                //codeContent detected
+                //verbatim detected
                 if (fexLine.Text == "```")
                 {
-                    //skip codeContent header
+                    //skip header
                     fexLine.Text = "";
                     index++;
 
-                    //mark node as to be codeContent
-                    fexLine.IsCode = true;
+                    //mark node as to be verbatim
+                    fexLine.IsVerbatim = true;
 
                     //prefix which can be cleared up
                     var removePrefix = new string('\t', fexLine.Level);
 
-                    //collapse rest of codeContent into this line
+                    //collapse rest of verbatim into this line
                     var foundEnd = false;
                     for (; index < fileInput.Count; index++)
                     {
@@ -113,14 +106,16 @@ namespace FexCompiler.Services
                         fexLine.Text += "\n";
                     }
 
-                    //cut off last "\n"
-                    if (fexLine.Text.Length > 0)
-                        fexLine.Text = fexLine.Text.Substring(0, fexLine.Text.Length - 1);
-
                     //issue warning because no codeContent end found
                     if (!foundEnd)
                     {
                         Console.WriteLine("no end for ``` found");
+                    }
+
+                    //cut off last "\n"
+                    if (fexLine.Text.Length > 0)
+                    {
+                        fexLine.Text = fexLine.Text.Substring(0, fexLine.Text.Length - 1);
                     }
                 }
                 //if level is 0, this could be a header
@@ -130,7 +125,7 @@ namespace FexCompiler.Services
                     if (index + 1 < fileInput.Count)
                     {
                         var nextLine = fileInput[index + 1];
-                        //if next line is only ===, but at least 3 then set level to -1
+                        //if next line is only ===, but at least 3 then set level to -2
                         if (nextLine.StartsWith("==="))
                         {
                             fexLine.Level = -2;
@@ -146,105 +141,11 @@ namespace FexCompiler.Services
                         }
                     }
                 }
-
+                
                 res.Add(fexLine);
             }
 
             return res;
-        }
-
-        /// <summary>
-        /// make sure the level starts at 0
-        /// </summary>
-        /// <param name="lines"></param>
-        private void NormalizeFexLineLevels(List<FexLine> lines)
-        {
-            //normalize indexes
-            //0: ensure all levels >= 0
-            var smallestNumber = lines.Min(t => t.Level);
-            foreach (var fexLine in lines)
-            {
-                fexLine.Level -= smallestNumber;
-            }
-        }
-
-        /// <summary>
-        /// makes sure the levels are set as tight as possible
-        /// </summary>
-        /// <param name="lines"></param>
-        private void TightenFexLineLevels(List<FexLine> lines)
-        {
-            //1: ensure levels are as tight as possible
-            if (lines.Count < 1)
-            {
-                return;
-            }
-
-            bool strangeLinesFound;
-            do
-            {
-                strangeLinesFound = false;
-
-                var lastLevel = lines[0].Level;
-                for (int i = 1; i < lines.Count; i++)
-                {
-                    if (lines[i].Level > lastLevel && lines[i].Level - 1 > lastLevel)
-                    {
-                        strangeLinesFound = true;
-
-                        //increase by more than one level in one line; this is wrong
-                        var faultyLevel = lines[i].Level;
-                        //1 is allowed, but this offset is bigger than that
-                        var offSet = faultyLevel - lastLevel;
-                        Debug.Assert(offSet > 1);
-                        //needed correction
-                        var correction = offSet - 1;
-                        Debug.Assert(correction >= 1);
-
-                        //correct all lines with level 
-                        for (; i < lines.Count; i++)
-                        {
-                            if (lines[i].Level >= faultyLevel)
-                            {
-                                lines[i].Level -= correction;
-                            }
-                            else
-                            {
-                                break;
-                            }
-                        }
-
-                        if (i == lines.Count)
-                        {
-                            break;
-                        }
-                    }
-
-                    lastLevel = lines[i].Level;
-                }
-            } while (strangeLinesFound);
-        }
-
-        /// <summary>
-        /// tries to find any mistakes in levels
-        /// </summary>
-        /// <param name="lines"></param>
-        private void FixFexLineLevels(List<FexLine> lines)
-        {
-            if (lines.Count == 0)
-            {
-                return;
-            }
-
-            //1: ensure levels start at 0, else add dummy lines till it does
-            while (lines[0].Level > 0)
-            {
-                lines.Insert(0, new FexLine()
-                {
-                    Level = lines[0].Level - 1,
-                    Text = "unknown title"
-                });
-            }
         }
 
         /// <summary>
@@ -253,12 +154,12 @@ namespace FexCompiler.Services
         /// split at colon if not inside brackets
         /// </summary>
         /// <param name="lines"></param>
-        private void RemoveColonAtEndOfLines(List<FexLine> lines)
+        private static void RemoveColonAtEndOfLines(List<Line> lines)
         {
             //split on colon if there is content afterwards
             for (int i = 0; i < lines.Count; i++)
             {
-                if (lines[i].IsCode)
+                if (lines[i].IsVerbatim)
                 {
                     continue;
                 }
@@ -278,5 +179,12 @@ namespace FexCompiler.Services
                 }
             }
         }
+    }
+    
+    public class Line
+    {
+        public int Level { get; set; }
+        public string Text { get; set; }
+        public bool IsVerbatim { get; set; }
     }
 }
