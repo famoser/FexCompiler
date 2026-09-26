@@ -1,14 +1,10 @@
 ﻿using FexCompiler.Services;
 
-var parseResult = ArgumentParser.ParseArguments(args);
-if (!parseResult.Success)
+var options = ArgumentParser.ParseArguments(args);
+if (options is null)
 {
-    Console.Error.WriteLine(parseResult.Error);
-    ArgumentParser.PrintUsage();
     return 1;
 }
-
-var options = parseResult.Options;
 
 Console.WriteLine($"File: {options.FilePath}");
 Console.WriteLine($"Author: {options.Author}");
