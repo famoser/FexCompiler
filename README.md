@@ -2,40 +2,35 @@
 
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
-Fex helps your to write and restructure rapidly. 
-Its primary purpose is to write summaries of books and courses. 
-
-The format works indentation-based:
 ```
-.fex:
-	format to write summaries faster than ever before
-	export formats:
-		.pdf to print your summary
-		.md for publishing in the web
-		.xlsx or .json to import into a flash card service
+Fex
+===
+
+purpose:
+	to write and restructure summaries rapidly
+	built for adademic courses
+
+approach:
+	intendation to denote sections and sub-sections
+	example:
+		this README!
+		each indent starts a new (sub-)section
+		use === and --- to denote headers and subheaders
+	advanced usage:
+		start and end verbatim-block with ```
+		no support non-text content (use words!)
+
+impact:
+	nudges clear structure on summaries
+	nudges precise description of each concept on single line
+	helps to focus on relevant points
+	helps to memorization over the structure
 ```
-
-You can grasp in an instant in which chapter you are, and how this chapter relates to others in terms of abstraction level. 
-Restructuring is blazingly fast: You only need to change the indentation (which nearly all editors have shortcuts for).
-
-The `.pdf` export uses latex under the hood; hence math expressions are possible. Simple expressions are even detected automatically so you do not have to write the cumbersome latex syntax yourself.
-
-There is no support for images or other non-text content; use your own words!
-
-## Export formats
-
-Available exports are:
-- **.pdf**: optimized for printing.
-- **.md**: publish in the web
-- **.json**: use it with https://github.com/famoser/FexFlashcards to memorize your summary with flash card functionality.
-- **.xlsx**: collection of your concepts so you can import then in a flash card service.
-
-You can declare exports before the `.fex` ending. For example, `summary.md-json.fex` will generate `summary.md` and `summary.json`. If you do not declare anything, then a PDF is generated.
 
 ## Real-World Example
 
 ```
-language concepts
+language concepts:
 	enable and facilitate the application of core concepts
 	dynamic method binding:
 		enables classification and polymorphism
@@ -44,10 +39,6 @@ language concepts
 		inhertiance has been replaced by code duplication
 		subtyping needed casts, same memory layout of super & subclasses needed
 ```
+
 (excerpt from https://github.com/famoser/eth-summaries/blob/master/2017-2%20Concepts%20of%20Object-Oriented%20Programming.fex)
 
-## Advanced features
-
-Some advanced features:
-- You can use triple-` to start and end a codeblock
-- Primary and secondary headers can be denoted by an immediately following line of `===` resp. `---` (at least 3 chars)
