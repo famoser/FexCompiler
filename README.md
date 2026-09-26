@@ -30,15 +30,19 @@ impact:
 ## Real-World Example
 
 ```
-language concepts:
-	enable and facilitate the application of core concepts
-	dynamic method binding:
-		enables classification and polymorphism
-		method implementation is selected at runtime
-	why not just use language concepts as guidelines:
-		inhertiance has been replaced by code duplication
-		subtyping needed casts, same memory layout of super & subclasses needed
+contract motivation:
+	coordination:
+		agreement about technicalities without conflict of interest
+		"cheap talk" is enough (no sanctions needed to enforce)
+		like on which street side to drive on generally
+		like at which time to deliver so buyer/seller meet
+	spot transaction:
+		immediate exchange of goods
+		like buying an apple & paying for it at the store
+	sequential transactions:
+		goods/services exchanged, potential conflict in the future
+		like sale (need guarantees product meets expectations)
 ```
 
-(excerpt from https://github.com/famoser/eth-summaries/blob/master/2017-2%20Concepts%20of%20Object-Oriented%20Programming.fex)
+(excerpt from https://github.com/famoser/eth-summaries/blob/master/2020-2%20Contract%20Design.fex)
 
