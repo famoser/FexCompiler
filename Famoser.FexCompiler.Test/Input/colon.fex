@@ -1,9 +1,0 @@
-﻿H1:
-	my menu
-	remove colon if last place: 
-		more chapter content
-		more
-	but not required
-		chapter content
-	ignore if within : line
-	remove always if at end of line:
