@@ -1,11 +1,12 @@
 using System.Diagnostics;
 using System.Globalization;
+using FexCompiler.Models;
 
 namespace FexCompiler.Services;
 
 public static class ArgumentParser
 {
-    public static ParseResult ParseArguments(string[] args)
+    public static Configuration? ParseArguments(string[] args)
     {
         string? filePath = null;
         string? author = null;
@@ -19,7 +20,7 @@ public static class ArgumentParser
             {
                 if (i + 1 >= args.Length)
                 {
-                    return ParseResult.Failure("Missing value for --author.");
+                    return Failure("Missing value for --author.");
                 }
 
                 author = args[++i];
@@ -36,7 +37,7 @@ public static class ArgumentParser
             {
                 if (i + 1 >= args.Length)
                 {
-                    return ParseResult.Failure("Missing value for --title.");
+                    return Failure("Missing value for --title.");
                 }
 
                 title = args[++i];
@@ -51,12 +52,12 @@ public static class ArgumentParser
 
             if (argument.StartsWith("--", StringComparison.Ordinal))
             {
-                return ParseResult.Failure($"Unknown option: {argument}");
+                return Failure($"Unknown option: {argument}");
             }
 
             if (filePath is not null)
             {
-                return ParseResult.Failure("Only one file path argument is supported.");
+                return Failure("Only one file path argument is supported.");
             }
 
             filePath = argument;
@@ -64,29 +65,36 @@ public static class ArgumentParser
 
         if (string.IsNullOrWhiteSpace(filePath))
         {
-            return ParseResult.Failure("Missing file path argument.");
+            return Failure("Missing file path argument.");
         }
 
         var fullFilePath = Path.GetFullPath(filePath);
 
         if (!File.Exists(fullFilePath))
         {
-            return ParseResult.Failure($"File does not exist: {fullFilePath}");
+            return Failure($"File does not exist: {fullFilePath}");
         }
 
         author ??= GetGitConfigValue("user.name");
 
         if (string.IsNullOrWhiteSpace(author))
         {
-            return ParseResult.Failure("Missing author. Provide --author or configure git config user.name.");
+            return Failure("Missing author. Provide --author or configure git config user.name.");
         }
 
         title ??= BuildDefaultTitle(fullFilePath);
 
-        return ParseResult.SuccessResult(new CommandLineOptions(fullFilePath, author, title));
+        return new Configuration(fullFilePath, author, title);
     }
 
-    static string BuildDefaultTitle(string filePath)
+    private static Configuration? Failure(string error)
+    {
+        Console.Error.WriteLine(error);
+        PrintUsage();
+        return null;
+    }
+
+    private static string BuildDefaultTitle(string filePath)
     {
         var parentDirectory = Path.GetFileName(Path.GetDirectoryName(filePath));
         var fileName = Path.GetFileNameWithoutExtension(filePath);
@@ -97,7 +105,7 @@ public static class ArgumentParser
         return $"{formattedParentDirectory} — {formattedFileName}";
     }
 
-    static string ToTitleCase(string? value)
+    private static string ToTitleCase(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
@@ -120,7 +128,7 @@ public static class ArgumentParser
         }));
     }
 
-    static string? GetGitConfigValue(string key)
+    private static string? GetGitConfigValue(string key)
     {
         try
         {
@@ -151,24 +159,9 @@ public static class ArgumentParser
         }
     }
 
-    public static void PrintUsage()
+    private static void PrintUsage()
     {
         Console.Error.WriteLine("Usage:");
         Console.Error.WriteLine("  FexCompiler <file-path> [--author <author>] [--title <title>]");
-    }
-
-    public sealed record CommandLineOptions(string FilePath, string Author, string Title);
-
-    public sealed record ParseResult(bool Success, CommandLineOptions? Options, string? Error)
-    {
-        public static ParseResult SuccessResult(CommandLineOptions options)
-        {
-            return new ParseResult(true, options, null);
-        }
-
-        public static ParseResult Failure(string error)
-        {
-            return new ParseResult(false, null, error);
-        }
     }
 }
