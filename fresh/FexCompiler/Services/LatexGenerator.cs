@@ -2,7 +2,7 @@ using FexCompiler.Models;
 
 namespace FexCompiler.Services;
 
-public static class LatexService
+public static class LatexGenerator
 {
     // ReSharper disable once StringLiteralTypo
     private const string TemplateHeader = """
@@ -77,7 +77,7 @@ public static class LatexService
                                           \end{document}
                                           """;
 
-    public static string GenerateLatex(Document document)
+    public static string Generate(Document document)
     {
         var latex = TemplateHeader +
                     "\n\\title{" + document.Title + "\\\\ \\vspace{6pt} \\small{" + document.Statistics.CharacterCount +
