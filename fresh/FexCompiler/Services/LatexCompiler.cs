@@ -12,6 +12,7 @@ public static class LatexCompiler
 
         var texFilepath = $"{filebasename}.tex";
         var logFilepath = $"{filebasename}.log";
+        var auxFilepath = $"{filebasename}.aux";
 
         File.WriteAllText(texFilepath, latex);
 
@@ -52,9 +53,12 @@ public static class LatexCompiler
         }
 
         File.Delete(texFilepath);
-        if (File.Exists(logFilepath))
+        foreach (var tempFilePaths in new [] { logFilepath, auxFilepath })
         {
-            File.Delete(logFilepath);
+            if (File.Exists(tempFilePaths))
+            {
+                File.Delete(tempFilePaths);
+            }
         }
 
         return true;

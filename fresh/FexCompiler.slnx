@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="FexCompiler.Tests/FexCompiler.Tests.csproj" />
+  <Project Path="FexCompiler/FexCompiler.csproj" />
+</Solution>

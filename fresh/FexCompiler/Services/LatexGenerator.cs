@@ -63,18 +63,6 @@ public static class LatexGenerator
                                           \titlespacing{\paragraph}{0pt}{3pt}{2pt}
                                           \titlespacing{\subparagraph}{0pt}{2pt}{1pt}
                                           \titlespacing{\subsubparagraph}{0pt}{1pt}{1pt}
-
-                                          % title & author from settings
-                                          \title{TITLE \\ \vspace{6pt} \small{CHARACTER_COUNT characters in WORD_COUNT words on LINE_COUNT lines}}
-                                          \author{AUTHOR}
-
-                                          % above is the preamble
-                                          \begin{document}
-                                          	\maketitle
-
-                                          	CONTENT
-
-                                          \end{document}
                                           """;
 
     public static string Generate(Document document)
