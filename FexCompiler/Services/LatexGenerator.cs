@@ -9,6 +9,7 @@ public static class LatexGenerator
                                           \documentclass[8pt, twocolumn]{article}
 
                                           % to be able to use UTF-8
+                                          \usepackage[T1]{fontenc}
                                           \usepackage[utf8]{inputenc}
                                           % for alpha, beta and other mathematical symbols
                                           \usepackage{textgreek}
