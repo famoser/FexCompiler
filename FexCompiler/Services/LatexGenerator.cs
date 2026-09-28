@@ -97,8 +97,9 @@ public static class LatexGenerator
                 var paragraphSpacer = "\\vspace{5pt}\n";
 
                 // if text before, add spacer now
-                if (result != "")
+                if (section.Content.Count > 0)
                 {
+                    result += ToLatex(section.Content);
                     result += paragraphSpacer;
                 }
 
